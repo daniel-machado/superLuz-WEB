@@ -17,7 +17,7 @@ const ProtectedRoute = () => {
   
   if (!hasPermission) {
     // Redireciona para a página inicial ou uma página de acesso negado
-    return <Navigate to="/access-denied" replace />;
+    return <Navigate to="/home" replace />;
   }
   
   // Se estiver autenticado e tiver permissão, permite o acesso
