@@ -141,7 +141,7 @@ const Header = () => {
               className="px-6 py-2 bg-green-500 hover:bg-green-400 text-gray-900 font-medium rounded-lg transition-colors inline-block text-center"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Loginn
+              Login
             </Link>
             )
             : 

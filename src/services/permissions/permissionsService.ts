@@ -67,7 +67,7 @@ export const routePermissions: RoutePermission[] = [
 
 // Lista de menus e suas permissões
 export const menuPermissions: MenuPermission[] = [
-  { key: 'home', allowedRoles: ['pending', 'admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
+  { key: 'Início', allowedRoles: ['pending', 'admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   { key: 'Unidades', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   { key: 'Avaliação De Unidades', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   { key: 'Avaliação De Individual', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
