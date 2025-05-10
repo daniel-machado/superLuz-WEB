@@ -63,7 +63,7 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
               
-              <Route index path="/" element={<Home />} />
+              <Route index path="/home" element={<Home />} />
 
               {/* 
               Exemplo de como usar a função hasRoutePermission para verificar permissões de rota  
@@ -145,7 +145,7 @@ export default function App() {
 
           {/* ROTAS PÚBLICAS - QUALQUER UM PODE ACESSAR */}
           {/* Auth Layout */}
-          <Route index path="/inicio" element={<InitialPage />} />
+          <Route index path="/" element={<InitialPage />} />
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/sign-up" element={<SignUp />} />
 

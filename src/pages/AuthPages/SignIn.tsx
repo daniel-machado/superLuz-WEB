@@ -11,7 +11,7 @@ export default function SignIn() {
     {
     token 
     ? 
-      <Navigate to="/" replace /> 
+      <Navigate to="/home" replace /> 
     : 
       <>
         <PageMeta

@@ -45,7 +45,7 @@ export default function SignInForm() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await signin(data.email, data.password);
-      navigate("/");
+      navigate("/home");
     } catch (error) {
       toast.error("Credenciais incorretas", {position: 'bottom-right'});
     }

@@ -9,7 +9,7 @@ const ProtectedRoute = () => {
   
   // Primeiro verificamos se o usuário está autenticado
   if (!token) {
-    return <Navigate to="/inicio" replace />;
+    return <Navigate to="/" replace />;
   }
   
   // Depois verificamos se o usuário tem permissão para acessar a rota

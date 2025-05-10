@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
 import PageMeta from "../components/common/PageMeta";
+import { useAuth } from "../context/AuthContext";
 
 //import PageBreadcrumb from "../components/common/PageBreadCrumb";
 
@@ -10,6 +11,8 @@ import PageMeta from "../components/common/PageMeta";
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const { token } = useAuth()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -68,12 +71,25 @@ const Header = () => {
 
           {/* Botão de Login */}
           <div className="hidden md:block">
-            <Link
+            { !token ? (
+              <Link
               to="/sign-in"
               className="px-6 py-2 bg-green-500 hover:bg-green-400 text-gray-900 font-medium rounded-lg transition-colors duration-300 transform hover:scale-105"
             >
               Login
             </Link>
+            )
+            : 
+            (
+              <Link
+                to="/home"
+                className="px-6 py-2 bg-green-500 hover:bg-green-400 text-gray-900 font-medium rounded-lg transition-colors duration-300 transform hover:scale-105"
+              >
+                Ir para o sistema
+              </Link>
+            )
+            }
+            
           </div>
 
 
@@ -118,13 +134,25 @@ const Header = () => {
               <Link to="#contato" className="text-gray-300 hover:text-white transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
                 Contato
               </Link>
+              
+              { !token ? (
               <Link
-                to="/sign-in"
+              to="/sign-in"
+              className="px-6 py-2 bg-green-500 hover:bg-green-400 text-gray-900 font-medium rounded-lg transition-colors inline-block text-center"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Loginn
+            </Link>
+            )
+            : 
+              <Link
+                to="/home"
                 className="px-6 py-2 bg-green-500 hover:bg-green-400 text-gray-900 font-medium rounded-lg transition-colors inline-block text-center"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Login
+                Ir para o sistema
               </Link>
+            }
             </nav>
           </div>
         )}

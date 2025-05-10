@@ -20,7 +20,7 @@ interface MenuPermission {
 // Lista de rotas e suas permissões
 export const routePermissions: RoutePermission[] = [
   // Dashboard - acessível para todos
-  { path: '/', allowedRoles: ['pending', 'admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
+  { path: '/home', allowedRoles: ['pending', 'admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   
   // Gerenciamento de Unidades - somente admin e coordinator
   { path: '/units', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
@@ -67,7 +67,7 @@ export const routePermissions: RoutePermission[] = [
 
 // Lista de menus e suas permissões
 export const menuPermissions: MenuPermission[] = [
-  { key: 'Início', allowedRoles: ['pending', 'admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
+  { key: 'home', allowedRoles: ['pending', 'admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   { key: 'Unidades', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   { key: 'Avaliação De Unidades', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   { key: 'Avaliação De Individual', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
