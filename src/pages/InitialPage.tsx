@@ -1,30 +1,84 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import emailjs from "@emailjs/browser";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
 import PageMeta from "../components/common/PageMeta";
 import { useAuth } from "../context/AuthContext";
+import toast from "react-hot-toast";
+import useSmoothScroll from "./useSmoothScroll";
 
 //import PageBreadcrumb from "../components/common/PageBreadCrumb";
 
-
-// Componente do Header
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("inicio");
+  const { token } = useAuth();
+  const scrollToSection = useSmoothScroll();
 
-  const { token } = useAuth()
 
+  // Efeito para detectar o scroll e mudar o fundo do header
   useEffect(() => {
     const handleScroll = () => {
+      // Lógica para o fundo do header
       if (window.scrollY > 20) {
         setIsScrolled(true);
       } else {
         setIsScrolled(false);
       }
+
+
+      // Determinar qual seção está visível
+      const sections = ["inicio", "sobre", "atividades", "galeria", "contato"];
+      
+      // Encontrar a seção mais próxima do topo da tela
+      let currentSection = "inicio";
+      let minDistance = Infinity;
+      
+      sections.forEach((sectionId) => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+          const rect = section.getBoundingClientRect();
+          // Considera um elemento visível quando o topo está entre -100px e metade da altura da janela
+          if (rect.top < window.innerHeight / 2 && rect.top > -100) {
+            const distance = Math.abs(rect.top);
+            
+            if (distance < minDistance) {
+              minDistance = distance;
+              currentSection = sectionId;
+            }
+          }
+        }
+      });
+      
+      if (currentSection !== activeSection) {
+        setActiveSection(currentSection);
+      }
     };
+
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [activeSection]);
+
+
+  // Função para navegar e fechar o menu mobile
+  const handleNavigation = (sectionId: string, e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    setIsMobileMenuOpen(false);
+    scrollToSection(sectionId, { offset: 80 });
+    setActiveSection(sectionId);
+  };
+
+
+  const navItems = [
+    { id: "inicio", label: "Início" },
+    { id: "sobre", label: "Sobre" },
+    { id: "atividades", label: "Atividades" },
+    { id: "galeria", label: "Galeria" },
+    { id: "contato", label: "Contato" }
+  ];
+
 
   return (
     <header
@@ -37,62 +91,50 @@ const Header = () => {
           {/* Logo */}
           <div className="flex items-center">
             <img
-              src="images/logo/logo-icon.svg" 
+              src="images/logo/logo-icon.svg"
               alt="Logo Clube de Desbravadores"
               className="h-12 w-auto"
             />
             <span className="ml-3 text-xl font-bold text-white">Luzeiros do Norte</span>
           </div>
 
-
-
-
           {/* Links de navegação - Desktop */}
           <nav className="hidden md:flex space-x-8">
-            <Link to="#inicio" className="text-gray-300 hover:text-white transition-colors">
-              Início
-            </Link>
-            <Link to="#sobre" className="text-gray-300 hover:text-white transition-colors">
-              Sobre
-            </Link>
-            <Link to="#atividades" className="text-gray-300 hover:text-white transition-colors">
-              Atividades
-            </Link>
-            <Link to="#galeria" className="text-gray-300 hover:text-white transition-colors">
-              Galeria
-            </Link>
-            <Link to="#contato" className="text-gray-300 hover:text-white transition-colors">
-              Contato
-            </Link>
+            {navItems.map((item) => (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                onClick={(e) => handleNavigation(item.id, e)}
+                className={`${
+                  activeSection === item.id
+                    ? "text-white font-medium border-b-2 border-green-500"
+                    : "text-gray-300 hover:text-white"
+                } transition-colors pb-1`}
+              >
+                {item.label}
+              </a>
+            ))}
           </nav>
-
-
 
 
           {/* Botão de Login */}
           <div className="hidden md:block">
-            { !token ? (
+            {!token ? (
               <Link
-              to="/sign-in"
-              className="px-6 py-2 bg-green-500 hover:bg-green-400 text-gray-900 font-medium rounded-lg transition-colors duration-300 transform hover:scale-105"
-            >
-              Login
-            </Link>
-            )
-            : 
-            (
+                to="/sign-in"
+                className="px-6 py-2 bg-green-500 hover:bg-green-400 text-gray-900 font-medium rounded-lg transition-colors duration-300 transform hover:scale-105"
+              >
+                Login
+              </Link>
+            ) : (
               <Link
                 to="/home"
                 className="px-6 py-2 bg-green-500 hover:bg-green-400 text-gray-900 font-medium rounded-lg transition-colors duration-300 transform hover:scale-105"
               >
                 Ir para o sistema
               </Link>
-            )
-            }
-            
+            )}
           </div>
-
-
 
 
           {/* Menu Hambúrguer - Mobile */}
@@ -113,46 +155,42 @@ const Header = () => {
         </div>
 
 
-
-
         {/* Menu Mobile */}
         {isMobileMenuOpen && (
           <div className="md:hidden bg-gray-800 shadow-lg rounded-lg mt-2 py-3 px-4">
             <nav className="flex flex-col space-y-3">
-              <Link to="#inicio" className="text-gray-300 hover:text-white transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                Início
-              </Link>
-              <Link to="#sobre" className="text-gray-300 hover:text-white transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                Sobre
-              </Link>
-              <Link to="#atividades" className="text-gray-300 hover:text-white transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                Atividades
-              </Link>
-              <Link to="#galeria" className="text-gray-300 hover:text-white transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                Galeria
-              </Link>
-              <Link to="#contato" className="text-gray-300 hover:text-white transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                Contato
-              </Link>
+              {navItems.map((item) => (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  onClick={(e) => handleNavigation(item.id, e)}
+                  className={`${
+                    activeSection === item.id
+                      ? "text-white font-medium border-l-2 pl-2 border-green-500"
+                      : "text-gray-300 hover:text-white pl-2"
+                  } transition-colors`}
+                >
+                  {item.label}
+                </a>
+              ))}
               
-              { !token ? (
-              <Link
-              to="/sign-in"
-              className="px-6 py-2 bg-green-500 hover:bg-green-400 text-gray-900 font-medium rounded-lg transition-colors inline-block text-center"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Login
-            </Link>
-            )
-            : 
-              <Link
-                to="/home"
-                className="px-6 py-2 bg-green-500 hover:bg-green-400 text-gray-900 font-medium rounded-lg transition-colors inline-block text-center"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Ir para o sistema
-              </Link>
-            }
+              {!token ? (
+                <Link
+                  to="/sign-in"
+                  className="px-6 py-2 bg-green-500 hover:bg-green-400 text-gray-900 font-medium rounded-lg transition-colors inline-block text-center"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Login
+                </Link>
+              ) : (
+                <Link
+                  to="/home"
+                  className="px-6 py-2 bg-green-500 hover:bg-green-400 text-gray-900 font-medium rounded-lg transition-colors inline-block text-center"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Ir para o sistema
+                </Link>
+              )}
             </nav>
           </div>
         )}
@@ -162,10 +200,9 @@ const Header = () => {
 };
 
 
-
-
 // Componente Hero
 const Hero = () => {
+  const scrollToSection = useSmoothScroll();
   return (
     <section id="inicio" className="relative min-h-screen flex items-center justify-center bg-gray-900 overflow-hidden">
       {/* Background com efeito de paralaxe */}
@@ -226,28 +263,35 @@ const Hero = () => {
           Formando líderes através de aventuras, aprendizado e serviço à comunidade
         </motion.p>
 
-
-
-
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.6 }}
+        className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6"
         >
-          <Link
-            to="#sobre"
+          const scrollToSection = useSmoothScroll();
+          <a
+            href="/sobre"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection("sobre", { offset: 80 }); // offset para compensar o header fixo
+            }}
             className="px-8 py-3 bg-green-500 hover:bg-green-400 text-gray-900 font-medium rounded-lg transition-colors duration-300 transform hover:scale-105 text-lg"
           >
             Conheça Mais
-          </Link>
-          <Link
-            to="#atividades"
+          </a>
+          <a
+            href="/atividades"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection("atividades", { offset: 80 });
+            }}
             className="px-8 py-3 border-2 border-white text-white hover:bg-white/10 font-medium rounded-lg transition-colors duration-300 transform hover:scale-105 text-lg"
           >
             Nossas Atividades
-          </Link>
+          </a>
         </motion.div>
+
       </div>
 
 
@@ -255,11 +299,18 @@ const Hero = () => {
 
       {/* Seta para baixo */}
       <div className="absolute bottom-6 left-0 right-0 flex justify-center animate-bounce">
-        <a href="#sobre" className="text-white">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
-        </a>
+          <a
+            href="/sobre"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection("sobre", { offset: 80 }); // offset para compensar o header fixo
+            }}
+            className="text-white"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          </a>
       </div>
     </section>
   );
@@ -315,11 +366,19 @@ const Sobre = () => {
           >
             <h3 className="text-2xl font-bold text-green-400">Nossa Missão</h3>
             <p className="text-gray-300 text-lg">
-              O Clube de Desbravadores é uma organização mundial que trabalha especificamente com o desenvolvimento cultural, social e espiritual de crianças e adolescentes.
+              O Clube de Desbravadores é uma organização mundial que trabalha especificamente com o desenvolvimento físico, mental e espiritual de crianças e adolescentes.
             </p>
             
             <p className="text-gray-300 text-lg">
               Nossas atividades têm como objetivo educar crianças e adolescentes para uma vida útil, incentivando o estudo da natureza, desenvolvendo suas habilidades e talentos, despertando o gosto pelo campismo e aventuras ao ar livre.
+            </p>
+
+            <p className="text-gray-300 text-lg">
+              O clube é um espaço seguro e acolhedor, onde os jovens podem fazer amigos, aprender novas habilidades e crescer como indivíduos. Acreditamos que cada membro é especial e tem um papel importante na nossa comunidade.
+            </p>
+
+            <p className="text-gray-300 text-lg">
+              Junte-se a nós e faça parte dessa incrível jornada de aprendizado, amizade e crescimento! Estamos sempre abertos a novos membros e interessados em fazer a diferença na vida dos jovens.
             </p>
 
 
@@ -327,16 +386,16 @@ const Sobre = () => {
 
             <div className="grid grid-cols-2 gap-6 mt-8">
               <div className="flex flex-col items-center bg-gray-800 p-6 rounded-lg">
-                <span className="text-green-400 text-4xl font-bold mb-2">250+</span>
+                <span className="text-green-400 text-4xl font-bold mb-2">45+</span>
                 <span className="text-white">Membros ativos</span>
               </div>
               <div className="flex flex-col items-center bg-gray-800 p-6 rounded-lg">
-                <span className="text-green-400 text-4xl font-bold mb-2">15+</span>
+                <span className="text-green-400 text-4xl font-bold mb-2">19+</span>
                 <span className="text-white">Anos de história</span>
               </div>
               <div className="flex flex-col items-center bg-gray-800 p-6 rounded-lg">
-                <span className="text-green-400 text-4xl font-bold mb-2">30+</span>
-                <span className="text-white">Especialidades</span>
+                <span className="text-green-400 text-4xl font-bold mb-2">100+</span>
+                <span className="text-white">Especialidades realizadas</span>
               </div>
               <div className="flex flex-col items-center bg-gray-800 p-6 rounded-lg">
                 <span className="text-green-400 text-4xl font-bold mb-2">100+</span>
@@ -379,7 +438,7 @@ const Atividades = () => {
     {
       icon: "🧭",
       title: "Técnicas de Sobrevivência",
-      description: "Aprendizado de técnicas de orientação, primeiros socorros e sobrevivência."
+      description: "Aprendizado de técnicas de orientação, primeiros socorros, sobrevivência, fogueiras, plantas comestíveis e diversas outras atividades relacionadas."
     },
     {
       icon: "🎯",
@@ -435,7 +494,7 @@ const Atividades = () => {
 
         <div className="mt-16 text-center">
           <Link
-            to="#galeria"
+            to="/gallery"
             className="px-8 py-3 bg-green-500 hover:bg-green-400 text-gray-900 font-medium rounded-lg transition-colors duration-300 transform hover:scale-105 inline-block"
           >
             Ver Nossa Galeria
@@ -485,31 +544,25 @@ const VideoSection = () => {
           transition={{ duration: 0.8 }}
           className="aspect-w-16 aspect-h-9 max-w-4xl mx-auto rounded-xl overflow-hidden shadow-2xl"
         >
-          {/* <iframe 
-            //width="853" 
-            //height="480"
+        <div className="aspect-18/9 overflow-hidden rounded-lg">
+          <iframe
+            src="https://www.youtube.com/embed/_fLssPA2jCw"
+            title="YouTube video"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
             className="w-full h-full"
-            src="https://www.youtube.com/embed/_fLssPA2jCw" 
-            title="Ordem unida e evolução - II campori ULB Resgatados 2024 - Luzeiros do Norte" 
-            //frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-            //referrerPolicy="strict-origin-when-cross-origin" 
-            //allowFullScreen
-          ></iframe> */}
-          <iframe 
-            className="w-full h-full"
-            src="https://www.youtube.com/embed/_fLssPA2jCw" 
-            title="Ordem unida e evolução - II campori ULB Resgatados 2024 - Luzeiros do Norte" 
-            //frameBorder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-            //referrerpolicy="strict-origin-when-cross-origin" 
-            //allowfullscreen
-            ></iframe>
+          ></iframe>
+        </div>
         </motion.div>
         <div className="mt-12 text-center">
-          <p className="text-gray-300 text-lg max-w-3xl mx-auto">
+          {/* <p className="text-gray-300 text-lg max-w-3xl mx-auto">
             Assista ao nosso vídeo e descubra a incrível jornada do nosso clube, desde sua fundação até os dias atuais, 
             com depoimentos inspiradores e momentos inesquecíveis.
+          </p> */}
+          <p className="text-gray-300 text-lg max-w-3xl mx-auto">
+            Assista ao nosso vídeo e veja uma das atividades que realizamos, que os desbravadores mais adoraram! 
+            A ordem unida e evolução é uma atividade que envolve disciplina, trabalho em equipe e muita diversão!
           </p>
         </div>
       </div>
@@ -612,7 +665,7 @@ const Galeria = () => {
 
         <div className="mt-12 text-center">
           <Link
-            to="#"
+            to="/gallery"
             className="px-8 py-3 border-2 border-green-500 text-green-500 hover:bg-green-500/10 font-medium rounded-lg transition-colors duration-300 transform hover:scale-105 inline-block"
           >
             Ver Mais Fotos
@@ -629,7 +682,7 @@ const Testemunhos = () => {
     {
       nome: "Deísa Maria",
       foto: "images/testemunhos/deisa.png", 
-      cargo: "Desbravadora há 3 anos",
+      cargo: "Desbravadora há 2 anos",
       texto: "O Clube de Desbravadores mudou minha vida. Aprendi valores importantes e fiz amizades que levarei para sempre. As aventuras e desafios me ajudaram a crescer como pessoa."
     },
     {
@@ -699,7 +752,49 @@ const Testemunhos = () => {
 };
 
 // Componente de Contato e Mapa
-const Contato = () => {
+const Contato = () => {  
+  const nameRef = useRef<HTMLInputElement | null>(null);
+  const emailRef = useRef<HTMLInputElement | null>(null);
+  const telefoneRef = useRef<HTMLInputElement | null>(null);
+  const assuntoRef = useRef<HTMLInputElement | null>(null);
+  const messageRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const [loading, setLoading] = useState(false);
+
+  const serviceId = "service_u8ma6lk";
+  const templateId = "template_uqx1as4";
+
+  useEffect(() => emailjs.init("AC_VcC2DVIywfHjeV"), []);
+
+  const sendEmail = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    try {
+      setLoading(true);
+      await emailjs.send(serviceId, templateId, {
+        name: nameRef.current?.value,
+        email: emailRef.current?.value,
+        telefone: telefoneRef.current?.value,
+        assunto: assuntoRef.current?.value,
+        message: messageRef.current?.value,
+      });
+      toast.success("Mensagem enviada com sucesso!", { position: "bottom-right" });
+      
+      
+      if (nameRef.current) nameRef.current.value = "";
+      if (emailRef.current) emailRef.current.value = "";
+      if (telefoneRef.current) telefoneRef.current.value = "";
+      if (assuntoRef.current) assuntoRef.current.value = "";
+      if (messageRef.current) messageRef.current.value = "";
+
+    } catch (error) {
+      console.log(error);
+      toast.error("Erro ao enviar mensagem.", { position: "bottom-right" });
+    } finally {
+      setLoading(false);
+    }  
+  };
+  
   return (
     <section id="contato" className="py-24 bg-gray-800">
       <div className="container mx-auto px-6">
@@ -711,7 +806,7 @@ const Contato = () => {
             transition={{ duration: 0.6 }}
             className="text-3xl sm:text-4xl font-bold text-white mb-4"
           >
-            Entre em Contato, 
+            Entre em Contato
           </motion.h2>
           <div className="w-24 h-1 bg-green-500 mx-auto mb-8"></div>
           <p className="text-gray-300 max-w-3xl mx-auto text-lg">
@@ -740,7 +835,7 @@ const Contato = () => {
                 </div>
                 <div>
                   <h4 className="text-white font-medium">Endereço</h4>
-                  <p className="text-gray-300">Colégio Guiomar Barreito - Juazeiro/BA</p>
+                  <p className="text-gray-300">Colégio Guiomar Barreto - Juazeiro/BA</p>
                 </div>
               </div>
               
@@ -776,7 +871,7 @@ const Contato = () => {
                 </div>
                 <div>
                   <h4 className="text-white font-medium">Horário de Reuniões</h4>
-                  <p className="text-gray-300">Domingos: 8h30 às 12h</p>
+                  <p className="text-gray-300">Domingo: 8:30 às 12h</p>
                 </div>
               </div>
             </div>
@@ -818,13 +913,18 @@ const Contato = () => {
           >
             <h3 className="text-2xl font-bold text-green-400 mb-6">Envie uma Mensagem</h3>
             
-            <form className="space-y-6">
+            <form 
+              className="space-y-6"
+              onSubmit={sendEmail}
+            >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="nome" className="block text-white mb-2">Nome</label>
                   <input
+                    ref={nameRef}
                     type="text"
                     id="nome"
+                    name="nome"
                     className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-white"
                     placeholder="Seu nome"
                     required
@@ -834,9 +934,24 @@ const Contato = () => {
                   <label htmlFor="email" className="block text-white mb-2">Email</label>
                   <input
                     type="email"
+                    ref={emailRef}
                     id="email"
+                    name="email"
                     className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-white"
                     placeholder="Seu email"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="telefone" className="block text-white mb-2">telefone</label>
+                  <input
+                    type="tel"
+                    ref={telefoneRef}
+                    id="telefone"
+                    name="telefone"
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-white"
+                    placeholder="Seu whatsapp"
                     required
                   />
                 </div>
@@ -846,7 +961,9 @@ const Contato = () => {
                 <label htmlFor="assunto" className="block text-white mb-2">Assunto</label>
                 <input
                   type="text"
+                  ref={assuntoRef}
                   id="assunto"
+                  name="assunto"
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-white"
                   placeholder="Assunto da mensagem"
                   required
@@ -857,6 +974,8 @@ const Contato = () => {
                 <label htmlFor="mensagem" className="block text-white mb-2">Mensagem</label>
                 <textarea
                   id="mensagem"
+                  ref={messageRef}
+                  name="mensagem"
                   rows={5}
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-white resize-none"
                   placeholder="Sua mensagem"
@@ -866,6 +985,8 @@ const Contato = () => {
               
               <button
                 type="submit"
+                value="Send"
+                disabled={loading}
                 className="w-full px-6 py-3 bg-green-500 hover:bg-green-400 text-gray-900 font-medium rounded-lg transition-colors duration-300 transform hover:scale-105"
               >
                 Enviar Mensagem
@@ -900,6 +1021,16 @@ const Contato = () => {
 
 // Componente Footer
 const Footer = () => {
+  const scrollToSection = useSmoothScroll();
+
+    const navItems = [
+      { id: "inicio", label: "Início" },
+      { id: "sobre", label: "Sobre" },
+      { id: "atividades", label: "Atividades" },
+      { id: "galeria", label: "Galeria" },
+      { id: "contato", label: "Contato" }
+    ];
+
   return (
     <footer className="bg-gray-900 text-gray-300 py-12">
       <div className="container mx-auto px-6">
@@ -949,39 +1080,26 @@ const Footer = () => {
             </div>
           </div>
 
-
           {/* Links Rápidos */}
           <div>
             <h3 className="text-lg font-bold text-white mb-4">Links Rápidos</h3>
             <ul className="space-y-2">
-              <li>
-                <Link to="#inicio" className="hover:text-green-400 transition-colors">
-                  Início
-                </Link>
-              </li>
-              <li>
-                <Link to="#sobre" className="hover:text-green-400 transition-colors">
-                  Sobre Nós
-                </Link>
-              </li>
-              <li>
-                <Link to="#atividades" className="hover:text-green-400 transition-colors">
-                  Atividades
-                </Link>
-              </li>
-              <li>
-                <Link to="#galeria" className="hover:text-green-400 transition-colors">
-                  Galeria
-                </Link>
-              </li>
-              <li>
-                <Link to="#contato" className="hover:text-green-400 transition-colors">
-                  Contato
-                </Link>
-              </li>
+              {navItems.map((link) => (
+                <li key={link.id}>
+                  <a 
+                    href={`#${link.id}`} 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      scrollToSection(link.id, { offset: 80 });
+                    }} 
+                    className="hover:text-green-400 transition-colors"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
-
 
           {/* Horários */}
           <div>
@@ -1040,7 +1158,6 @@ const Footer = () => {
 };
 
 
-
 // Estrutura principal da página
 export default function Home() {
   return (
@@ -1050,18 +1167,32 @@ export default function Home() {
         description="Clube de Desbravadores - Formando líderes através de aventuras, aprendizado e serviço à comunidade"
       />
       <Header />
-      
+
       <main className="max-w-full overflow-x-auto custom-scrollbar">
+        <section id="inicio">
         <Hero />
+        </section>
+
+        <section id="sobre">
         <Sobre />
+        </section>
+
+        <section id="atividades">
         <Atividades />
-        <VideoSection />
+        </section>
+
+        <section><VideoSection /></section>
+        
+        <section id="galeria">
         <Galeria />
-        <Testemunhos />
+        </section>
+
+        <section><Testemunhos /></section>
+        
+        <section id="contato">
         <Contato />
+        </section>
       </main>
-
-
       <Footer />
     </>
   );

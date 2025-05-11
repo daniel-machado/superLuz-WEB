@@ -45,6 +45,7 @@ import ReportAnswerIndividual from './pages/AnswerIndividualEvaluation/ReportAns
 import QuizScreen from "./pages/QuizAttempt/QuizScreen";
 //import { hasRoutePermission } from "./services/permissions/permissionsService";
 import AccessDenied from "./pages/AccessDenied/accessDenied";
+import GalleryPhotos from "./pages/galeryPhotos";
 
 export default function App() {
   const { loading } = useAuth();
@@ -146,6 +147,7 @@ export default function App() {
           {/* ROTAS PÚBLICAS - QUALQUER UM PODE ACESSAR */}
           {/* Auth Layout */}
           <Route index path="/" element={<InitialPage />} />
+          <Route path="/gallery" element={<GalleryPhotos />} />
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/sign-up" element={<SignUp />} />
 
