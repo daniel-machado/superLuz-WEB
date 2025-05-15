@@ -11,18 +11,32 @@ import Label from "../form/Label";
 import specialtyDefault from '../../assets/specialtyDefault.jpg';
 import Select from "../form/Select";
 
+interface IClass {
+  id: string;
+  name: string;
+  type: "regular" | "advanced" | "leadership";
+  emblem: any;
+  minAge: number;
+  maxAge: number;
+  requirements?: any[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (ClassData: any) => void;
-  loading: boolean;
+  onEdit: (ClassData: IClass) => void;
+  classe: IClass; 
+  //loading: boolean;
 }
 
-const CreateClassModal: React.FC<Props> = ({ isOpen, loading, onClose, onSave }) => {
-  const [photoUrl, setPhotoUrl] = useState(specialtyDefault);
-  const [nameClass, setNameClass] = useState('');
-  const [typeClass, setTypeClass] = useState('');
-  const [minAge, setMinAge] = useState('');
+const EditClassModal: React.FC<Props> = ({ isOpen, onClose, onEdit, classe }) => {
+  const classId = classe.id;
+  const [photoUrl, setPhotoUrl] = useState(classe.emblem);
+  const [nameClass, setNameClass] = useState(classe.name);
+  const [typeClass, setTypeClass] = useState(classe.type);
+  const [minAge, setMinAge] = useState(classe.minAge);
   const [compressedFile, setCompressedFile] = useState<File | null>(null); 
 
   const options = [
@@ -32,8 +46,15 @@ const CreateClassModal: React.FC<Props> = ({ isOpen, loading, onClose, onSave })
   ];
 
   const handleSave = () => {
-    const data = { nameClass, typeClass, minAge, compressedFile};
-    onSave(data);
+    const data = { 
+      id: classId, 
+      name: nameClass, 
+      type: typeClass, 
+      minAge: minAge, 
+      maxAge: 100,
+      emblem: compressedFile
+    };
+    onEdit(data);
     onClose();
   };
 
@@ -61,7 +82,9 @@ const CreateClassModal: React.FC<Props> = ({ isOpen, loading, onClose, onSave })
   };
   
   const handleSelectChange = (value: string) => {
-    setTypeClass(value)
+      if (value === "regular" || value === "advanced" || value === "leadership") {
+          setTypeClass(value);
+      }
   };
 
   return (
@@ -69,10 +92,10 @@ const CreateClassModal: React.FC<Props> = ({ isOpen, loading, onClose, onSave })
       <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
         <div className="px-2 pr-14">
           <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-            Criar Classe
+            Editar Classe
           </h4>
           <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
-            Crie uma nova Classe
+            Editar a classe de {classe.name}
           </p>
         </div>
 
@@ -114,6 +137,7 @@ const CreateClassModal: React.FC<Props> = ({ isOpen, loading, onClose, onSave })
             <div className="mb-5">
               <Label>Nome da Classe</Label>
               <Input
+                value={nameClass}
                 type="text"
                 onChange={(e) => setNameClass(e.target.value)}
                 placeholder="Nome da classe"
@@ -125,7 +149,8 @@ const CreateClassModal: React.FC<Props> = ({ isOpen, loading, onClose, onSave })
                 <Label>Idade</Label>
                 <Input
                   type="text"
-                  onChange={(e) => setMinAge(e.target.value)}
+                  value={minAge}
+                  onChange={(e) => setMinAge(Number(e.target.value))}
                   placeholder="Idade"
                 />
               </div>
@@ -134,6 +159,7 @@ const CreateClassModal: React.FC<Props> = ({ isOpen, loading, onClose, onSave })
               <div>
                 <Label>Tipo</Label>
                 <Select
+                defaultValue={typeClass}
                   options={options}
                   placeholder="Selecione a categoria"
                   onChange={handleSelectChange}
@@ -152,7 +178,8 @@ const CreateClassModal: React.FC<Props> = ({ isOpen, loading, onClose, onSave })
             Fechar
           </Button>
           <Button size="sm" onClick={handleSave}>
-            {loading ? "Criando class..." : "Criar classe"}
+            {/* {loading ? "Atualizando class..." : "Atualizar classe"} */}
+            {"Atualizar classe"}
           </Button>
         </div>
       </div>
@@ -160,4 +187,4 @@ const CreateClassModal: React.FC<Props> = ({ isOpen, loading, onClose, onSave })
   );
 };
 
-export default CreateClassModal;
+export default EditClassModal;

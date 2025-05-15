@@ -26,7 +26,7 @@ const ApproveUserModal: React.FC<Props> = ({ isOpen, user, onClose, onApproved }
     { value: "counselor", label: "Conselheiro" },
     { value: "director", label: "Diretor" },
     { value: "lead", label: "Líder" },
-    { value: "secretary", label: "Secretário" },
+    { value: "secretary", label: "Liderança" },
     { value: "admin", label: "Admin" },
   ];
 

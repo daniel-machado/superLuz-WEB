@@ -1,7 +1,7 @@
 import { SignUpFormData } from '../dtos/SignUpFormData'
 import { UserDTO } from '../dtos/UserDTO'
 import api from "./api";
-import Cookies from "js-cookie";
+
 
 interface LoginResponse {
   success: boolean;
@@ -107,7 +107,7 @@ export const authService = {
   },
 
   changePassword: async (oldPassword: string, newPassword: string) => {
-    const token = Cookies.get("accessToken");
+    const token = localStorage.getItem('token')
     try {
       const response = await api.patch('/auth/change-password', { oldPassword, newPassword}, 
         {
@@ -124,7 +124,7 @@ export const authService = {
   },
 
   sendVerificationCode: async (email: string) => {
-    const token = Cookies.get("accessToken");
+    const token = localStorage.getItem('token')
     try {
       const response = await api.patch('/auth/send-verification-code', { email}, 
         {
@@ -141,7 +141,7 @@ export const authService = {
   },
 
   verifyVerificationCode: async (email: string, providedCode: string) => {
-    const token = Cookies.get("accessToken");
+    const token = localStorage.getItem('token')
     try {
       const response = await api.patch('/auth/verify-verification-code', { email, providedCode}, 
         {

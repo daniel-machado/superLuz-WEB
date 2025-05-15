@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { questionsService } from '../../services/questionsService';
 import { answerService } from '../../services/answerService';
@@ -9,8 +9,10 @@ import { toast } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import Textarea from '../../components/form/input/TextArea';
 import ComponentCard from '../../components/common/ComponentCard';
-import { Trash2, Loader2, Edit, Plus, Save, Check, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Trash2, Loader2, Edit, Plus, Save, Check, X, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
 import { Modal } from '../../components/ui/modal';
+import PageMeta from '../../components/common/PageMeta';
+import { useAuth } from '../../context/AuthContext';
 
 
 interface Answer {
@@ -49,6 +51,9 @@ export default function QuizQuestions() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+
+    const navigate = useNavigate();
+    const {userRole} = useAuth()
 
 
   useEffect(() => {
@@ -343,451 +348,471 @@ export default function QuizQuestions() {
 
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-gray-950 text-gray-200">
-      {/* Sidebar com perguntas já criadas - Visível apenas em telas grandes */}
-      <aside className="hidden lg:block lg:w-80 xl:w-96 p-4 border-r border-gray-800 overflow-y-auto sticky top-0 h-screen bg-gray-900">
-        <ComponentCard title={`Perguntas (${countQuestions})`} className="bg-gray-900 border-gray-800">
-          {isLoading ? (
-            <div className="flex justify-center py-4">
-              <Loader2 className="animate-spin h-5 w-5 text-indigo-400" />
-            </div>
-          ) : (
-            <>
-              <motion.ul 
-                className="space-y-3 mt-2"
-                initial="hidden"
-                animate="visible"
-                variants={containerVariants}
-              >
-                {questions.length === 0 ? (
-                  <p className="text-sm text-gray-400">Nenhuma pergunta ainda.</p>
-                ) : (
-                  currentQuestions.map((q, index) => (
-                    <motion.li
-                      key={q.id}
-                      className="border p-3 rounded-lg border-gray-800 bg-gray-850 hover:bg-gray-800 shadow-md flex justify-between items-start cursor-pointer transition-all duration-200 group"
-                      variants={itemVariants}
-                      onClick={() => openEditModal(q)}
-                    >
-                      <div className="w-full pr-3">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="bg-indigo-900 text-indigo-200 text-xs font-semibold px-2 py-1 rounded-md">
-                            {indexOfFirstQuestion + index + 1}
-                          </span>
-                          <h3 className="text-sm font-medium text-gray-200 truncate">
-                            {q.question}
-                          </h3>
-                        </div>
-                        <div className="mt-2 flex flex-wrap gap-1">
-                          {q.quizAnswers.map((answer, idx) => (
-                            <span 
-                              key={answer.id} 
-                              className={`text-xs px-2 py-1 rounded ${
-                                answer.isCorrect 
-                                  ? 'bg-green-900 text-green-200' 
-                                  : 'bg-gray-700 text-gray-300'
-                              }`}
-                            >
-                              {String.fromCharCode(65 + idx)}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openEditModal(q);
-                          }}
-                          className="text-indigo-400 hover:text-indigo-300 transition-colors p-1.5 bg-gray-800 rounded-full"
-                          title="Editar"
-                        >
-                          <Edit size={14} />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openDeleteModal(q);
-                          }}
-                          className="text-red-400 hover:text-red-300 transition-colors p-1.5 bg-gray-800 rounded-full"
-                          title="Excluir"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </motion.li>
-                  ))
-                )}
-              </motion.ul>
-              
-              {/* Pagination for desktop */}
-              {questions.length > 0 && (
-                <div className="flex justify-center items-center gap-1 mt-4">
-                  <button 
-                    onClick={() => paginate(Math.max(1, currentPage - 1))}
-                    disabled={currentPage === 1}
-                    className="p-1 rounded-md text-gray-400 hover:text-gray-200 disabled:text-gray-700"
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
-                  
-                  {Array.from({ length: totalPages }, (_, i) => (
-                    <button
-                      key={i + 1}
-                      onClick={() => paginate(i + 1)}
-                      className={`w-7 h-7 rounded-md text-xs font-medium flex items-center justify-center transition-colors ${
-                        currentPage === i + 1
-                          ? 'bg-indigo-600 text-white'
-                          : 'text-gray-400 hover:bg-gray-800'
-                      }`}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
-                  
-                  <button 
-                    onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
-                    disabled={currentPage === totalPages}
-                    className="p-1 rounded-md text-gray-400 hover:text-gray-200 disabled:text-gray-700"
-                  >
-                    <ChevronRight size={16} />
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        </ComponentCard>
-      </aside>
+    <>
+      <PageMeta
+        title="Gerenciamento de perguntas do quiz | Luzeiros do Norte"
+        description="Clube de Desbravadores - Gerenciamento de perguntas do quiz"
+      />
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 mb-4 transition-colors"
+      >
+        <ArrowLeft className="w-5 h-5 mr-1" />
+        Voltar para lista de desbravadores
+      </button>
+      { userRole === "admin" || userRole === "director" 
+        ?
+            <div className="flex flex-col lg:flex-row min-h-screen bg-gray-950 text-gray-200">
 
-
-      {/* Conteúdo principal */}
-      <div className="flex-1 flex flex-col">
-        {/* Formulário de criação de pergunta */}
-        <main className="flex-1 p-4 md:p-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="max-w-3xl mx-auto"
-          >
-            <ComponentCard title="Criar Nova Pergunta" className="bg-gray-900 border-gray-800">
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-300">Pergunta</label>
-                <Textarea
-                  value={questionText}
-                  onChange={(value: string) => setQuestionText(value)}
-                  placeholder="Ex: Qual é o versículo mais curto da Bíblia?"
-                  className="min-h-[100px] bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-indigo-600 focus:ring-indigo-600"
-                />
-              </div>
-
-
-              {/* ALTERNATIVAS NOVAS */}
-              <div className="space-y-3 mt-5">
-                <h3 className="text-sm font-medium text-gray-300">Alternativas</h3>
-                
-                {answers.map((answer, index) => (
-                  <div
-                    key={index}
-                    className={`flex items-start gap-3 p-3 rounded-lg transition-all ${
-                      answer.isCorrect 
-                        ? 'bg-green-900/20 border border-green-700/30' 
-                        : 'bg-gray-800/50 border border-gray-700/30 hover:bg-gray-800'
-                    }`}
-                  >
-                    <div className="flex items-center justify-center mt-1">
-                      <Checkbox
-                        checked={answer.isCorrect}
-                        onChange={(checked: boolean) => handleAnswerChange(index, 'isCorrect', checked)}
-                        className={answer.isCorrect ? "text-green-500" : ""}
-                      />
+              <aside className="hidden lg:block lg:w-80 xl:w-96 p-4 border-r border-gray-800 overflow-y-auto sticky top-0 h-screen bg-gray-900">
+                {/* Sidebar com perguntas já criadas - Visível apenas em telas grandes */}
+                <ComponentCard title={`Perguntas (${countQuestions})`} className="bg-gray-900 border-gray-800">
+                  {isLoading ? (
+                    <div className="flex justify-center py-4">
+                      <Loader2 className="animate-spin h-5 w-5 text-indigo-400" />
                     </div>
-                    
-                    <div className="flex-1">
-                      <div className="flex items-center mb-1">
-                        <span className="text-xs font-medium text-gray-400 mr-2">
-                          {String.fromCharCode(65 + index)}
-                        </span>
-                        {answer.isCorrect && (
-                          <span className="text-xs bg-green-900 text-green-200 px-2 py-0.5 rounded-full">
-                            Correta
-                          </span>
-                        )}
-                      </div>
-                      <Input
-                        placeholder={`Alternativa ${index + 1}`}
-                        value={answer.text}
-                        onChange={(e) => handleAnswerChange(index, 'text', e.target.value)}
-                        className="bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-indigo-600 focus:ring-indigo-600"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-
-              <Button
-                onClick={handleCreateQuestion}
-                className="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white"
-                disabled={isCreating}
-              >
-                {isCreating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Salvando...
-                  </>
-                ) : (
-                  <>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Salvar Pergunta
-                  </>
-                )}
-              </Button>
-            </ComponentCard>
-          </motion.div>
-        </main>
-
-
-        {/* Lista de perguntas para mobile */}
-        <div className="lg:hidden p-4 border-t border-gray-800 bg-gray-900">
-          <ComponentCard title={`Perguntas (${countQuestions})`} className="bg-gray-900 border-gray-800">
-            {isLoading ? (
-              <div className="flex justify-center py-4">
-                <Loader2 className="animate-spin h-5 w-5 text-indigo-400" />
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {questions.length === 0 ? (
-                  <p className="text-sm text-gray-400 text-center py-4">Nenhuma pergunta ainda.</p>
-                ) : (
-                  <AnimatePresence>
-                    {currentQuestions.map((q, index) => (
-                      <motion.div
-                        key={q.id}
-                        className="border p-4 rounded-lg border-gray-800 bg-gray-850 shadow-md"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
+                  ) : (
+                    <>
+                      <motion.ul 
+                        className="space-y-3 mt-2"
+                        initial="hidden"
+                        animate="visible"
+                        variants={containerVariants}
                       >
-                        <div className="flex items-center gap-2 mb-3">
-                          <span className="bg-indigo-900 text-indigo-200 text-xs font-semibold px-2 py-1 rounded-md">
-                            {indexOfFirstQuestion + index + 1}
-                          </span>
-                          <h3 className="text-sm font-medium text-gray-200">
-                            {q.question}
-                          </h3>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-2 mb-3">
-                          {q.quizAnswers.map((answer, idx) => (
-                            <div 
-                              key={answer.id} 
-                              className={`text-xs p-2 rounded flex items-center gap-1.5 ${
-                                answer.isCorrect 
-                                  ? 'bg-green-900/30 text-green-200 border border-green-700/30' 
-                                  : 'bg-gray-800 text-gray-300 border border-gray-700/30'
+                        {questions.length === 0 ? (
+                          <p className="text-sm text-gray-400">Nenhuma pergunta ainda.</p>
+                        ) : (
+                          currentQuestions.map((q, index) => (
+                            <motion.li
+                              key={q.id}
+                              className="border p-3 rounded-lg border-gray-800 bg-gray-850 hover:bg-gray-800 shadow-md flex justify-between items-start cursor-pointer transition-all duration-200 group"
+                              variants={itemVariants}
+                              onClick={() => openEditModal(q)}
+                            >
+                              <div className="w-full pr-3">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="bg-indigo-900 text-indigo-200 text-xs font-semibold px-2 py-1 rounded-md">
+                                    {indexOfFirstQuestion + index + 1}
+                                  </span>
+                                  <h3 className="text-sm font-medium text-gray-200 truncate">
+                                    {q.question}
+                                  </h3>
+                                </div>
+                                <div className="mt-2 flex flex-wrap gap-1">
+                                  {q.quizAnswers.map((answer, idx) => (
+                                    <span 
+                                      key={answer.id} 
+                                      className={`text-xs px-2 py-1 rounded ${
+                                        answer.isCorrect 
+                                          ? 'bg-green-900 text-green-200' 
+                                          : 'bg-gray-700 text-gray-300'
+                                      }`}
+                                    >
+                                      {String.fromCharCode(65 + idx)}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    openEditModal(q);
+                                  }}
+                                  className="text-indigo-400 hover:text-indigo-300 transition-colors p-1.5 bg-gray-800 rounded-full"
+                                  title="Editar"
+                                >
+                                  <Edit size={14} />
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    openDeleteModal(q);
+                                  }}
+                                  className="text-red-400 hover:text-red-300 transition-colors p-1.5 bg-gray-800 rounded-full"
+                                  title="Excluir"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            </motion.li>
+                          ))
+                        )}
+                      </motion.ul>
+                      
+                      {/* Pagination for desktop */}
+                      {questions.length > 0 && (
+                        <div className="flex justify-center items-center gap-1 mt-4">
+                          <button 
+                            onClick={() => paginate(Math.max(1, currentPage - 1))}
+                            disabled={currentPage === 1}
+                            className="p-1 rounded-md text-gray-400 hover:text-gray-200 disabled:text-gray-700"
+                          >
+                            <ChevronLeft size={16} />
+                          </button>
+                          
+                          {Array.from({ length: totalPages }, (_, i) => (
+                            <button
+                              key={i + 1}
+                              onClick={() => paginate(i + 1)}
+                              className={`w-7 h-7 rounded-md text-xs font-medium flex items-center justify-center transition-colors ${
+                                currentPage === i + 1
+                                  ? 'bg-indigo-600 text-white'
+                                  : 'text-gray-400 hover:bg-gray-800'
                               }`}
                             >
-                              <span className="font-medium">{String.fromCharCode(65 + idx)}</span>
-                              <span className="truncate">{answer.answer}</span>
-                              {answer.isCorrect && <Check size={12} className="ml-auto text-green-400" />}
+                              {i + 1}
+                            </button>
+                          ))}
+                          
+                          <button 
+                            onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
+                            disabled={currentPage === totalPages}
+                            className="p-1 rounded-md text-gray-400 hover:text-gray-200 disabled:text-gray-700"
+                          >
+                            <ChevronRight size={16} />
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </ComponentCard>
+              </aside>
+
+                <div className="flex-1 flex flex-col">
+                  {/* Conteúdo principal */}
+                  {/* Formulário de criação de pergunta */}
+                  <main className="flex-1 p-4 md:p-6">
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="max-w-3xl mx-auto"
+                    >
+                      <ComponentCard title="Criar Nova Pergunta" className="bg-gray-900 border-gray-800">
+                        <div>
+                          <label className="block text-sm font-medium mb-2 text-gray-300">Pergunta</label>
+                          <Textarea
+                            value={questionText}
+                            onChange={(value: string) => setQuestionText(value)}
+                            placeholder="Ex: Qual é o versículo mais curto da Bíblia?"
+                            className="min-h-[100px] bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-indigo-600 focus:ring-indigo-600"
+                          />
+                        </div>
+
+
+                        {/* ALTERNATIVAS NOVAS */}
+                        <div className="space-y-3 mt-5">
+                          <h3 className="text-sm font-medium text-gray-300">Alternativas</h3>
+                          
+                          {answers.map((answer, index) => (
+                            <div
+                              key={index}
+                              className={`flex items-start gap-3 p-3 rounded-lg transition-all ${
+                                answer.isCorrect 
+                                  ? 'bg-green-900/20 border border-green-700/30' 
+                                  : 'bg-gray-800/50 border border-gray-700/30 hover:bg-gray-800'
+                              }`}
+                            >
+                              <div className="flex items-center justify-center mt-1">
+                                <Checkbox
+                                  checked={answer.isCorrect}
+                                  onChange={(checked: boolean) => handleAnswerChange(index, 'isCorrect', checked)}
+                                  className={answer.isCorrect ? "text-green-500" : ""}
+                                />
+                              </div>
+                              
+                              <div className="flex-1">
+                                <div className="flex items-center mb-1">
+                                  <span className="text-xs font-medium text-gray-400 mr-2">
+                                    {String.fromCharCode(65 + index)}
+                                  </span>
+                                  {answer.isCorrect && (
+                                    <span className="text-xs bg-green-900 text-green-200 px-2 py-0.5 rounded-full">
+                                      Correta
+                                    </span>
+                                  )}
+                                </div>
+                                <Input
+                                  placeholder={`Alternativa ${index + 1}`}
+                                  value={answer.text}
+                                  onChange={(e) => handleAnswerChange(index, 'text', e.target.value)}
+                                  className="bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-indigo-600 focus:ring-indigo-600"
+                                />
+                              </div>
                             </div>
                           ))}
                         </div>
-                        
-                        <div className="flex justify-end gap-2 mt-2">
-                          <Button
-                            onClick={() => openEditModal(q)}
-                            size="sm"
-                            variant="outline"
-                            className="border-gray-700 text-indigo-400 hover:text-indigo-300"
-                          >
-                            <Edit size={14} className="mr-1" />
-                            Editar
-                          </Button>
-                          <Button
-                            onClick={() => openDeleteModal(q)}
-                            size="sm"
-                            variant="outline"
-                            className="border-gray-700 text-red-400 hover:text-red-300"
-                          >
-                            <Trash2 size={14} className="mr-1" />
-                            Excluir
-                          </Button>
+
+
+                        <Button
+                          onClick={handleCreateQuestion}
+                          className="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white"
+                          disabled={isCreating}
+                        >
+                          {isCreating ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Salvando...
+                            </>
+                          ) : (
+                            <>
+                              <Plus className="mr-2 h-4 w-4" />
+                              Salvar Pergunta
+                            </>
+                          )}
+                        </Button>
+                      </ComponentCard>
+                    </motion.div>
+                  </main>
+
+
+                  {/* Lista de perguntas para mobile */}
+                  <div className="lg:hidden p-4 border-t border-gray-800 bg-gray-900">
+                    <ComponentCard title={`Perguntas (${countQuestions})`} className="bg-gray-900 border-gray-800">
+                      {isLoading ? (
+                        <div className="flex justify-center py-4">
+                          <Loader2 className="animate-spin h-5 w-5 text-indigo-400" />
                         </div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                )}
-                
-                {/* Mobile pagination */}
-                {questions.length > 0 && (
-                  <div className="flex justify-center items-center gap-1 mt-4">
-                    <button 
-                      onClick={() => paginate(Math.max(1, currentPage - 1))}
-                      disabled={currentPage === 1}
-                      className="p-2 rounded-md text-gray-400 hover:text-gray-200 disabled:text-gray-700"
-                    >
-                      <ChevronLeft size={16} />
-                    </button>
-                    
-                    <span className="text-sm text-gray-400">
-                      {currentPage} de {totalPages}
-                    </span>
-                    
-                    <button 
-                      onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
-                      disabled={currentPage === totalPages}
-                      className="p-2 rounded-md text-gray-400 hover:text-gray-200 disabled:text-gray-700"
-                    >
-                      <ChevronRight size={16} />
-                    </button>
+                      ) : (
+                        <div className="space-y-4">
+                          {questions.length === 0 ? (
+                            <p className="text-sm text-gray-400 text-center py-4">Nenhuma pergunta ainda.</p>
+                          ) : (
+                            <AnimatePresence>
+                              {currentQuestions.map((q, index) => (
+                                <motion.div
+                                  key={q.id}
+                                  className="border p-4 rounded-lg border-gray-800 bg-gray-850 shadow-md"
+                                  initial={{ opacity: 0, y: 20 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -20 }}
+                                >
+                                  <div className="flex items-center gap-2 mb-3">
+                                    <span className="bg-indigo-900 text-indigo-200 text-xs font-semibold px-2 py-1 rounded-md">
+                                      {indexOfFirstQuestion + index + 1}
+                                    </span>
+                                    <h3 className="text-sm font-medium text-gray-200">
+                                      {q.question}
+                                    </h3>
+                                  </div>
+                                  
+                                  <div className="grid grid-cols-2 gap-2 mb-3">
+                                    {q.quizAnswers.map((answer, idx) => (
+                                      <div 
+                                        key={answer.id} 
+                                        className={`text-xs p-2 rounded flex items-center gap-1.5 ${
+                                          answer.isCorrect 
+                                            ? 'bg-green-900/30 text-green-200 border border-green-700/30' 
+                                            : 'bg-gray-800 text-gray-300 border border-gray-700/30'
+                                        }`}
+                                      >
+                                        <span className="font-medium">{String.fromCharCode(65 + idx)}</span>
+                                        <span className="truncate">{answer.answer}</span>
+                                        {answer.isCorrect && <Check size={12} className="ml-auto text-green-400" />}
+                                      </div>
+                                    ))}
+                                  </div>
+                                  
+                                  <div className="flex justify-end gap-2 mt-2">
+                                    <Button
+                                      onClick={() => openEditModal(q)}
+                                      size="sm"
+                                      variant="outline"
+                                      className="border-gray-700 text-indigo-400 hover:text-indigo-300"
+                                    >
+                                      <Edit size={14} className="mr-1" />
+                                      Editar
+                                    </Button>
+                                    <Button
+                                      onClick={() => openDeleteModal(q)}
+                                      size="sm"
+                                      variant="outline"
+                                      className="border-gray-700 text-red-400 hover:text-red-300"
+                                    >
+                                      <Trash2 size={14} className="mr-1" />
+                                      Excluir
+                                    </Button>
+                                  </div>
+                                </motion.div>
+                              ))}
+                            </AnimatePresence>
+                          )}
+                          
+                          {/* Mobile pagination */}
+                          {questions.length > 0 && (
+                            <div className="flex justify-center items-center gap-1 mt-4">
+                              <button 
+                                onClick={() => paginate(Math.max(1, currentPage - 1))}
+                                disabled={currentPage === 1}
+                                className="p-2 rounded-md text-gray-400 hover:text-gray-200 disabled:text-gray-700"
+                              >
+                                <ChevronLeft size={16} />
+                              </button>
+                              
+                              <span className="text-sm text-gray-400">
+                                {currentPage} de {totalPages}
+                              </span>
+                              
+                              <button 
+                                onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
+                                disabled={currentPage === totalPages}
+                                className="p-2 rounded-md text-gray-400 hover:text-gray-200 disabled:text-gray-700"
+                              >
+                                <ChevronRight size={16} />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </ComponentCard>
                   </div>
-                )}
-              </div>
-            )}
-          </ComponentCard>
-        </div>
-      </div>
-
-
-      {/* Modal de Edição */}
-      <Modal isOpen={showEditModal} onClose={closeEditModal}>
-        <div className="bg-gray-900 p-5 rounded-lg border border-gray-800 shadow-lg text-gray-200 space-y-4">
-          <h3 className="text-lg font-medium text-indigo-300 flex items-center gap-2">
-            <Edit size={18} />
-            Editar Pergunta
-          </h3>
-          
-          <Textarea
-            value={editText}
-            onChange={(value: string) => setEditText(value)}
-            className="min-h-[80px] bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-indigo-600 focus:ring-indigo-600"
-            placeholder="Digite a pergunta"
-          />
-
-
-          <div className="space-y-3">
-            <h4 className="text-sm font-medium text-gray-300">Alternativas</h4>
+                </div>
+              
             
-            {editAnswers.map((answer, index) => (
-              <div
-                key={index}
-                className={`flex gap-3 items-start p-3 rounded-lg transition-all ${
-                  answer.isCorrect 
-                    ? 'bg-green-900/20 border border-green-700/30' 
-                    : 'bg-gray-800/50 border border-gray-700/30 hover:bg-gray-800'
-                }`}
-              >
-                <div className="flex items-center justify-center mt-1">
-                  <Checkbox
-                    checked={answer.isCorrect}
-                    onChange={(checked: boolean) => handleEditAnswerChange(index, 'isCorrect', checked)}
-                    className={answer.isCorrect ? "text-green-500" : ""}
-                  />
-                </div>
+
+            {/* Modal de Edição */}
+            <Modal isOpen={showEditModal} onClose={closeEditModal}>
+              <div className="bg-gray-900 p-5 rounded-lg border border-gray-800 shadow-lg text-gray-200 space-y-4">
+                <h3 className="text-lg font-medium text-indigo-300 flex items-center gap-2">
+                  <Edit size={18} />
+                  Editar Pergunta
+                </h3>
                 
-                <div className="flex-1">
-                  <div className="flex items-center mb-1">
-                    <span className="text-xs font-medium text-gray-400 mr-2">
-                      {String.fromCharCode(65 + index)}
-                    </span>
-                    {answer.isCorrect && (
-                      <span className="text-xs bg-green-900 text-green-200 px-2 py-0.5 rounded-full">
-                        Correta
-                      </span>
+                <Textarea
+                  value={editText}
+                  onChange={(value: string) => setEditText(value)}
+                  className="min-h-[80px] bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-indigo-600 focus:ring-indigo-600"
+                  placeholder="Digite a pergunta"
+                />
+
+
+                <div className="space-y-3">
+                  <h4 className="text-sm font-medium text-gray-300">Alternativas</h4>
+                  
+                  {editAnswers.map((answer, index) => (
+                    <div
+                      key={index}
+                      className={`flex gap-3 items-start p-3 rounded-lg transition-all ${
+                        answer.isCorrect 
+                          ? 'bg-green-900/20 border border-green-700/30' 
+                          : 'bg-gray-800/50 border border-gray-700/30 hover:bg-gray-800'
+                      }`}
+                    >
+                      <div className="flex items-center justify-center mt-1">
+                        <Checkbox
+                          checked={answer.isCorrect}
+                          onChange={(checked: boolean) => handleEditAnswerChange(index, 'isCorrect', checked)}
+                          className={answer.isCorrect ? "text-green-500" : ""}
+                        />
+                      </div>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-center mb-1">
+                          <span className="text-xs font-medium text-gray-400 mr-2">
+                            {String.fromCharCode(65 + index)}
+                          </span>
+                          {answer.isCorrect && (
+                            <span className="text-xs bg-green-900 text-green-200 px-2 py-0.5 rounded-full">
+                              Correta
+                            </span>
+                          )}
+                        </div>
+                        <Input
+                          value={answer.text}
+                          onChange={(e) => handleEditAnswerChange(index, 'text', e.target.value)}
+                          placeholder={`Alternativa ${index + 1}`}
+                          className="bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-indigo-600 focus:ring-indigo-600"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button 
+                    onClick={closeEditModal} 
+                    variant="outline"
+                    className="border-gray-700 text-gray-300 hover:bg-gray-800"
+                  >
+                    <X size={16} className="mr-1" />
+                    Cancelar
+                  </Button>
+                  <Button 
+                    onClick={handleUpdateQuestion} 
+                    disabled={isUpdating}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                  >
+                    {isUpdating ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Salvando...
+                      </>
+                    ) : (
+                      <>
+                        <Save size={16} className="mr-1" />
+                        Salvar Alterações
+                      </>
                     )}
-                  </div>
-                  <Input
-                    value={answer.text}
-                    onChange={(e) => handleEditAnswerChange(index, 'text', e.target.value)}
-                    placeholder={`Alternativa ${index + 1}`}
-                    className="bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:border-indigo-600 focus:ring-indigo-600"
-                  />
+                  </Button>
                 </div>
               </div>
-            ))}
-          </div>
+            </Modal>
 
 
-          <div className="flex justify-end gap-3 pt-4">
-            <Button 
-              onClick={closeEditModal} 
-              variant="outline"
-              className="border-gray-700 text-gray-300 hover:bg-gray-800"
-            >
-              <X size={16} className="mr-1" />
-              Cancelar
-            </Button>
-            <Button 
-              onClick={handleUpdateQuestion} 
-              disabled={isUpdating}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white"
-            >
-              {isUpdating ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Salvando...
-                </>
-              ) : (
-                <>
-                  <Save size={16} className="mr-1" />
-                  Salvar Alterações
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
-      </Modal>
-
-
-      {/* Modal de Confirmação de Exclusão */}
-      <Modal isOpen={showDeleteModal} onClose={closeDeleteModal}>
-        <div className="bg-gray-900 p-5 rounded-lg border border-gray-800 shadow-lg text-gray-200 space-y-4">
-          <h3 className="text-lg font-medium text-red-400 flex items-center gap-2">
-            <Trash2 size={18} />
-            Confirmar Exclusão
-          </h3>
-          
-          {questionToDelete && (
-            <div className="bg-gray-800 p-3 rounded border border-gray-700 mb-3">
-              <p className="text-sm text-gray-300 font-medium">{questionToDelete.question}</p>
-            </div>
-          )}
-          
-          <p className="text-gray-300">Tem certeza que deseja excluir esta pergunta?</p>
-          <p className="text-sm text-gray-400">Esta ação não pode ser desfeita.</p>
-          
-          <div className="flex justify-end gap-3 pt-2">
-            <Button 
-              variant="outline" 
-              onClick={closeDeleteModal}
-              className="border-gray-700 text-gray-300 hover:bg-gray-800"
-            >
-              <X size={16} className="mr-1" />
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="bg-red-600 hover:bg-red-700 text-white"
-            >
-              {isDeleting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Excluindo...
-                </>
-              ) : (
-                <>
-                  <Trash2 size={16} className="mr-1" />
+            {/* Modal de Confirmação de Exclusão */}
+            <Modal isOpen={showDeleteModal} onClose={closeDeleteModal}>
+              <div className="bg-gray-900 p-5 rounded-lg border border-gray-800 shadow-lg text-gray-200 space-y-4">
+                <h3 className="text-lg font-medium text-red-400 flex items-center gap-2">
+                  <Trash2 size={18} />
                   Confirmar Exclusão
-                </>
-              )}
-            </Button>
+                </h3>
+                
+                {questionToDelete && (
+                  <div className="bg-gray-800 p-3 rounded border border-gray-700 mb-3">
+                    <p className="text-sm text-gray-300 font-medium">{questionToDelete.question}</p>
+                  </div>
+                )}
+                
+                <p className="text-gray-300">Tem certeza que deseja excluir esta pergunta?</p>
+                <p className="text-sm text-gray-400">Esta ação não pode ser desfeita.</p>
+                
+                <div className="flex justify-end gap-3 pt-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={closeDeleteModal}
+                    className="border-gray-700 text-gray-300 hover:bg-gray-800"
+                  >
+                    <X size={16} className="mr-1" />
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    {isDeleting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Excluindo...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 size={16} className="mr-1" />
+                        Confirmar Exclusão
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </Modal>
           </div>
-        </div>
-      </Modal>
-    </div>
+        :
+          <p className="flex justify-center text-xl items-center font-medium text-red-500 mb-2">Tu num pode acessar aqui não doido</p>
+      }
+  </>
+    
   );
 }
 

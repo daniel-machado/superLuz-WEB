@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight, Download, Heart, Share2, Search, Filter, Grid3X3, Table2, Maximize } from "lucide-react";
 import { Link } from "react-router-dom";
+import PageMeta from "../components/common/PageMeta";
 
 interface IPhotos {
   id: number; 
@@ -39,13 +40,13 @@ const PhotosData = [
     description: "A caminhada ecológica foi uma atividade de conscientização ambiental, onde os desbravadores aprenderam sobre a flora e fauna local.",
     category: "atividades",
     featured: false,
-    date: "22/04/2025"
+    date: "15/03/2025"
   },
   {
     id: 4,
     src: "images/atividades/IMG4.jpg",
     title: "Dia de Aventuras",
-    description: "Explorando novos horizontes e desafios com atividades práticas ao ar livre.",
+    description: "Fogueira e cozinha ao ar livre",
     category: "aventura",
     featured: false,
     date: "05/02/2025"
@@ -54,8 +55,8 @@ const PhotosData = [
     id: 5,
     src: "images/atividades/IMG5.jpg",
     title: "Especialidade de Primeiros Socorros",
-    description: "Aprendendo técnicas essenciais de primeiros socorros para situações de emergência.",
-    category: "especialidades",
+    description: "Primeira reunião do clube, muita alegria e diversão",
+    category: "atividades",
     featured: true,
     date: "18/02/2025"
   },
@@ -63,7 +64,7 @@ const PhotosData = [
     id: 6,
     src: "images/atividades/IMG6.jpg",
     title: "Investidura de Classes",
-    description: "Cerimônia especial de reconhecimento pelo cumprimento dos requisitos de classe.",
+    description: "Lenço, é oque nos move",
     category: "cerimonia",
     featured: false,
     date: "10/03/2025"
@@ -72,8 +73,8 @@ const PhotosData = [
     id: 7,
     src: "images/atividades/IMG7.jpg",
     title: "Projeto Comunitário",
-    description: "Desbravadores realizando trabalho voluntário em nossa comunidade local.",
-    category: "projeto",
+    description: "Abertura do clube",
+    category: "atividade",
     featured: true,
     date: "28/03/2025"
   },
@@ -81,8 +82,8 @@ const PhotosData = [
     id: 8,
     src: "images/atividades/IMG8.jpg",
     title: "Olimpíadas dos Desbravadores",
-    description: "Competições esportivas promovendo o trabalho em equipe e a camaradagem.",
-    category: "esportes",
+    description: "Campori, momento emocionante",
+    category: "atividade",
     featured: false,
     date: "12/04/2025"
   },
@@ -90,8 +91,8 @@ const PhotosData = [
     id: 9,
     src: "images/atividades/IMG9.jpg",
     title: "Especialidade de Culinária",
-    description: "Preparando refeições saudáveis e aprendendo sobre nutrição e técnicas de cozinha.",
-    category: "especialidades",
+    description: "Campori, momento emocionante",
+    category: "atividade",
     featured: false,
     date: "03/05/2025"
   },
@@ -99,8 +100,8 @@ const PhotosData = [
     id: 10,
     src: "images/atividades/IMG10.jpg",
     title: "Acampamento de Inverno",
-    description: "Sobrevivência e diversão em nosso acampamento especial de inverno.",
-    category: "acampamento",
+    description: "Campori, momento emocionante",
+    category: "cerimonia",
     featured: true,
     date: "15/06/2025"
   },
@@ -108,8 +109,8 @@ const PhotosData = [
     id: 11,
     src: "images/atividades/IMG11.jpg",
     title: "Dia Mundial dos Desbravadores",
-    description: "Celebração global do movimento dos desbravadores com atividades especiais.",
-    category: "cerimonia",
+    description: "Recreação na reunião do clube",
+    category: "treinamento",
     featured: true,
     date: "20/09/2025"
   },
@@ -126,8 +127,8 @@ const PhotosData = [
     id: 13,
     src: "images/atividades/IMG13.jpg",
     title: "Visita ao Museu de Ciências",
-    description: "Expandindo conhecimentos através de uma excursão educativa.",
-    category: "excursao",
+    description: "Recreação na reunião do clube",
+    category: "treinamento",
     featured: false,
     date: "14/07/2025"
   },
@@ -135,8 +136,8 @@ const PhotosData = [
     id: 14,
     src: "images/atividades/IMG14.jpg",
     title: "Investidura de Líderes",
-    description: "Cerimônia especial para os novos líderes do nosso clube.",
-    category: "cerimonia",
+    description: "Recreação na reunião do clube",
+    category: "treinamento",
     featured: true,
     date: "30/07/2025"
   },
@@ -144,8 +145,8 @@ const PhotosData = [
     id: 15,
     src: "images/atividades/IMG15.jpg",
     title: "Especialidade de Astronomia",
-    description: "Observando estrelas e aprendendo sobre os segredos do universo.",
-    category: "especialidades",
+    description: "Campori, momento inesquecível",
+    category: "acampamento",
     featured: false,
     date: "08/08/2025"
   },
@@ -162,7 +163,7 @@ const PhotosData = [
     id: 17,
     src: "images/atividades/IMG17.jpg",
     title: "Ação Social",
-    description: "Distribuição de alimentos e suprimentos para famílias carentes.",
+    description: "NOsso portal no campori ULB",
     category: "projeto",
     featured: false,
     date: "05/09/2025"
@@ -171,8 +172,8 @@ const PhotosData = [
     id: 18,
     src: "images/atividades/IMG18.jpg",
     title: "Especialidade de Sobrevivência",
-    description: "Aprendendo técnicas para sobreviver em ambientes selvagens.",
-    category: "especialidades",
+    description: "Momento de alegria, abertura do campori",
+    category: "evento",
     featured: true,
     date: "19/09/2025"
   },
@@ -180,7 +181,7 @@ const PhotosData = [
     id: 19,
     src: "images/atividades/IMG19.jpg",
     title: "Desfile Cívico",
-    description: "Participação especial no desfile da cidade representando os Desbravadores.",
+    description: "Evolução e ordem unida sendo apresentado para todo o campori",
     category: "evento",
     featured: false,
     date: "07/09/2025"
@@ -189,7 +190,7 @@ const PhotosData = [
     id: 20,
     src: "images/atividades/IMG20.jpg",
     title: "Confraternização de Fim de Ano",
-    description: "Celebrando as conquistas e momentos especiais do ano que passou.",
+    description: "O cantor veio tirar foto com o Luzeiros do Norte",
     category: "evento",
     featured: true,
     date: "13/12/2025"
@@ -198,7 +199,7 @@ const PhotosData = [
 
 const GalleryPhotos = () => {
   // Estado para fotos completas incluindo as comentadas no código original
-  const [photos, setPhotos] = useState<IPhotos[]>([]);
+  const [photos, setPhotos] = useState<IPhotos[]>(PhotosData);
 
   // Estados para controlar a interface e filtros
   const [selectedPhoto, setSelectedPhoto] = useState<IPhotos | null>(null);
@@ -231,7 +232,6 @@ const GalleryPhotos = () => {
     }
   }, []);
 
-
   // Salvar favoritos no localStorage quando mudar
   useEffect(() => {
     localStorage.setItem("galleryFavorites", JSON.stringify(favoritePhotos));
@@ -257,7 +257,6 @@ const GalleryPhotos = () => {
       setFavoritePhotos([...favoritePhotos, id]);
     }
   };
-
 
   // Abrir modal com foto selecionada
   const openPhotoModal = (photo: IPhotos) => {
@@ -316,9 +315,67 @@ const GalleryPhotos = () => {
     </div>
   );
 
+  // Download da foto
+const handleDownload = (photoSrc: string, photoTitle: string) => {
+  // Criar um link temporário para download
+  const link = document.createElement('a');
+  link.href = photoSrc;
+  link.download = `${photoTitle.replace(/[^a-z0-9]/gi, '_')}.jpg`; // Normaliza o nome do arquivo
+  
+  // Configurações para download
+  link.setAttribute('target', '_blank');
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  
+  // Disparar o download
+  link.click();
+  
+  // Limpar o link após o download
+  document.body.removeChild(link);
+};
+
+// Compartilhar foto
+const handleShare = async (photo: IPhotos) => {
+  // Verificar se a API de compartilhamento está disponível
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: photo.title,
+        text: photo.description,
+        url: photo.src // Pode ser substituído por uma URL definitiva se necessário
+      });
+    } catch (error) {
+      console.error('Erro ao compartilhar:', error);
+      // Fallback para copiar link
+      fallbackShare(photo);
+    }
+  } else {
+    // Fallback para navegadores que não suportam Web Share API
+    fallbackShare(photo);
+  }
+};
+
+// Função de compartilhamento de fallback (copia link ou detalhes para área de transferência)
+const fallbackShare = (photo: IPhotos) => {
+  // Tentar copiar URL da imagem para área de transferência
+  navigator.clipboard.writeText(photo.src)
+    .then(() => {
+      alert('Link da imagem copiado para a área de transferência!');
+    })
+    .catch(err => {
+      console.error('Erro ao copiar:', err);
+      alert('Não foi possível copiar o link. Tente novamente.');
+    });
+};
+
+
 
   return (
     <>
+    <PageMeta
+        title="Página de galeria de fotos do Clube de Desbravadores | Luzeiros do Norte"
+        description="Clube de Desbravadores - Fotos das atividades do clube, incluindo acampamentos, reuniões e eventos especiais."
+      />
       {/* Header da Galeria */}
       <section className="relative bg-gray-900 text-white py-16 overflow-hidden">
         <BackgroundSVG />
@@ -498,20 +555,22 @@ const GalleryPhotos = () => {
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
           >
             <div className="absolute top-4 right-4 z-10 flex gap-2">
-              <button 
+              {/* <button 
                 onClick={() => toggleFavorite(selectedPhoto.id)}
                 className={`p-3 rounded-full ${favoritePhotos.includes(selectedPhoto.id) ? 'bg-red-500 text-white' : 'bg-gray-800 text-white hover:bg-red-500/80'} transition-colors`}
                 aria-label="Favoritar"
               >
                 <Heart size={20} fill={favoritePhotos.includes(selectedPhoto.id) ? "white" : "none"} />
-              </button>
+              </button> */}
               <button 
+                onClick={() => handleShare(selectedPhoto)}
                 className="p-3 bg-gray-800 text-white rounded-full hover:bg-gray-700 transition-colors"
                 aria-label="Compartilhar"
               >
                 <Share2 size={20} />
               </button>
               <button 
+              onClick={() => handleDownload(selectedPhoto.src, selectedPhoto.title)}
                 className="p-3 bg-gray-800 text-white rounded-full hover:bg-gray-700 transition-colors"
                 aria-label="Download"
               >
@@ -566,12 +625,12 @@ const GalleryPhotos = () => {
                   <p className="text-gray-300 mb-2 text-sm">{selectedPhoto.date}</p>
                   <p className="text-gray-400 mb-auto">{selectedPhoto.description}</p>
                   
-                  <div className="border-t border-gray-700 mt-6 pt-4">
+                  {/* <div className="border-t border-gray-700 mt-6 pt-4">
                     <div className="flex items-center gap-2 text-gray-300 text-sm">
                       <Heart size={16} className="text-red-500" />
                       <span>{Math.floor(Math.random() * 50) + 5} curtidas</span>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </motion.div>

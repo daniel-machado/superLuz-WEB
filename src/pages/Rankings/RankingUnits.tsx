@@ -4,7 +4,7 @@ import { Loader2, Award, List } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ConfirmDeleteEvaUnitModal from "../../components/EvaluationUnitComponents/ConfirmDeleteEvaUnitModal";
 import { rankingUnitService } from "../../services/rankingUnitService";
-import { RankUnitDetailModal } from "./components/RankUnitDetailModal";
+import  RankUnitDetailModal  from "./components/RankUnitDetailModal";
 import Podium from "./components/Podium";
 import RankingList from "./components/RankingList";
 import TableView from "./components/TableView";
@@ -12,6 +12,7 @@ import { AnimatedBackground, AnimatedBackgroundStars, AnimatedConfetti } from '.
 import AnimatedBackgroundOficial from "./components/AnimatedBackgroundOficial";
 import AnimatedBackgroundStarsOficial from "./components/AnimatedBackgroundStarsOficial";
 import AnimatedBrushesOficial from "./components/AnimatedBrusheOficial";
+import PageMeta from "../../components/common/PageMeta";
 
 interface UnitRank {
   unitId: string;
@@ -120,190 +121,197 @@ export default function RankingUnits() {
   }, []);
 
   return (
-    <motion.div 
-      className="w-full max-w-4xl mx-auto p-4"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >    
-      <motion.div
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="mb-4 flex flex-col sm:flex-row justify-between items-center"
-      >
-        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-0">Ranking de Unidades</h1>
-      </motion.div>
-
-      {/* Tab Navigation */}
-      <div className="flex justify-center mb-4">
-        <div className="bg-gray-800 bg-opacity-70 rounded-full p-1 flex shadow-lg">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setActiveTab("podium")}
-            className={`flex items-center px-4 py-2 rounded-full transition-all ${
-              activeTab === "podium" 
-                ? "bg-gradient-to-r from-blue-600 to-indigo-700 text-white" 
-                : "text-gray-300 hover:text-white"
-            }`}
-          >
-            <Award className="w-5 h-5 mr-2" />
-            Pódio
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setActiveTab("table")}
-            className={`flex items-center px-4 py-2 rounded-full transition-all ${
-              activeTab === "table" 
-                ? "bg-gradient-to-r from-blue-600 to-indigo-700 text-white" 
-                : "text-gray-300 hover:text-white"
-            }`}
-          >
-            <List className="w-5 h-5 mr-2" />
-            Tabela
-          </motion.button>
-        </div>
-      </div>
-
-      {isLoading ? (
+    <>
+    <PageMeta
+        title="Ranking de Unidades | Luzeiros do Norte"
+        description="Clube de Desbravadores - Ranking de Unidades"
+      />
+      <motion.div 
+        className="w-full max-w-4xl mx-auto p-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >    
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex flex-col items-center justify-center w-full h-64"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="mb-4 flex flex-col sm:flex-row justify-between items-center"
         >
-          <Loader2 className="w-10 h-10 text-blue-600 animate-spin dark:text-blue-400" />
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Carregando ranking...</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-0">Ranking de Unidades</h1>
         </motion.div>
-      ) : (
-        <motion.div 
-          ref={rankingContainerRef}
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.2}
-          onDragEnd={(_, info) => {
-            if (Math.abs(info.offset.x) > 100) {
-              handleSwipe(info.offset.x);
-            }
-          }}
-          className="bg-gray-900 rounded-xl overflow-hidden shadow-2xl"
-        >
-          <AnimatePresence mode="wait" initial={isFirstRender}>
-            {activeTab === "podium" ? (
-              <motion.div
-                key="podium-view"
-                custom="right"
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                variants={tabVariants}
-                className="overflow-hidden rounded-lg shadow-xl bg-gray-800"
-              >
-                {/* Podium Section */}
-                <motion.div className="relative px-4 pt-5 pb-5 sm:pb-5 overflow-hidden bg-gradient-to-b">
-                  <AnimatedBackground />
-                  <AnimatedBackgroundStars />
-                  <AnimatedConfetti />
-                  <AnimatedBackgroundOficial/>
-                  <AnimatedBackgroundStarsOficial />
-                  <AnimatedBrushesOficial />
 
-                  {/* Holofotes para efeito dramático */}
-                  {showSpotlight && (
-                    <>
-                      <motion.div 
-                        className="absolute left-1/4 -top-10 w-32 h-80 bg-yellow-400 opacity-10 blur-xl"
-                        initial={{ opacity: 0 }}
-                        animate={{ 
-                          opacity: [0, 0.1, 0.08],
-                          rotate: [-10, -5]
-                        }}
-                        transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
-                      />
-                      
-                      <motion.div 
-                        className="absolute right-1/4 -top-10 w-32 h-80 bg-yellow-400 opacity-10 blur-xl"
-                        initial={{ opacity: 0 }}
-                        animate={{ 
-                          opacity: [0, 0.1, 0.08],
-                          rotate: [10, 5]
-                        }}
-                        transition={{ duration: 2, repeat: Infinity, repeatType: "reverse", delay: 0.5 }}
-                      />
-                    </>
-                  )}
+        {/* Tab Navigation */}
+        <div className="flex justify-center mb-4">
+          <div className="bg-gray-800 bg-opacity-70 rounded-full p-1 flex shadow-lg">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setActiveTab("podium")}
+              className={`flex items-center px-4 py-2 rounded-full transition-all ${
+                activeTab === "podium" 
+                  ? "bg-gradient-to-r from-blue-600 to-indigo-700 text-white" 
+                  : "text-gray-300 hover:text-white"
+              }`}
+            >
+              <Award className="w-5 h-5 mr-2" />
+              Pódio
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setActiveTab("table")}
+              className={`flex items-center px-4 py-2 rounded-full transition-all ${
+                activeTab === "table" 
+                  ? "bg-gradient-to-r from-blue-600 to-indigo-700 text-white" 
+                  : "text-gray-300 hover:text-white"
+              }`}
+            >
+              <List className="w-5 h-5 mr-2" />
+              Tabela
+            </motion.button>
+          </div>
+        </div>
+
+        {isLoading ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex flex-col items-center justify-center w-full h-64"
+          >
+            <Loader2 className="w-10 h-10 text-blue-600 animate-spin dark:text-blue-400" />
+            <p className="mt-4 text-gray-600 dark:text-gray-400">Carregando ranking...</p>
+          </motion.div>
+        ) : (
+          <motion.div 
+            ref={rankingContainerRef}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.2}
+            onDragEnd={(_, info) => {
+              if (Math.abs(info.offset.x) > 100) {
+                handleSwipe(info.offset.x);
+              }
+            }}
+            className="bg-gray-900 rounded-xl overflow-hidden shadow-2xl"
+          >
+            <AnimatePresence mode="wait" initial={isFirstRender}>
+              {activeTab === "podium" ? (
+                <motion.div
+                  key="podium-view"
+                  custom="right"
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={tabVariants}
+                  className="overflow-hidden rounded-lg shadow-xl bg-gray-800"
+                >
+                  {/* Podium Section */}
+                  <motion.div className="relative px-4 pt-5 pb-5 sm:pb-5 overflow-hidden bg-gradient-to-b">
+                    <AnimatedBackground />
+                    <AnimatedBackgroundStars />
+                    <AnimatedConfetti />
+                    <AnimatedBackgroundOficial/>
+                    <AnimatedBackgroundStarsOficial />
+                    <AnimatedBrushesOficial />
+
+                    {/* Holofotes para efeito dramático */}
+                    {showSpotlight && (
+                      <>
+                        <motion.div 
+                          className="absolute left-1/4 -top-10 w-32 h-80 bg-yellow-400 opacity-10 blur-xl"
+                          initial={{ opacity: 0 }}
+                          animate={{ 
+                            opacity: [0, 0.1, 0.08],
+                            rotate: [-10, -5]
+                          }}
+                          transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
+                        />
+                        
+                        <motion.div 
+                          className="absolute right-1/4 -top-10 w-32 h-80 bg-yellow-400 opacity-10 blur-xl"
+                          initial={{ opacity: 0 }}
+                          animate={{ 
+                            opacity: [0, 0.1, 0.08],
+                            rotate: [10, 5]
+                          }}
+                          transition={{ duration: 2, repeat: Infinity, repeatType: "reverse", delay: 0.5 }}
+                        />
+                      </>
+                    )}
+                  
+                    <Podium topThree={topThree} handleOpenDetail={handleOpenDetail} />
+                    
+                  </motion.div>
                 
-                  <Podium topThree={topThree} handleOpenDetail={handleOpenDetail} />
-                  
+                  {/* List of other rankings */}
+                  <RankingList
+                    rankings={restOfRanking}
+                    handleOpenDetail={handleOpenDetail}
+                  />
                 </motion.div>
-              
-                {/* List of other rankings */}
-                <RankingList
-                  rankings={restOfRanking}
-                  handleOpenDetail={handleOpenDetail}
-                />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="table-view"
-                custom="left"
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                variants={tabVariants}
-                className="overflow-hidden rounded-lg shadow-xl bg-gray-800"
-              >
-                {/* Table View */}
-                <div className="relative overflow-hidden">
-                  <AnimatedBackground />
-                  <AnimatedBackgroundStars />
-                  <AnimatedConfetti />
-                  <AnimatedBackgroundOficial/>
-                  <AnimatedBackgroundStarsOficial />
-                  
-                  <div className="p-4 relative z-10">
-                    <TableView 
-                      ranking={ranking} 
-                      handleOpenDetail={handleOpenDetail} 
-                    />
+              ) : (
+                <motion.div
+                  key="table-view"
+                  custom="left"
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={tabVariants}
+                  className="overflow-hidden rounded-lg shadow-xl bg-gray-800"
+                >
+                  {/* Table View */}
+                  <div className="relative overflow-hidden">
+                    <AnimatedBackground />
+                    <AnimatedBackgroundStars />
+                    <AnimatedConfetti />
+                    <AnimatedBackgroundOficial/>
+                    <AnimatedBackgroundStarsOficial />
+                    
+                    <div className="p-4 relative z-10">
+                      <TableView 
+                        ranking={ranking} 
+                        handleOpenDetail={handleOpenDetail} 
+                      />
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-      )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        )}
 
-      {/* Swipe Indicator - only on mobile */}
-      <div className="mt-4 text-center text-gray-400 text-sm md:hidden">
-        <motion.div 
-          initial={{ opacity: 0.5 }}
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          Arraste para {activeTab === "podium" ? "ver tabela" : "ver pódio"}
-        </motion.div>
-      </div>
+        {/* Swipe Indicator - only on mobile */}
+        <div className="mt-4 text-center text-gray-400 text-sm md:hidden">
+          <motion.div 
+            initial={{ opacity: 0.5 }}
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            Arraste para {activeTab === "podium" ? "ver tabela" : "ver pódio"}
+          </motion.div>
+        </div>
 
-      {/* Detail Modal */}
-      <AnimatePresence>
-        {isDetailModalOpen && selectedRanking && (
-          <RankUnitDetailModal
-            unit={selectedRanking}
-            onClose={() => setIsDetailModalOpen(false)}
+        {/* Detail Modal */}
+        <AnimatePresence>
+          {isDetailModalOpen && selectedRanking && (
+            <RankUnitDetailModal
+              unit={selectedRanking}
+              isOpen={isDetailModalOpen}
+              onClose={() => setIsDetailModalOpen(false)}
+            />
+          )}
+        </AnimatePresence>
+    
+        {/* Delete Modal */}
+        {isDeleteModalOpen && selectedRanking && (
+          <ConfirmDeleteEvaUnitModal
+            isOpen={isDeleteModalOpen}
+            onClose={() => setIsDeleteModalOpen(false)}
+            onConfirmDelete={() => {}}
           />
         )}
-      </AnimatePresence>
-  
-      {/* Delete Modal */}
-      {isDeleteModalOpen && selectedRanking && (
-        <ConfirmDeleteEvaUnitModal
-          isOpen={isDeleteModalOpen}
-          onClose={() => setIsDeleteModalOpen(false)}
-          onConfirmDelete={() => {}}
-        />
-      )}
-    </motion.div>
+      </motion.div>
+    </>
   );
 }
 

@@ -16,6 +16,8 @@ export interface Question {
   id: string;
   question: string;
   points: number;
+  typeQuestion: 'text' | 'number' | 'yes_no';
+  description?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -28,6 +30,7 @@ export interface Answer {
   answer: string;
   score: number;
   week: number;
+  observation: string | null;
   createdAt: string;
   updatedAt: string;
   unitAnswers?: {

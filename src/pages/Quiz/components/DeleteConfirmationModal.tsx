@@ -72,7 +72,7 @@ export default function DeleteConfirmationModal({
 
                 <div className="mt-6 flex justify-center space-x-3">
                   <Button
-                    //variant="secondary"
+                    variant="outline"
                     size="sm"
                     onClick={onClose}
                     disabled={isLoading}
@@ -84,6 +84,7 @@ export default function DeleteConfirmationModal({
                     size="sm"
                     onClick={onConfirm}
                     disabled={isLoading}
+                    className="bg-red-500"
                     //isLoading={isLoading}
                   >
                     Confirmar

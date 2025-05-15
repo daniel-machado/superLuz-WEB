@@ -224,6 +224,7 @@ import { useState } from "react";
 import { Modal } from "../ui/modal";
 import Select from "../form/Select";
 import Button from "../ui/button/Button";
+import Label from "../form/Label";
 
 interface Props {
   isOpen: boolean;
@@ -248,24 +249,35 @@ export default function CreateQuizModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="space-y-4 mt-4">
-        <Select
-          options={specialties.map((spec) => ({
-            label: spec.name,
-            value: spec.id,
-          }))}
-          placeholder="Selecione uma especialidade"
-          onChange={(value) => setSelectedSpecialty(value)}
-        />
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] m-4">
+      <div className="p-5 space-y-4">
+        <div className="px-2 pr-14">
+          <h4 className="mb-2 text-2xl font-semibold text-green-500">
+            Criar Quiz
+          </h4>
+          <p className="mb-5 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+            Para criar o quiz, selecione a especialidade que deseja associar ele
+          </p>
+        </div>
+        <div className="space-y-4 mt-4">
+          <Label>Selecione a especialidade</Label>
+          <Select
+            options={specialties.map((spec) => ({
+              label: spec.name,
+              value: spec.id,
+            }))}
+            placeholder="Selecione uma especialidade"
+            onChange={(value) => setSelectedSpecialty(value)}
+          />
 
-        <div className="flex justify-end gap-2">
-          <Button onClick={onClose} disabled={isLoading}>
-            Cancelar
-          </Button>
-          <Button onClick={handleSubmit} disabled={isLoading || !selectedSpecialty}>
-            {isLoading ? "Criando..." : "Criar Quiz"}
-          </Button>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={onClose} disabled={isLoading}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSubmit} disabled={isLoading || !selectedSpecialty}>
+              {isLoading ? "Criando..." : "Criar Quiz"}
+            </Button>
+          </div>
         </div>
       </div>
     </Modal>

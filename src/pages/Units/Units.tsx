@@ -58,7 +58,7 @@ export default function Units() {
   return (
     <>
       <PageMeta
-        title="Unidades do clube"
+        title="Unidades do clube | Luzeiros do Norte"
         description="Todas as unidades do clube para gerenciamento"
       />
       <PageBreadcrumb pageTitle="Unidades" />

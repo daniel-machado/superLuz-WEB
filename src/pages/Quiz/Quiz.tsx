@@ -39,11 +39,10 @@ export default function Quiz() {
   const [quizzes, setQuizzes] = useState<IQuiz[]>([]);
   const [specialties, setSpecialties] = useState<ISpecialty[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedQuiz, setSelectedQuiz] = useState<IQuiz | null>(null);
+  const [_selectedQuiz, setSelectedQuiz] = useState<IQuiz | null>(null);
   const [quizToDelete, setQuizToDelete] = useState<string | null>(null);
 
-console.log(selectedQuiz, "selectedQuiz")
-  const { specialtys } = useAuth();
+  const { specialtys, userRole } = useAuth();
   const navigate = useNavigate();
 
 
@@ -160,7 +159,9 @@ console.log(selectedQuiz, "selectedQuiz")
     <>
       <PageMeta title="Quizzes das especialidades" description="Listagem de quizzes por especialidade" />
       <PageBreadcrumb pageTitle="Quizzes" />
-      <div className="space-y-6">
+      { userRole === "admin" || userRole === "director" 
+        ?
+          <div className="space-y-6">
         <ComponentCard title="Quizzes cadastrados">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
             <div className="relative w-full sm:w-64">
@@ -198,6 +199,7 @@ console.log(selectedQuiz, "selectedQuiz")
             </div>
           ) : (
             <div className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+
               <div className="max-w-full overflow-x-auto">
                 {filteredQuizzes.length > 0 ? (
                   <QuizTable
@@ -212,6 +214,7 @@ console.log(selectedQuiz, "selectedQuiz")
                   </div>
                 )}
               </div>
+
             </div>
           )}
         </ComponentCard>
@@ -237,7 +240,10 @@ console.log(selectedQuiz, "selectedQuiz")
           title="Deletar Quiz"
           message="Tem certeza que deseja deletar este quiz? Esta ação não pode ser desfeita."
         />
-      </div>
+          </div>
+       :
+          <p className="flex justify-center text-xl items-center font-medium text-red-500 mb-2">Tu num pode acessar aqui não doido</p>
+      }
     </>
   );
 }

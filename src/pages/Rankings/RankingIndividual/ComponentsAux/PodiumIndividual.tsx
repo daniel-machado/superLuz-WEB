@@ -24,35 +24,12 @@ const PodiumIndividual = ({ topThree, handleOpenDetail }: PodiumProps) => {
   const { width, height } = useWindowSize();
   const [showConfetti, setShowConfetti] = useState(false);
 
-  // // Define podium colors and animations
-  // const podiumColors = [
-  //   "bg-gradient-to-t from-yellow-500 to-yellow-300 h-24 sm:h-28", // 1st place
-  //   "bg-gradient-to-t from-gray-400 to-gray-300 h-16 sm:h-20",     // 2nd place
-  //   "bg-gradient-to-t from-amber-700 to-amber-500 h-12 sm:h-16"    // 3rd place
-  // ];
     // Cores para os pódios
     const podiumColors = [
       'bg-gradient-to-t from-yellow-500 to-yellow-300 h-40', // Primeiro lugar
       'bg-gradient-to-t from-gray-400 to-gray-300 h-32',     // Segundo lugar
       'bg-gradient-to-t from-amber-700 to-amber-500 h-24'    // Terceiro lugar
     ];
-  
-
-  // Animação constante para o primeiro lugar
-  // const pulseAnimation = {
-  //   scale: [1, 1.05, 1],
-  //   boxShadow: [
-  //     "0 10px 15px -3px rgba(2, 255, 171, 0.3)", // Verde com opacidade 0.3
-  //     "0 20px 25px -5px rgba(2, 255, 171, 0.4)", // Verde com opacidade 0.4
-  //     "0 10px 15px -3px rgba(2, 255, 171, 0.3)", // Verde com opacidade 0.3
-  //   ],
-  //   transition: {
-  //     duration: 2,
-  //     ease: "easeInOut",
-  //     repeat: Infinity,
-  //     repeatType: "loop" as const,
-  //   },
-  // };
   
      // Animações para os pódios
   const podiumAnimations = [
@@ -232,7 +209,7 @@ const PodiumIndividual = ({ topThree, handleOpenDetail }: PodiumProps) => {
                 }
               }}
             >
-              <Crown className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400" strokeWidth={1.5} fill="rgba(250, 204, 21, 0.5)" />
+              <Crown className="w-6 h-6 mb-3 sm:w-8 sm:h-8 text-yellow-400" strokeWidth={1.5} fill="rgba(250, 204, 21, 0.5)" />
             </motion.div>
           
             <motion.div
@@ -335,23 +312,6 @@ const PodiumIndividual = ({ topThree, handleOpenDetail }: PodiumProps) => {
                   ★
                 </motion.div>
               </motion.div>
-              {/* <motion.div
-                className="absolute inset-0 flex items-center justify-center mt-5"
-                animate={{
-                  opacity: [0.3, 0.7, 0.3],
-                }}
-                transition={{
-                  duration: 1,
-                  repeat: Infinity,
-                  repeatType: "loop",
-                }}
-              >
-                <img
-                  src={superUnidadeBiblica}
-                  alt="Unidade Bíblica"
-                  className="absolute inset-0 object-cover z-0 w-30 h-30 opacity-70 flex items-center justify-center"
-                />
-              </motion.div> */}
             </motion.div>
           </motion.div>
         ) : null}

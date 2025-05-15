@@ -18,6 +18,7 @@ import TextArea from "../../components/form/input/TextArea";
 import { CategoryIcons } from "./Components/CategoryIcons";
 import { CategoryColors } from "./Components/CategoryColors";
 import { specialtyUserService } from "../../services/specialtyUserService";
+import Label from "../../components/form/Label";
 
 
 interface ISpecialty {
@@ -617,68 +618,88 @@ export default function Specialty() {
 
 
       {/* Create Specialty Modal */}
-      <Modal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        //title="Criar Nova Especialidade"
-      >
-        <div className="space-y-4">
+      <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} className="max-w-[700px] m-4">
+        <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-5 dark:bg-gray-900 lg:p-11">
+          <div className="px-2 pr-14">
+            <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
+              Criar Especialidade
+            </h4>
+            <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+              Crie uma nova especialidade
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              //label="Nome da Especialidade*"
-              value={nameSpecialty}
-              onChange={(e) => setNameSpecialty(e.target.value)}
-              placeholder="Ex: Apicultura"
-            />
-            <Select
-              //label="Categoria*"
-              //value={category}
-              onChange={(e) => setCategory(e as string)}
-              options={categories.map((cat) => ({
-                value: cat,
-                label: cat.charAt(0).toUpperCase() + cat.slice(1),
-              }))}
-            />
+            <div className="m-3">
+              <Label>Nome da Especialidade</Label>
+              <Input
+                //label="Nome da Especialidade*"
+                value={nameSpecialty}
+                onChange={(e) => setNameSpecialty(e.target.value)}
+                placeholder="Ex: Apicultura"
+              />
+            </div>
+
+            <div className="m-3">
+              <Label>Categoria</Label>
+                  <Select
+                  placeholder="Selecione a categoria"
+                  onChange={(e) => setCategory(e as string)}
+                  options={categories.map((cat) => ({
+                    value: cat,
+                    label: cat.charAt(0).toUpperCase() + cat.slice(1),
+                  }))}
+                />
+            </div>
           </div>
 
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              //label="Código"
-              value={codigo}
-              onChange={(e) => setCodigo(e.target.value)}
-              placeholder="Ex: AP"
-            />
-            <Input
-              //label="Número"
-              value={numero}
-              onChange={(e) => setNumero(e.target.value)}
-              placeholder="Ex: 004"
-            />
+
+            <div className="m-3">
+              <Label>Código</Label>
+              <Input
+                value={codigo}
+                onChange={(e) => setCodigo(e.target.value)}
+                placeholder="Ex: AP"
+              />
+            </div>
+
+            <div className="m-3">
+              <Label>Número</Label>
+              <Input
+                value={numero}
+                onChange={(e) => setNumero(e.target.value)}
+                placeholder="Ex: 004"
+              />
+            </div>
           </div>
 
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              type="number"
-              //label="Nível"
-              value={level || ""}
-              onChange={(e) => setLevel(e.target.value ? parseInt(e.target.value) : null)}
-              placeholder="Ex: 1"
-            />
-            <Input
-              //label="Ano"
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-              placeholder="Ex: 1929"
-            />
+          <div className="m-3">
+              <Label>Nível</Label>
+              <Input
+                type="number"
+                value={level || ""}
+                onChange={(e) => setLevel(e.target.value ? parseInt(e.target.value) : null)}
+                placeholder="Ex: 1"
+              />
+            </div>
+            
+            <div className="m-3">
+              <Label>Ano</Label>
+              <Input
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+                placeholder="Ex: 1929"
+              />
+            </div>
           </div>
 
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Emblema
-            </label>
+            <Label>Emblema</Label>
             <div className="flex items-center space-x-4">
               {previewImage ? (
                 <img
@@ -705,14 +726,15 @@ export default function Specialty() {
             </div>
           </div>
 
-
-          <TextArea
-            //label="Requisitos (um por linha)"
-            value={requirements}
-            onChange={(value: string) => setRequirements(value)}
-            rows={4}
-            placeholder="Digite os requisitos, um por linha..."
-          />
+          <div className="m-3">
+            <Label>Requisitos</Label>
+            <TextArea
+              value={requirements}
+              onChange={(value: string) => setRequirements(value)}
+              rows={4}
+              placeholder="Digite os requisitos, um por linha..."
+            />
+          </div>
           
 
           <div className="flex justify-end space-x-3 pt-4">
@@ -737,69 +759,90 @@ export default function Specialty() {
 
 
       {/* Edit Specialty Modal */}
-      <Modal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        //title={`Editar ${selectedSpecialty?.name || 'Especialidade'}`}
-      >
+      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} className="max-w-[700px] m-4">
         {selectedSpecialty && (
-          <div className="space-y-4">
+           <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-5 dark:bg-gray-900 lg:p-11">
+            <div className="px-2 pr-14">
+              <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
+                Editar Especialidade
+              </h4>
+              <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+                Edite essa especialidade
+              </p>
+            </div>
+          
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input
-                //label="Nome da Especialidade*"
-                value={nameSpecialty}
-                onChange={(e) => setNameSpecialty(e.target.value)}
-                placeholder="Ex: Apicultura"
-              />
-              <Select
-                //label="Categoria*"
-                //value={category}
-                onChange={(e) => setCategory(e as string)}
-                options={categories.map((cat) => ({
-                  value: cat,
-                  label: cat.charAt(0).toUpperCase() + cat.slice(1),
-                }))}
-              />
+              <div className="m-3">
+                  <Label>Nome da especialidade</Label>
+                    <Input
+                    value={nameSpecialty}
+                    onChange={(e) => setNameSpecialty(e.target.value)}
+                    placeholder="Ex: Apicultura"
+                  />
+              </div>
+              
+              <div className="m-3">
+                  <Label>Categoria</Label>
+                  <Select
+                    onChange={(e) => setCategory(e as string)}
+                    options={categories.map((cat) => ({
+                      value: cat,
+                      label: cat.charAt(0).toUpperCase() + cat.slice(1),
+                    }))}
+                  />
+              </div>
+              
             </div>
 
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input
-                //label="Código"
-                value={codigo}
-                onChange={(e) => setCodigo(e.target.value)}
-                placeholder="Ex: AP"
-              />
-              <Input
+              <div className="m-3">
+                  <Label>Código</Label>
+                      <Input
+                    //label="Código"
+                    value={codigo}
+                    onChange={(e) => setCodigo(e.target.value)}
+                    placeholder="Ex: AP"
+                  />
+              </div>
+              <div className="m-3">
+                  <Label>Número</Label>
+                  <Input
                 //label="Número"
                 value={numero}
                 onChange={(e) => setNumero(e.target.value)}
                 placeholder="Ex: 004"
               />
+              </div> 
             </div>
 
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input
+            <div className="m-3">
+                  <Label>Nível</Label>
+                  <Input
                 type="number"
                 //label="Nível"
                 value={level || ""}
                 onChange={(e) => setLevel(e.target.value ? parseInt(e.target.value) : null)}
                 placeholder="Ex: 1"
               />
-              <Input
+              </div> 
+
+              <div className="m-3">
+                  <Label>Ano</Label>
+                  <Input
                 //label="Ano"
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
                 placeholder="Ex: 1929"
               />
+              </div> 
             </div>
 
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Emblema
-              </label>
+              <Label>Emblema</Label>
               <div className="flex items-center space-x-4">
                 {previewImage ? (
                   <img
@@ -826,14 +869,17 @@ export default function Specialty() {
               </div>
             </div>
 
-
-            <TextArea
+            <div className="m-3">
+                  <Label>Requisito</Label>
+                  <TextArea
               //label="Requisitos (um por linha)"
               value={requirements}
               onChange={(value: string) => setRequirements(value)}
               rows={4}
               placeholder="Digite os requisitos, um por linha..."
             />
+              </div>
+            
 
 
             <div className="flex justify-end space-x-3 pt-4">
@@ -859,17 +905,17 @@ export default function Specialty() {
 
 
       {/* Delete Confirmation Modal */}
-      <Modal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        //title="Confirmar Exclusão"
-        //size="sm"
-      >
+      <Modal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} className="max-w-[700px] m-4" >
         {selectedSpecialty && (
-          <div className="space-y-4">
-            <p className="text-gray-700 dark:text-gray-300">
-              Tem certeza que deseja excluir a especialidade <span className="font-semibold">{selectedSpecialty.name}</span>? Esta ação não pode ser desfeita.
-            </p>
+          <div className="no-scrollbar relative w-full overflow-y-auto rounded-3xl bg-white p-5 dark:bg-gray-900 lg:p-11">
+            <div className="px-2 pr-14">
+              <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
+                Tem certeza que deseja excluir essa especialidade?
+              </h4>
+              <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+                Esta ação não pode ser desfeita
+              </p>
+            </div>
             
             <div className="flex justify-end space-x-3 pt-4">
               <Button

@@ -28,6 +28,7 @@ import { userService } from '../../services/userService';
 import { specialtyService } from '../../services/specialtyService';
 import { Unit } from '../../dtos/UnitDTO';
 import { Tabs, TabsList, TabsTrigger } from './ComponentsUser/TabsContexts';
+import PageMeta from '../../components/common/PageMeta';
 
 enum StatusSpecialty {
   PENDING = 'pending',
@@ -49,7 +50,7 @@ type SpecialtyInfo = {
   name: string;
   description?: string;
   category?: string;
-  imageUrl?: string;
+  emblem?: string;
 };
 
 
@@ -93,6 +94,16 @@ interface CounselorUnit {
   userId: string;
 }
 
+interface UsersAll {
+  id: string;
+  name: string;
+  email: string;
+  birthDate: string;
+  role: string;
+  photoUrl: string | null;
+  status: string
+}
+
 export type SpecialtyAssociation = {
   userId: string;
   specialtyId: string;
@@ -105,7 +116,6 @@ const SpecialtyManager = () => {
   const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
   const [specialtyToRemove, setSpecialtyToRemove] = useState<SpecialtyUser | null>(null);
   const [currentSpecialty, setCurrentSpecialty] = useState<SpecialtyUser | null>(null);
-  //const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('all');
   const [activeView, setActiveView] = useState('personal');
   const [selectedUnit, setSelectedUnit] = useState('all');
@@ -114,6 +124,7 @@ const SpecialtyManager = () => {
   const [users, setUsers] = useState<UserInfo[]>([]);
   const [specialties, setSpecialties] = useState<SpecialtyInfo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [usersAll, setUsersAll] = useState<UsersAll[]>([]);
 
   // Get all units data from the API (mock for now)
   const [units, setUnits] = useState<Unit[]>([]);
@@ -146,7 +157,7 @@ const SpecialtyManager = () => {
     const loadingToast = toast.loading("Carregando dados...", { position: 'bottom-center' });
   
     try {
-      await Promise.all([fetchSpecialtyUsers(), fetchUsers(), fetchSpecialties()]);
+      await Promise.all([fetchSpecialtyUsers(), fetchUsers(), fetchSpecialties(), fetchUsersAll()]);
       toast.dismiss(loadingToast);
       toast.success("Dados carregados com sucesso", {
         position: 'bottom-center',
@@ -184,7 +195,6 @@ const SpecialtyManager = () => {
     }
   };
 
-
   const fetchUsers = async () => {
     try {
       const response = await userService.getAllUsers();
@@ -214,6 +224,19 @@ const SpecialtyManager = () => {
     }
   };
 
+  const fetchUsersAll = async () => {
+    try {
+      const data = await userService.getAllUsers();
+      setUsersAll(data);
+      return data;
+    } catch (error) {
+      toast.error("Erro ao carregar usuários", {
+        position: 'bottom-right',
+        icon: '🚫',
+      });
+      return [];
+    }
+  };
 
   const confirmRemove = async () => {
     if (!specialtyToRemove) return;
@@ -360,19 +383,19 @@ const SpecialtyManager = () => {
     }
   };
 
-  // const handleRemoveClick = (specialty: SpecialtyUser) => {
-  //   setSpecialtyToRemove(specialty);
-  // };
+  const handleRemoveClick = (specialty: SpecialtyUser) => {
+    setSpecialtyToRemove(specialty);
+  };
 
-  // const sendReport = (specialty: SpecialtyUser) => {
-  //   setCurrentSpecialty(specialty);
-  //   setIsReportModalOpen(true);
-  // };
+  const sendReport = (specialty: SpecialtyUser) => {
+    setCurrentSpecialty(specialty);
+    setIsReportModalOpen(true);
+  };
 
-  // const evaluateBySpecialty = (specialty: SpecialtyUser) => {
-  //   setCurrentSpecialty(specialty);
-  //   setIsApprovalModalOpen(true);
-  // };
+  const evaluateBySpecialty = (specialty: SpecialtyUser) => {
+    setCurrentSpecialty(specialty);
+    setIsApprovalModalOpen(true);
+  };
 
   
   // Fetch units data on component mount
@@ -557,46 +580,123 @@ const SpecialtyManager = () => {
         roleMatch = unitDbvIds.includes(item.userId);
       }
       
-      // Filter by selected unit (for admin, director, lead in group view)
-      let unitMatch = true;
-      if (activeView === 'group' && selectedUnit !== 'all') {
+      // // Filter by selected unit (for admin, director, lead in group view)
+      // let unitMatch = true;
+      // if (activeView === 'group' && selectedUnit !== 'all') {
+      //   const unitData = units.find(unit => unit.id === selectedUnit);
+      //   const unitDbvIds = (unitData?.dbvs ?? []).map(dbv => dbv.dbv.id);
+      //   unitMatch = unitDbvIds.includes(item.userId);
+      // }
+      
+      // Atualize a parte de filtro por unidade para incluir a direção
+    let unitMatch = true;
+    if (activeView === 'group' && selectedUnit !== 'all') {
+      if (selectedUnit === 'direction') {
+        // Filtra apenas membros da direção
+        const isDirectionMember = usersAll.some(user => 
+          user.id === item.userId && user.role !== 'dbv' 
+          && !units.some(unit => unit.dbvs?.some(dbv => 
+            dbv.dbv.id === user.id) ?? false));
+        
+            unitMatch = isDirectionMember;
+      } else {
+        // Filtro normal por unidade
         const unitData = units.find(unit => unit.id === selectedUnit);
         const unitDbvIds = (unitData?.dbvs ?? []).map(dbv => dbv.dbv.id);
         unitMatch = unitDbvIds.includes(item.userId);
       }
-      
+    }
+
       // Filter by category
       let categoryMatch = true;
       if (selectedCategory !== 'all') {
         categoryMatch = item.specialtyInfo?.category === selectedCategory;
       }
       
-      return searchMatch && statusMatch && roleMatch && unitMatch && categoryMatch;
-    });
-  }, [data, search, activeTab, activeView, selectedUnit, selectedCategory, user, units, counselorUnit]);
+  return searchMatch && statusMatch && roleMatch && unitMatch && categoryMatch;
+  });
+}, [data, search, activeTab, activeView, selectedUnit, selectedCategory, user, units, counselorUnit, usersAll]);
+
 
 
   // Group data by unit for the group view
-  const groupedByUnit = useMemo(() => {
-    if (!units || !data) return [];
+  // const groupedByUnit = useMemo(() => {
+  //   if (!units || !data) return [];
     
-    return units.map(unit => {
-      const unitDbvIds = (unit.dbvs ?? []).map(dbv => dbv.dbv.id);
-      const unitSpecialties = data.filter(item => 
-        unitDbvIds.includes(item.userId) &&
-        (selectedCategory === 'all' || item.specialtyInfo?.category === selectedCategory) &&
-        (activeTab === 'all' || item.approvalStatus === activeTab) &&
-        (search === '' || 
-          item.specialtyUser?.name?.toLowerCase().includes(search.toLowerCase()) ||
-          item.specialtyInfo?.name?.toLowerCase().includes(search.toLowerCase()))
-      );
+  //   return units.map(unit => {
+  //     const unitDbvIds = (unit.dbvs ?? []).map(dbv => dbv.dbv.id);
+  //     const unitSpecialties = data.filter(item => 
+  //       unitDbvIds.includes(item.userId) &&
+  //       (selectedCategory === 'all' || item.specialtyInfo?.category === selectedCategory) &&
+  //       (activeTab === 'all' || item.approvalStatus === activeTab) &&
+  //       (search === '' || 
+  //         item.specialtyUser?.name?.toLowerCase().includes(search.toLowerCase()) ||
+  //         item.specialtyInfo?.name?.toLowerCase().includes(search.toLowerCase()))
+  //     );
       
-      return {
-        unit,
-        specialties: unitSpecialties
-      };
-    }).filter(group => group.specialties.length > 0);
-  }, [units, data, selectedCategory, activeTab, search]);
+  //     return {
+  //       unit,
+  //       specialties: unitSpecialties
+  //     };
+  //   }).filter(group => group.specialties.length > 0);
+  // }, [units, data, selectedCategory, activeTab, search]);
+
+  const groupedByUnit = useMemo(() => {
+  if (!units || !data) return [];
+  
+  // Processa unidades normais
+  const unitGroups = units.map(unit => {
+    const unitDbvIds = (unit.dbvs ?? []).map(dbv => dbv.dbv.id);
+    const unitSpecialties = data.filter(item =>
+      unitDbvIds.includes(item.userId) &&
+      (selectedCategory === 'all' || item.specialtyInfo?.category === selectedCategory) &&
+      (activeTab === 'all' || item.approvalStatus === activeTab) &&
+      (search === '' ||
+        item.specialtyUser?.name?.toLowerCase().includes(search.toLowerCase()) ||
+        item.specialtyInfo?.name?.toLowerCase().includes(search.toLowerCase()))
+    );
+    
+    return {
+      unit,
+      specialties: unitSpecialties
+    };
+  }).filter(group => group.specialties.length > 0);
+
+
+  // Adiciona grupo para membros sem unidade (direção)
+  const usersWithoutUnit = usersAll.filter(user => 
+    user.role !== 'dbv' && // Não são DBVs
+    !units.some(unit => 
+      unit.dbvs?.some(dbv => dbv.dbv.id === user.id) ?? false
+    )
+  );
+
+
+  const directionSpecialties = data.filter(item =>
+    usersWithoutUnit.some(user => user.id === item.userId) &&
+    (selectedCategory === 'all' || item.specialtyInfo?.category === selectedCategory) &&
+    (activeTab === 'all' || item.approvalStatus === activeTab) &&
+    (search === '' ||
+      item.specialtyUser?.name?.toLowerCase().includes(search.toLowerCase()) ||
+      item.specialtyInfo?.name?.toLowerCase().includes(search.toLowerCase()))
+  );
+
+
+  if (directionSpecialties.length > 0) {
+    unitGroups.push({
+      unit: {
+        id: 'direction',
+        name: 'Direção',
+        photo: null,
+        dbvs: []
+      },
+      specialties: directionSpecialties
+    });
+  }
+
+
+  return unitGroups;
+}, [units, data, selectedCategory, activeTab, search, usersAll]);
 
 
   // Determine which view tabs to show based on user role
@@ -642,380 +742,391 @@ const SpecialtyManager = () => {
 
 
   return (
-    <motion.div
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      variants={pageVariants}
-      className="min-h-screen"
-    >
-      <div className="space-y-6 pb-10">
-        <div className="bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-700">
-          <div className="p-5">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-              <h2 className="text-xl font-semibold text-white">Especialidades dos Desbravadores</h2>
-              
-              {(userRole === 'admin' || userRole === 'director' || userRole === 'lead') && (
-                  <motion.div
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                >
-                  <Button
-                    size="sm"
-                    variant="primary"
-                    startIcon={<PlusIcon />}
-                    onClick={() => {
-                      setSpecialtyToRemove(null);
-                      setIsModalOpen(true);
-                    }}
-                    className="rounded-xl shadow-md hover:shadow-lg transition-all duration-300 bg-gradient-to-r from-purple-500 to-indigo-600"
+    <>
+      <PageMeta
+        title="Especialidades associadas a membros | Luzeiros do Norte"
+        description="Clube de Desbravadores - Especialidades associadas a membros"
+      />
+      <motion.div
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        variants={pageVariants}
+        className="min-h-screen"
+      >
+        <div className="space-y-6 pb-10">
+          <div className="bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-700">
+            <div className="p-5">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <h2 className="text-xl font-semibold text-white">Especialidades dos Desbravadores</h2>
+                
+                {(userRole === 'admin' || userRole === 'director' || userRole === 'lead') && (
+                    <motion.div
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
                   >
-                    Associar Especialidade
-                  </Button>
-                </motion.div>
-              )}
-              
-            </div>
-                        
-                        {/* View Tabs - Only shown if user is not a 'dbv' */}
-            {viewTabs && (
-              <Tabs value={activeView} onValueChange={handleViewTabChange} className="mb-4 md:mb-6 overflow-x-auto">
-                <TabsList className="bg-gray-700 p-1 rounded-lg min-w-max">
-                  {viewTabs.map(tab => (
-                    <TabsTrigger
-                      key={tab.id}
-                      value={tab.id}
-                      className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-gray-300 rounded-md px-3 py-1.5 text-sm whitespace-nowrap"
+                    <Button
+                      size="sm"
+                      variant="primary"
+                      startIcon={<PlusIcon />}
+                      onClick={() => {
+                        setSpecialtyToRemove(null);
+                        setIsModalOpen(true);
+                      }}
+                      className="rounded-xl shadow-md hover:shadow-lg transition-all duration-300 bg-gradient-to-r from-purple-500 to-indigo-600"
                     >
-                      {tab.icon && <span className="mr-1.5">{tab.icon}</span>}
-                      {tab.label}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </Tabs>
-            )}
-
-
-            {/* Search and Filters Row - Stacked on small screens, side by side on larger screens */}
-            <div className="flex flex-col gap-3 mb-4 md:mb-6">
-              {/* Search Bar - Full width on all screens */}
-              <div className="relative w-full">
-                <Input
-                  placeholder="Buscar por nome do desbravador ou especialidade"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10 rounded-xl focus:ring-2 focus:ring-blue-500 w-full"
-                />
-                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      Associar Especialidade
+                    </Button>
+                  </motion.div>
+                )}
+                
               </div>
-              
-              {/* Filters - Responsive container that allows horizontal scrolling on small screens */}
-              <div className="w-full overflow-x-auto pb-2">
-                <div className="flex gap-2 min-w-max">
-                  {/* Status filter - Made more compact for small screens */}
-                  <div className="flex items-center bg-gray-700 rounded-lg overflow-hidden">
-                    <Button
-                      onClick={() => setActiveTab('all')}
-                      className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm transition-all duration-300 rounded-none ${activeTab === 'all' ? 'bg-indigo-600 text-white' : 'bg-transparent text-gray-300 hover:bg-gray-600'}`}
-                    >
-                      Todos
-                    </Button>
-                    <Button
-                      onClick={() => setActiveTab('pending')}
-                      className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm transition-all duration-300 rounded-none flex items-center ${activeTab === 'pending' ? 'bg-yellow-600 text-white' : 'bg-transparent text-gray-300 hover:bg-gray-600'}`}
-                    >
-                      <Clock size={12} className="mr-1 sm:mr-2" />
-                      <span className="whitespace-nowrap">Pendentes</span>
-                    </Button>
-                    <Button
-                      onClick={() => setActiveTab('approved')}
-                      className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm transition-all duration-300 rounded-none flex items-center ${activeTab === 'approved' ? 'bg-green-600 text-white' : 'bg-transparent text-gray-300 hover:bg-gray-600'}`}
-                    >
-                      <CheckCircle size={12} className="mr-1 sm:mr-2" />
-                      <span className="whitespace-nowrap">Aprovados</span>
-                    </Button>
-                    <Button
-                      onClick={() => setActiveTab('rejected')}
-                      className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm transition-all duration-300 rounded-none flex items-center ${activeTab === 'rejected' ? 'bg-red-600 text-white' : 'bg-transparent text-gray-300 hover:bg-gray-600'}`}
-                    >
-                      <XCircle size={12} className="mr-1 sm:mr-2" />
-                      <span className="whitespace-nowrap">Rejeitados</span>
-                    </Button>
-                  </div>
-                  
-                  {/* Show Unit filter for group view */}
-                  {activeView === 'group' && (
+                          
+              {/* View Tabs - Only shown if user is not a 'dbv' */}
+              {viewTabs && (
+                <Tabs value={activeView} onValueChange={handleViewTabChange} className="mb-4 md:mb-6 overflow-x-auto">
+                  <TabsList className="bg-gray-700 p-1 rounded-lg min-w-max">
+                    {viewTabs.map(tab => (
+                      <TabsTrigger
+                        key={tab.id}
+                        value={tab.id}
+                        className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-gray-300 rounded-md px-3 py-1.5 text-sm whitespace-nowrap"
+                      >
+                        {tab.icon && <span className="mr-1.5">{tab.icon}</span>}
+                        {tab.label}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                </Tabs>
+              )}
+
+
+              {/* Search and Filters Row - Stacked on small screens, side by side on larger screens */}
+              <div className="flex flex-col gap-3 mb-4 md:mb-6">
+                {/* Search Bar - Full width on all screens */}
+                <div className="relative w-full">
+                  <Input
+                    placeholder="Buscar por nome do desbravador ou especialidade"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="pl-10 rounded-xl focus:ring-2 focus:ring-blue-500 w-full"
+                  />
+                  <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                </div>
+                
+                {/* Filters - Responsive container that allows horizontal scrolling on small screens */}
+                <div className="w-full overflow-x-auto pb-2">
+                  <div className="flex gap-2 min-w-max">
+                    {/* Status filter - Made more compact for small screens */}
+                    <div className="flex items-center bg-gray-700 rounded-lg overflow-hidden">
+                      <Button
+                        onClick={() => setActiveTab('all')}
+                        className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm transition-all duration-300 rounded-none ${activeTab === 'all' ? 'bg-indigo-600 text-white' : 'bg-transparent text-gray-300 hover:bg-gray-600'}`}
+                      >
+                        Todos
+                      </Button>
+                      <Button
+                        onClick={() => setActiveTab('pending')}
+                        className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm transition-all duration-300 rounded-none flex items-center ${activeTab === 'pending' ? 'bg-yellow-600 text-white' : 'bg-transparent text-gray-300 hover:bg-gray-600'}`}
+                      >
+                        <Clock size={12} className="mr-1 sm:mr-2" />
+                        <span className="whitespace-nowrap">Pendentes</span>
+                      </Button>
+                      <Button
+                        onClick={() => setActiveTab('approved')}
+                        className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm transition-all duration-300 rounded-none flex items-center ${activeTab === 'approved' ? 'bg-green-600 text-white' : 'bg-transparent text-gray-300 hover:bg-gray-600'}`}
+                      >
+                        <CheckCircle size={12} className="mr-1 sm:mr-2" />
+                        <span className="whitespace-nowrap">Aprovados</span>
+                      </Button>
+                      <Button
+                        onClick={() => setActiveTab('rejected')}
+                        className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm transition-all duration-300 rounded-none flex items-center ${activeTab === 'rejected' ? 'bg-red-600 text-white' : 'bg-transparent text-gray-300 hover:bg-gray-600'}`}
+                      >
+                        <XCircle size={12} className="mr-1 sm:mr-2" />
+                        <span className="whitespace-nowrap">Rejeitados</span>
+                      </Button>
+                    </div>
+                    
+                    {/* Show Unit filter for group view */}
+                    {activeView === 'group' && (
+                      <select
+                        value={selectedUnit}
+                        onChange={(e) => setSelectedUnit(e.target.value)}
+                        className="bg-gray-700 border border-gray-600 text-white rounded-lg px-2 py-1.5 text-xs sm:text-sm whitespace-nowrap"
+                      >
+                        <option value="all">Todas Unidades</option>
+                        {units.map(unit => (
+                          <option key={unit.id} value={unit.id}>{unit.name}</option>
+                        ))}
+                        <option value="direction">Direção</option>
+                      </select>
+                    )}
+
+                    
+                    {/* Categories filter */}
                     <select
-                      value={selectedUnit}
-                      onChange={(e) => setSelectedUnit(e.target.value)}
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
                       className="bg-gray-700 border border-gray-600 text-white rounded-lg px-2 py-1.5 text-xs sm:text-sm whitespace-nowrap"
                     >
-                      <option value="all">Todas Unidades</option>
-                      {units.map(unit => (
-                        <option key={unit.id} value={unit.id}>{unit.name}</option>
+                      <option value="all">Todas Categorias</option>
+                      {categories.map(category => (
+                        <option key={category} value={category}>{category}</option>
                       ))}
                     </select>
-                  )}
-                  
-                  {/* Categories filter */}
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="bg-gray-700 border border-gray-600 text-white rounded-lg px-2 py-1.5 text-xs sm:text-sm whitespace-nowrap"
-                  >
-                    <option value="all">Todas Categorias</option>
-                    {categories.map(category => (
-                      <option key={category} value={category}>{category}</option>
-                    ))}
-                  </select>
+                  </div>
                 </div>
               </div>
-            </div>
 
 
 
-            {/* Main Content Area */}
-            <AnimatePresence mode="wait">
-              {isLoading ? (
-                <motion.div
-                  key="loading"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="flex justify-center items-center py-16"
-                >
-                  <div className="flex flex-col items-center">
-                    <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="mt-6 text-gray-400 text-lg">Carregando especialidades...</p>
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="content"
-                  variants={contentVariants}
-                  initial="hidden"
-                  animate="visible"
-                >
-                  {/* Group View - For admin, director, lead */}
-                  {activeView === 'group' && (
-                    <>
-                      {groupedByUnit.length === 0 ? (
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="flex justify-center items-center py-16 bg-gray-800 rounded-xl shadow-md"
-                        >
-                          <div className="flex flex-col items-center text-center px-4">
-                            <Layers className="w-20 h-20 text-gray-500 mb-6" />
-                            <h3 className="text-2xl font-semibold text-gray-300 mb-3">
-                              Nenhuma unidade com especialidades encontrada
-                            </h3>
-                            <p className="text-gray-400 max-w-md">
-                              {search ? 
-                                "Nenhum resultado para sua busca. Tente outro termo ou filtro." : 
-                                "Não há especialidades associadas a nenhuma unidade com os filtros selecionados."}
-                            </p>
-                          </div>
-                        </motion.div>
-                      ) : (
-                        <div className="space-y-8">
-                          {groupedByUnit.map((groupData) => (
-                            <div key={groupData.unit.id} className="bg-gray-750 rounded-xl p-4 shadow-md border border-gray-700">
-                              <div className="flex items-center mb-4 gap-3">
-                                {groupData.unit.photo ? (
-                                  <img 
-                                    src={groupData.unit.photo} 
-                                    alt={groupData.unit.name}
-                                    className="w-10 h-10 rounded-full object-cover border border-indigo-500"
-                                  />
-                                ) : (
-                                  <div className="w-10 h-10 rounded-full bg-indigo-800 flex items-center justify-center">
-                                    <Users size={16} className="text-white" />
-                                  </div>
-                                )}
-                                <h3 className="text-lg font-semibold text-white">{groupData.unit.name}</h3>
-                                <Badge 
-                                  color="primary" 
-                                  //className="ml-auto"
-                                >
-                                  {groupData.specialties.length} especialidade{groupData.specialties.length !== 1 ? 's' : ''}
-                                </Badge>
-                              </div>
-                              
-                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {groupData.specialties.map((item, index) => (
-                                  <SpecialtyCard 
-                                  key={item.id}
-                                  item={item}
-                                  userLogged={user}
-                                  isLoading={isLoading}
-                                  reportSend={() => {}}
-                                  approve={() => {}}
-                                  onRemoveClick={() => {}}
-                                  index={index}
-  
-                                />
-                                ))}
-                              </div>
+              {/* Main Content Area */}
+              <AnimatePresence mode="wait">
+                {isLoading ? (
+                  <motion.div
+                    key="loading"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex justify-center items-center py-16"
+                  >
+                    <div className="flex flex-col items-center">
+                      <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                      <p className="mt-6 text-gray-400 text-lg">Carregando especialidades...</p>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="content"
+                    variants={contentVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    {/* Group View - For admin, director, lead */}
+                    {activeView === 'group' && (
+                      <>
+                        {groupedByUnit.length === 0 ? (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="flex justify-center items-center py-16 bg-gray-800 rounded-xl shadow-md"
+                          >
+                            <div className="flex flex-col items-center text-center px-4">
+                              <Layers className="w-20 h-20 text-gray-500 mb-6" />
+                              <h3 className="text-2xl font-semibold text-gray-300 mb-3">
+                                Nenhuma unidade com especialidades encontrada
+                              </h3>
+                              <p className="text-gray-400 max-w-md">
+                                {search ? 
+                                  "Nenhum resultado para sua busca. Tente outro termo ou filtro." : 
+                                  "Não há especialidades associadas a nenhuma unidade com os filtros selecionados."}
+                              </p>
                             </div>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  )}
-                  
-                  {/* Unit View - For counselors */}
-                  {activeView === 'unit' && user?.user?.user?.role === 'counselor' && (
-                    <>
-                      {filteredData.length === 0 ? (
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="flex justify-center items-center py-16 bg-gray-800 rounded-xl shadow-md"
-                        >
-                          <div className="flex flex-col items-center text-center px-4">
-                            <Users className="w-20 h-20 text-gray-500 mb-6" />
-                            <h3 className="text-2xl font-semibold text-gray-300 mb-3">
-                              Nenhuma especialidade encontrada na sua unidade
-                            </h3>
-                            <p className="text-gray-400 max-w-md">
-                              {search ?
-                                "Nenhum resultado para sua busca. Tente outro termo ou filtro." :
-                                "Os desbravadores da sua unidade ainda não têm especialidades associadas."}
-                            </p>
-                          </div>
-                        </motion.div>
-                      ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                          <AnimatePresence>
-                            {filteredData.map((item, index) => (
-                              <SpecialtyCard 
-                              key={item.id}
-                              item={item}
-                              userLogged={user}
-                              isLoading={isLoading}
-                              reportSend={() => {}}
-                              approve={() => {}}
-                              onRemoveClick={() => {}}
-                              index={index}
-
-                            />
+                          </motion.div>
+                        ) : (
+                          <div className="space-y-8">
+                            {groupedByUnit.map((groupData) => (
+                              <div key={groupData.unit.id} className="bg-gray-750 rounded-xl p-4 shadow-md border border-gray-700">
+                                <div className="flex items-center mb-4 gap-3">
+                                  {groupData.unit.photo ? (
+                                    <img 
+                                      src={groupData.unit.photo} 
+                                      alt={groupData.unit.name}
+                                      className="w-10 h-10 rounded-full object-cover border border-indigo-500"
+                                    />
+                                  ) : (
+                                    <div className="w-10 h-10 rounded-full bg-indigo-800 flex items-center justify-center">
+                                      <Users size={16} className="text-white" />
+                                    </div>
+                                  )}
+                                  <h3 className="text-lg font-semibold text-white">{groupData.unit.name}</h3>
+                                  <Badge 
+                                    color="primary" 
+                                    //className="ml-auto"
+                                  >
+                                    {groupData.specialties.length} especialidade{groupData.specialties.length !== 1 ? 's' : ''}
+                                  </Badge>
+                                </div>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                  {groupData.specialties.map((item, index) => (
+                                    <SpecialtyCard 
+                                    key={item.id}
+                                    item={item}
+                                    userLogged={user}
+                                    isLoading={isLoading}
+                                    reportSend={(e) => sendReport(e)}
+                                    approve={(e) => {evaluateBySpecialty(e)}}
+                                    onRemoveClick={(e) => handleRemoveClick(e)}
+                                    usersAll={usersAll.find(user => user.id === item.userId) || { id: '', name: '', email: '', birthDate: '', role: '', photoUrl: null, status: '' }}
+                                    index={index}
+    
+                                  />
+                                  ))}
+                                </div>
+                              </div>
                             ))}
-                          </AnimatePresence>
-                        </div>
-                      )}
-                    </>
-                  )}
-                  
-                  {/* Personal View - For all users */}
-                  {(activeView === 'personal' || user?.user?.user?.role === 'dbv') && (
-                    <>
-                      {filteredData.length === 0 ? (
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="flex justify-center items-center py-16 bg-gray-800 rounded-xl shadow-md"
-                        >
-                          <div className="flex flex-col items-center text-center px-4">
-                            <BookOpen className="w-20 h-20 text-gray-500 mb-6" />
-                            <h3 className="text-2xl font-semibold text-gray-300 mb-3">
-                              Nenhuma especialidade encontrada
-                            </h3>
-                            <p className="text-gray-400 max-w-md">
-                              {search ?
-                                "Nenhum resultado para sua busca. Tente outro termo ou filtro." :
-                                "Você não tem especialidades associadas ainda. Clique em 'Associar Especialidade' para começar."}
-                            </p>
                           </div>
-                        </motion.div>
-                      ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                          <AnimatePresence>
-                            {filteredData.map((item, index) => (
-                              <SpecialtyCard 
+                        )}
+                      </>
+                    )}
+                    
+                    {/* Unit View - For counselors */}
+                    {activeView === 'unit' && user?.user?.user?.role === 'counselor' && (
+                      <>
+                        {filteredData.length === 0 ? (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="flex justify-center items-center py-16 bg-gray-800 rounded-xl shadow-md"
+                          >
+                            <div className="flex flex-col items-center text-center px-4">
+                              <Users className="w-20 h-20 text-gray-500 mb-6" />
+                              <h3 className="text-2xl font-semibold text-gray-300 mb-3">
+                                Nenhuma especialidade encontrada na sua unidade
+                              </h3>
+                              <p className="text-gray-400 max-w-md">
+                                {search ?
+                                  "Nenhum resultado para sua busca. Tente outro termo ou filtro." :
+                                  "Os desbravadores da sua unidade ainda não têm especialidades associadas."}
+                              </p>
+                            </div>
+                          </motion.div>
+                        ) : (
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <AnimatePresence>
+                              {filteredData.map((item, index) => (
+                                <SpecialtyCard 
                                 key={item.id}
                                 item={item}
                                 userLogged={user}
                                 isLoading={isLoading}
-                                reportSend={() => {}}
-                                approve={() => {}}
-                                onRemoveClick={() => {}}
+                                reportSend={(e) => sendReport(e)}
+                                approve={(e) => {evaluateBySpecialty(e)}}
+                                onRemoveClick={(e) => handleRemoveClick(e)}
+                                usersAll={usersAll.find(user => user.id === item.userId) || { id: '', name: '', email: '', birthDate: '', role: '', photoUrl: null, status: '' }}
                                 index={index}
 
                               />
-                            ))}
-                          </AnimatePresence>
-                        </div>
-                      )}
-                    </>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
+                              ))}
+                            </AnimatePresence>
+                          </div>
+                        )}
+                      </>
+                    )}
+                    
+                    {/* Personal View - For all users */}
+                    {(activeView === 'personal' || user?.user?.user?.role === 'dbv') && (
+                      <>
+                        {filteredData.length === 0 ? (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="flex justify-center items-center py-16 bg-gray-800 rounded-xl shadow-md"
+                          >
+                            <div className="flex flex-col items-center text-center px-4">
+                              <BookOpen className="w-20 h-20 text-gray-500 mb-6" />
+                              <h3 className="text-2xl font-semibold text-gray-300 mb-3">
+                                Nenhuma especialidade encontrada
+                              </h3>
+                              <p className="text-gray-400 max-w-md">
+                                {search ?
+                                  "Nenhum resultado para sua busca. Tente outro termo ou filtro." :
+                                  "Você não tem especialidades associadas ainda. Clique em 'Associar Especialidade' para começar."}
+                              </p>
+                            </div>
+                          </motion.div>
+                        ) : (
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <AnimatePresence>
+                              {filteredData.map((item, index) => (
+                                <SpecialtyCard 
+                                  key={item.id}
+                                  item={item}
+                                  userLogged={user}
+                                  isLoading={isLoading}
+                                  reportSend={(e) => sendReport(e)}
+                                  approve={(e) => {evaluateBySpecialty(e)}}
+                                  onRemoveClick={(e) => handleRemoveClick(e)}
+                                  usersAll={usersAll.find(user => user.id === item.userId) || { id: '', name: '', email: '', birthDate: '', role: '', photoUrl: null, status: '' }}
+                                  index={index}
+
+                                />
+                              ))}
+                            </AnimatePresence>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
-      </div>
 
 
-      {/* Modals (same as in your code) */}
-      {/* Report Modal */}
-      <AnimatePresence>
-        {isReportModalOpen && currentSpecialty && (
-          <ReportModal
-            isOpen={isReportModalOpen}
-            onClose={() => {
-              setIsReportModalOpen(false)
-              setCurrentSpecialty(null)
-            }}
-            onReport={(reportText: string) => handleSubmitReport(reportText)}
-            currentSpecialty={currentSpecialty}
-          />
-        )}
-      </AnimatePresence>
+        {/* Modals (same as in your code) */}
+        {/* Report Modal */}
+        <AnimatePresence>
+          {isReportModalOpen && currentSpecialty && (
+            <ReportModal
+              isOpen={isReportModalOpen}
+              onClose={() => {
+                setIsReportModalOpen(false)
+                setCurrentSpecialty(null)
+              }}
+              onReport={(reportText: string) => handleSubmitReport(reportText)}
+              currentSpecialty={currentSpecialty}
+            />
+          )}
+        </AnimatePresence>
 
 
-      {/* Approval Modal */}
-      <AnimatePresence>
-        {isApprovalModalOpen && currentSpecialty && (
-          <EvaluateApproveRejectModal
-            isOpen={isApprovalModalOpen}
-            onClose={() => setIsApprovalModalOpen(false)}
-            specialty={currentSpecialty}
-            approve={(specialty, approvalComment) => handleApprove(specialty, approvalComment)}
-            reject={(specialty, approvalComment) => handleReject(specialty, approvalComment)}
-          />
-        )}
-      </AnimatePresence>
+        {/* Approval Modal */}
+        <AnimatePresence>
+          {isApprovalModalOpen && currentSpecialty && (
+            <EvaluateApproveRejectModal
+              isOpen={isApprovalModalOpen}
+              onClose={() => setIsApprovalModalOpen(false)}
+              specialty={currentSpecialty}
+              approve={(specialty, approvalComment) => handleApprove(specialty, approvalComment)}
+              reject={(specialty, approvalComment) => handleReject(specialty, approvalComment)}
+            />
+          )}
+        </AnimatePresence>
 
 
-      {/* Remove Confirmation Modal */}
-      <AnimatePresence>
-        {specialtyToRemove && (
-          <AssociationRemoveModal
-            onClose={() => setSpecialtyToRemove(null)}
-            onRemove={confirmRemove}
-            specialtyToRemove={specialtyToRemove}
-          />
-        )}
-      </AnimatePresence>
+        {/* Remove Confirmation Modal */}
+        <AnimatePresence>
+          {specialtyToRemove && (
+            <AssociationRemoveModal
+              onClose={() => setSpecialtyToRemove(null)}
+              onRemove={confirmRemove}
+              specialtyToRemove={specialtyToRemove}
+            />
+          )}
+        </AnimatePresence>
 
 
-      {/* Create Association Modal */}
-      <AnimatePresence>
-        {isModalOpen && (
-          <AssociationModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onSave={handleSaveAssociation}
-            users={users}
-            specialties={specialties}
-          />
-        )}
-      </AnimatePresence>
-    </motion.div>
+        {/* Create Association Modal */}
+        <AnimatePresence>
+          {isModalOpen && (
+            <AssociationModal
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              onSave={handleSaveAssociation}
+              users={users}
+              specialties={specialties}
+            />
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </>
   );
 };
 
@@ -1027,6 +1138,7 @@ interface SpecialtyUserCardProps {
   approve: (specialty: SpecialtyUser) => void;
   reportSend: (specialty: SpecialtyUser) => void;
   onRemoveClick: (specialty: SpecialtyUser) => void;
+  usersAll: UsersAll;
   index: number;
 }
 
@@ -1037,6 +1149,7 @@ const SpecialtyCard = ({
   onRemoveClick,
   reportSend,
   approve,
+  usersAll,
   index = 0
 }: SpecialtyUserCardProps) => {
 
@@ -1082,7 +1195,7 @@ const handleToggleExpand = (id: string) => {
 
 // Helper functions
 const canSubmitReport = (specialty: SpecialtyUser) => {
-  return specialty.isQuizApproved && specialty.report.length === 0;
+  return specialty.isQuizApproved && specialty.report.length === 0 && specialty.userId === userLogged?.user.user.id;
 };
 
 
@@ -1130,27 +1243,25 @@ const getStatusBadge = (status: StatusSpecialty) => {
   }
 };
 
-
-// // Filter data
-// const filteredData = data.filter(item =>
-//   (item.specialtyUser?.name?.toLowerCase().includes(search.toLowerCase()) ||
-//   item.specialtyInfo?.name?.toLowerCase().includes(search.toLowerCase())) &&
-//   (activeTab === "all" || 
-//    (activeTab === "pending" && (item.approvalStatus.includes("waiting") || item.approvalStatus === StatusSpecialty.PENDING)) ||
-//    (activeTab === "approved" && item.approvalStatus === StatusSpecialty.APPROVED) ||
-//    (activeTab === "rejected" && item.approvalStatus.includes("rejected")))
-// );
-
-
 // Get approval progress percentage
 const getApprovalProgress = (specialty: SpecialtyUser) => {
   let progress = 0;
-  if (specialty.isQuizApproved) progress += 10;
-  if (specialty.report ! === null) progress += 30;
-  if (specialty.counselorApproval) progress += 20;
-  if (specialty.leadApproval) progress += 10;
-  if (specialty.directorApproval) progress += 30;
-  return progress;
+  if((specialty.userId === userLogged?.user.user.id && userLogged.user.user.role !== "dbv") ||
+    specialty.userId === usersAll.id && usersAll.role !== "dbv"
+  ){
+    if (specialty.isQuizApproved) progress += 25;
+    if (specialty.report && specialty.report.length > 0) progress += 25;
+    if (specialty.leadApproval) progress += 25;
+    if (specialty.directorApproval) progress += 25;
+    return progress;
+  } else{
+    if (specialty.isQuizApproved) progress += 10;
+    if (specialty.report && specialty.report.length > 0) progress += 30;
+    if (specialty.counselorApproval) progress += 20;
+    if (specialty.leadApproval) progress += 10;
+    if (specialty.directorApproval) progress += 30;
+    return progress;
+  }
 };
 
 
@@ -1292,12 +1403,17 @@ const formatDate = (dateStr: string) => {
                             Relatório Enviado
                           </span>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <div className={`w-2 h-2 rounded-full ${item.counselorApproval ? 'bg-green-500' : 'bg-gray-500'}`} />
-                          <span className={item.counselorApproval ? 'text-green-400' : 'text-gray-500'}>
-                            Conselheiro
-                          </span>
-                        </div>
+                        {
+                          (usersAll.role === "dbv") && (
+                            <div className="flex items-center gap-1.5">
+                              <div className={`w-2 h-2 rounded-full ${item.counselorApproval ? 'bg-green-500' : 'bg-gray-500'}`} />
+                              <span className={item.counselorApproval ? 'text-green-400' : 'text-gray-500'}>
+                                Conselheiro
+                              </span>
+                            </div>
+                          )
+                        }
+                        
                         <div className="flex items-center gap-1.5">
                           <div className={`w-2 h-2 rounded-full ${item.leadApproval ? 'bg-green-500' : 'bg-gray-500'}`} />
                           <span className={item.leadApproval ? 'text-green-400' : 'text-gray-500'}>
@@ -1311,20 +1427,134 @@ const formatDate = (dateStr: string) => {
                           </span>
                         </div>
                       </div>
-                     
-                      {/* Report Preview (if exists) */}
+                    
+                      
                       {item.report && item.report.length > 0 && (
                         <div className="p-2 sm:p-3 bg-gray-750 rounded-lg text-xs text-gray-300 mt-2">
                           <div className="flex items-center mb-1.5">
                             <FileText size={14} className="text-indigo-400 mr-2" />
                             <span className="font-semibold text-indigo-400">Relatório Enviado:</span>
                           </div>
-                          <p className="line-clamp-3 text-xs sm:text-sm">
-                            {item.report}
+                          <p className="text-xs sm:text-sm">
+                            {item.report[0][0]}
                           </p>
+                        <div className="text-right text-gray-500 text-xs mt-2">
+                          {new Date(item.report[0][1]).toLocaleString()}
+                          </div>
                         </div>
                       )}
-                     
+
+                      {(item.userId === usersAll.id && usersAll.role === "dbv") 
+                        ?
+                          <>
+                            {item.approvalComments && item.approvalComments.length > 0 && item.counselorApproval && (
+                              <div className="p-2 sm:p-3 bg-gray-750 rounded-lg text-xs text-gray-300 mt-2">
+                                <div className="flex items-center mb-1.5">
+                                  <FileText size={14} className="text-green-200 mr-2" />
+                                  <span className="font-semibold text-green-200">Feedback Conselheiro(a):</span>
+                                </div>
+                                <p className="text-xs sm:text-sm">
+                                  {item.approvalComments[0][0]}
+                                </p>
+                                <div className='flex justify-between'>
+                                  <p className="text-right text-gray-500 text-xs mt-2">
+                                    {item.approvalComments[0][2]}
+                                  </p>
+                                  <div className="text-right text-gray-500 text-xs mt-2">
+                                    {new Date(item.approvalComments[0][1]).toLocaleString()}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {item.approvalComments && item.approvalComments.length > 0 && item.leadApproval && (
+                              <div className="p-2 sm:p-3 bg-gray-750 rounded-lg text-xs text-gray-300 mt-2">
+                                <div className="flex items-center mb-1.5">
+                                  <FileText size={14} className="text-green-300 mr-2" />
+                                  <span className="font-semibold text-green-300">Feedback Do Líder(a):</span>
+                                </div>
+                                <p className="text-xs sm:text-sm">
+                                  {item.approvalComments[1][0]}
+                                </p>
+                                <div className='flex justify-between'>
+                                  <p className="text-right text-gray-500 text-xs mt-2">
+                                    {item.approvalComments[1][2]}
+                                  </p>
+                                  <div className="text-right text-gray-500 text-xs mt-2">
+                                    {new Date(item.approvalComments[1][1]).toLocaleString()}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {item.approvalComments && item.approvalComments.length > 0 && item.directorApproval && (
+                              <div className="p-2 sm:p-3 bg-gray-750 rounded-lg text-xs text-gray-300 mt-2">
+                                <div className="flex items-center mb-1.5">
+                                  <FileText size={14} className="text-green-600 mr-2" />
+                                  <span className="font-semibold text-green-600">Feedback Do Diretor:</span>
+                                </div>
+                                <p className="text-xs sm:text-sm">
+                                  {item.approvalComments[2][0]}
+                                </p>
+                                <div className='flex justify-between'>
+                                  <p className="text-right text-gray-500 text-xs mt-2">
+                                    {item.approvalComments[2][2]}
+                                  </p>
+                                  <div className="text-right text-gray-500 text-xs mt-2">
+                                    {new Date(item.approvalComments[2][1]).toLocaleString()}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        :
+                          <>    
+                            {item.approvalComments && item.approvalComments.length > 0 && item.leadApproval && (
+                              <div className="p-2 sm:p-3 bg-gray-750 rounded-lg text-xs text-gray-300 mt-2">
+                                <div className="flex items-center mb-1.5">
+                                  <FileText size={14} className="text-green-300 mr-2" />
+                                  <span className="font-semibold text-green-300">Feedback Do Líder(a):</span>
+                                </div>
+                                <p className="text-xs sm:text-sm">
+                                  {item.approvalComments[0][0]}
+                                </p>
+                                <div className='flex justify-between'>
+                                  <p className="text-right text-gray-500 text-xs mt-2">
+                                    {item.approvalComments[0][2]}
+                                  </p>
+                                  <div className="text-right text-gray-500 text-xs mt-2">
+                                    {new Date(item.approvalComments[0][1]).toLocaleString()}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {item.approvalComments && item.approvalComments.length > 0 && item.directorApproval && (
+                              <div className="p-2 sm:p-3 bg-gray-750 rounded-lg text-xs text-gray-300 mt-2">
+                                <div className="flex items-center mb-1.5">
+                                  <FileText size={14} className="text-green-600 mr-2" />
+                                  <span className="font-semibold text-green-600">Feedback Do Diretor:</span>
+                                </div>
+                                <p className="text-xs sm:text-sm">
+                                  {item.approvalComments[1][0]}
+                                </p>
+                                <div className='flex justify-between'>
+                                  <p className="text-right text-gray-500 text-xs mt-2">
+                                    {item.approvalComments[1][2]}
+                                  </p>
+                                  <div className="text-right text-gray-500 text-xs mt-2">
+                                    {new Date(item.approvalComments[1][1]).toLocaleString()}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                        </>
+                      
+                      }
+                      
+
+                    
+                    
                       {/* Action Buttons - More responsive layout */}
                       <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 pt-2">
                         {/* Send Report Button */}
@@ -1353,8 +1583,7 @@ const formatDate = (dateStr: string) => {
                         )}
                        
                         {/* Remove Button */}
-                        {(userLogged?.user.user.role === 'admin' ||
-                          (userLogged?.user.user.id === item.userId && item.approvalStatus !== 'approved')) && (
+                        {(userLogged?.user.user.role === 'admin' || userLogged?.user.user.role === "director") && (
                           <Button
                             size="sm"
                             variant="outline"
@@ -1421,8 +1650,16 @@ const ReportModal = ({
         
         <div className="mb-4 p-3 bg-gray-700 rounded-lg">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-full bg-indigo-700 flex items-center justify-center">
-              <Award size={16} className="text-white" />
+            <div className="w-15 h-15 rounded-full flex items-center justify-center">
+              {currentSpecialty?.specialtyInfo?.emblem ? (
+                <img 
+                  src={currentSpecialty?.specialtyInfo?.emblem} 
+                  alt={currentSpecialty?.specialtyInfo?.emblem} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <Award size={16} className="text-indigo-400" />
+              )}                   
             </div>
             <div>
               <h4 className="text-md font-semibold text-white">
@@ -1438,7 +1675,7 @@ const ReportModal = ({
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Seu Relatório (mínimo 50 caracteres)
+              Seu Relatório (mínimo 700 caracteres)
             </label>
             <textarea
               value={reportText}
@@ -1449,8 +1686,8 @@ const ReportModal = ({
             />
             <div className="text-xs text-gray-400 mt-2 flex justify-between">
               <span>{reportText.length} caracteres</span>
-              <span className={reportText.length < 50 ? "text-red-400" : "text-green-400"}>
-                {reportText.length < 50 ? `Mínimo: 50 caracteres (faltam ${50 - reportText.length})` : "✓ Tamanho mínimo atingido"}
+              <span className={reportText.length < 700 ? "text-red-400" : "text-green-400"}>
+                {reportText.length < 700 ? `Mínimo: 700 caracteres (faltam ${700 - reportText.length})` : "✓ Tamanho mínimo atingido"}
               </span>
             </div>
           </div>
@@ -1467,7 +1704,7 @@ const ReportModal = ({
               //type="submit"
               variant="primary"
               className="px-4 py-2"
-              disabled={reportText.trim().length < 50}
+              disabled={reportText.trim().length < 700}
             >
               Enviar Relatório
             </Button>
@@ -1495,128 +1732,128 @@ const EvaluateApproveRejectModal = ({
   const [comment, setComment] = useState("");
   const [decision, setDecision] = useState<'approve' | 'reject' | null>(null);
   
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!decision) return;
-    
-    if (decision === 'approve') {
-      approve(specialty, comment);
-    } else {
-      reject(specialty, comment);
-    }
-    
-    onClose();
-  };
+  const handleSubmit = () => {
+      if (!decision) return;
+      
+      if (decision === 'approve') {
+        approve(specialty, comment);
+      } else {
+        reject(specialty, comment);
+      }
+      
+      onClose();
+    };
   
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
-    >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-gray-800 rounded-xl shadow-lg p-6 max-w-lg w-full"
-      >
-        <h3 className="text-xl font-semibold text-white mb-4">
-          Avaliação de Especialidade
-        </h3>
-        
-        <div className="mb-6 p-4 bg-gray-700 rounded-lg">
-          <div className="flex items-start gap-3">
-            <div className="w-12 h-12 rounded-full bg-indigo-700 flex items-center justify-center flex-shrink-0">
-              <Award size={20} className="text-white" />
-            </div>
-            <div className="flex-grow">
-              <h4 className="text-lg font-semibold text-white">
-                {specialty?.specialtyInfo?.name || "Especialidade"}
-              </h4>
-              <p className="text-sm text-gray-400 mb-2">
-                {specialty?.specialtyInfo?.category || "Categoria"}
-              </p>
-              <div className="flex items-center text-sm text-gray-300">
-                <User size={14} className="mr-2" />
-                <span>{specialty?.specialtyUser?.name || "Desbravador"}</span>
-              </div>
-            </div>
-          </div>
-          
-          {specialty?.report && (
-            <div className="mt-4 p-3 bg-gray-750 rounded-lg">
-              <div className="text-xs text-gray-400 mb-1">Relatório do Desbravador:</div>
-              <p className="text-sm text-gray-300">{specialty.report}</p>
-            </div>
-          )}
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  exit={{ opacity: 0 }}
+  className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+>
+  <motion.div
+    initial={{ scale: 0.9, opacity: 0 }}
+    animate={{ scale: 1, opacity: 1 }}
+    exit={{ scale: 0.9, opacity: 0 }}
+    className="bg-gray-800 rounded-xl shadow-lg p-6 max-w-lg w-full max-h-full overflow-y-auto"
+  >
+    <h3 className="text-xl font-semibold text-white mb-4">
+      Avaliação de Especialidade
+    </h3>
+    
+    <div className="mb-6 p-4 bg-gray-700 rounded-lg">
+      <div className="flex items-start gap-3">
+        <div className="w-12 h-12 rounded-full bg-indigo-700 flex items-center justify-center flex-shrink-0">
+          <Award size={20} className="text-white" />
         </div>
+        <div className="flex-grow">
+          <h4 className="text-lg font-semibold text-white">
+            {specialty?.specialtyInfo?.name || "Especialidade"}
+          </h4>
+          <p className="text-sm text-gray-400 mb-2">
+            {specialty?.specialtyInfo?.category || "Categoria"}
+          </p>
+          <div className="flex items-center text-sm text-gray-300">
+            <User size={14} className="mr-2" />
+            <span>{specialty?.specialtyUser?.name || "Desbravador"}</span>
+          </div>
+        </div>
+      </div>
+      
+      {specialty?.report && (
+        <div className="mt-4 p-3 bg-gray-750 rounded-lg">
+          <div className="text-xs text-gray-400 mb-1">Relatório do Desbravador:</div>
+          <p className="text-sm text-gray-300">{specialty.report[0][0]}</p>
+        </div>
+      )}
+    </div>
+    
+    <div>
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-gray-300 mb-3">
+          Sua Decisão
+        </label>
         
-        <form onSubmit={handleSubmit}>
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-300 mb-3">
-              Sua Decisão
-            </label>
-            <div className="flex gap-4">
-              <Button
-                //type="button"
-                variant={decision === 'approve' ? 'primary' : 'outline'}
-                onClick={() => setDecision('approve')}
-                className={`flex-1 flex items-center justify-center p-4 ${
-                  decision === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-700 hover:bg-gray-600'
-                } rounded-lg transition-colors duration-200`}
-              >
-                <CheckCircle className="mr-2" size={18} />
-                Aprovar
-              </Button>
-              
-              <Button
-                //type="button"
-                variant={decision === 'reject' ? 'outline' : 'primary'}
-                onClick={() => setDecision('reject')}
-                className={`flex-1 flex items-center justify-center p-4 ${
-                  decision === 'reject' ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-700 hover:bg-gray-600'
-                } rounded-lg transition-colors duration-200`}
-              >
-                <XCircle className="mr-2" size={18} />
-                Rejeitar
-              </Button>
-            </div>
-          </div>
-          
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Comentário (opcional)
-            </label>
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              rows={4}
-              className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white resize-none focus:ring focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Adicione um comentário ou feedback para o desbravador..."
-            />
-          </div>
-          
-          <div className="flex justify-end gap-3">
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className="px-4 py-2"
-            >
-              Cancelar
-            </Button>
-            <Button
-              //type="submit"
-              variant="primary"
-              className="px-4 py-2"
-              disabled={!decision}
-            >
-              Confirmar
-            </Button>
-          </div>
-        </form>
-      </motion.div>
-    </motion.div>
+<div className="flex gap-4">
+      <Button
+        variant={decision === 'reject' ? 'primary' : 'outline'}
+        onClick={() => setDecision('reject')}
+        className={`flex-1 flex items-center justify-center p-4 ${
+          decision === 'reject' ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-700 hover:bg-gray-600'
+        } rounded-lg transition-colors duration-200`}
+      >
+        <XCircle className="mr-2" size={18} />
+        Rejeitar
+      </Button>
+
+      <Button
+        variant={decision === 'approve' ? 'primary' : 'outline'}
+        onClick={() => setDecision('approve')}
+        className={`flex-1 flex items-center justify-center p-4 ${
+          decision === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-700 hover:bg-gray-600'
+        } rounded-lg transition-colors duration-200`}
+      >
+        <CheckCircle className="mr-2" size={18} />
+        Aprovar
+      </Button>
+    </div>
+
+      </div>
+      
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-300 mb-2">
+          Comentário (opcional)
+        </label>
+        <textarea
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          rows={4}
+          className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white resize-none focus:ring focus:ring-indigo-500 focus:border-indigo-500"
+          placeholder="Adicione um comentário ou feedback para o desbravador..."
+        />
+      </div>
+      
+      <div className="flex justify-end gap-3">
+        <Button
+          variant="outline"
+          onClick={onClose}
+          className="px-4 py-2"
+        >
+          Cancelar
+        </Button>
+        <Button
+          variant="primary"
+          //onClick={(e) => handleSubmit(e)}
+          onClick={handleSubmit}
+          disabled={!decision}
+        >
+          Confirmar
+        </Button>
+      </div>
+    </div>
+  </motion.div>
+</motion.div>
+
   );
 };
 
@@ -1683,30 +1920,6 @@ const AssociationRemoveModal = ({ onClose, onRemove, specialtyToRemove }: Associ
   );
 };
 
-
-
-
-
-
-// type SpecialtyInfo = {
-//   id: string;
-//   name: string;
-//   description?: string;
-//   category?: string;
-//   imageUrl?: string;
-// };
-
-
-// type UserInfo = {
-//   id: string;
-//   name: string;
-//   role: string;
-// };
-
-// type SpecialtyAssociation = {
-//   userId: string;
-//   specialtyId: string;
-// };
 
 interface AssociationModalProps {
   isOpen: boolean; 
@@ -1849,9 +2062,9 @@ const AssociationModal = ({
                         }`}
                       >
                         <div className="w-10 h-10 rounded-lg bg-gray-700 flex items-center justify-center overflow-hidden">
-                          {specialty.imageUrl ? (
+                          {specialty.emblem ? (
                             <img 
-                              src={specialty.imageUrl} 
+                              src={specialty.emblem} 
                               alt={specialty.name} 
                               className="w-full h-full object-cover"
                             />

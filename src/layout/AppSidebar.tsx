@@ -610,8 +610,12 @@ const navItems: NavItem[] = [
     name: "Usuários",
     subItems: [
       { name: "Todos os Usuários", path: "/users", pro: false },
-      { name: "Usuários pendentes", path: "/users-pending", pro: false }
     ],
+  },
+  {
+    icon: <CalenderIcon />,
+    name: "Usuários Pendentes",
+    path: "/users-pending",
   },
   {
     icon: <CalenderIcon />,

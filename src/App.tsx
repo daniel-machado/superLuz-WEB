@@ -46,6 +46,9 @@ import QuizScreen from "./pages/QuizAttempt/QuizScreen";
 //import { hasRoutePermission } from "./services/permissions/permissionsService";
 import AccessDenied from "./pages/AccessDenied/accessDenied";
 import GalleryPhotos from "./pages/galeryPhotos";
+import VerificationCode from "./pages/VerificationCode";
+import ForgotPassword from "./pages/ForgotPassword";
+import Profile from "./pages/ProfileFriends/Profile";
 
 export default function App() {
   const { loading } = useAuth();
@@ -65,7 +68,8 @@ export default function App() {
             <Route element={<AppLayout />}>
               
               <Route index path="/home" element={<Home />} />
-
+              <Route path="/verification-code" element={<VerificationCode />} />
+              
               {/* 
               Exemplo de como usar a função hasRoutePermission para verificar permissões de rota  
               <Route 
@@ -101,12 +105,11 @@ export default function App() {
               <Route path="/ranking-individual" element={<RankingIndividual />} />
 
 
-              <Route path="/quiz" element={<Quiz />} />
-              <Route path="/quiz/:id/questions" element={<QuizQuestions />} />
-
               <Route path="/specialty" element={<Specialty />} />
               <Route path="/specialty-users" element={<SpecialtyUsers />} />
 
+              <Route path="/quiz" element={<Quiz />} />
+              <Route path="/quiz/:id/questions" element={<QuizQuestions />} />
               <Route path="/quiz-attempt/:quizId" element={<QuizScreen />} />
 
               <Route path="/class" element={<Class />} />
@@ -117,6 +120,9 @@ export default function App() {
 
               {/* Others Page */}
               <Route path="/profile" element={<UserProfiles />} />
+
+              <Route path="/profile-user/:userId" element={<Profile />} />
+
               <Route path="/calendar" element={<Calendar />} />
               <Route path="/blank" element={<Blank />} />
 
@@ -150,6 +156,9 @@ export default function App() {
           <Route path="/gallery" element={<GalleryPhotos />} />
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/sign-up" element={<SignUp />} />
+
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+
 
           
           {/* Fallback Route */}

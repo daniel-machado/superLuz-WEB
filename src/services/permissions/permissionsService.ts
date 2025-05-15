@@ -26,7 +26,7 @@ export const routePermissions: RoutePermission[] = [
   { path: '/units', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   
   // Avaliações de Unidades
-  { path: '/evaluation-units', allowedRoles: ['pending', 'admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
+  { path: '/evaluation-units', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   { path: '/questions-evaluation-unit', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   { path: '/answer-evaluation-unit', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   
@@ -37,7 +37,7 @@ export const routePermissions: RoutePermission[] = [
   { path: '/questions-evaluation-individual', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   { path: '/answer-evaluation-individual', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   
-  { path: '/individual-reports', allowedRoles: ['admin', 'director', 'counselor'] },
+  { path: '/individual-reports', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   
   // Rankings
   { path: '/ranking-individual', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
@@ -52,16 +52,20 @@ export const routePermissions: RoutePermission[] = [
   { path: '/class-users', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   
   // Quiz
-  { path: '/quiz', allowedRoles: ['admin', 'director'] },
-  { path: '/quiz-attempt', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
+  { path: '/quiz', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
+  { path: '/quiz-attempt::quizId', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   
   // Usuários
   { path: '/users', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   { path: '/users-pending', allowedRoles: ['admin','director'] },
   
   // Páginas gerais
-  { path: '/calendar', allowedRoles: ['admin' ] },
+  // { path: '/calendar', allowedRoles: ['admin'] },
+  { path: '/verification-code', allowedRoles: ['pending', 'admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   { path: '/profile', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
+
+  { path: '/profile-user', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
+  
 ];
 
 
@@ -75,15 +79,16 @@ export const menuPermissions: MenuPermission[] = [
   { key: 'Especialidades', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   { key: 'Classes', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   { key: 'Quiz', allowedRoles: ['admin', 'director'] },
-  { key: 'Usuários', allowedRoles: ['admin', 'director'] },
+  { key: 'Usuários', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
+  { key: 'Usuários Pendentes', allowedRoles: ['admin', 'director'] },
   { key: 'User Profile', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
-  { key: 'Calendar', allowedRoles: ['admin'] },
-  { key: 'Forms', allowedRoles: ['admin'] },
-  { key: 'Tables', allowedRoles: ['admin'] },
-  { key: 'Pages', allowedRoles: ['admin'] },
-  { key: 'Charts', allowedRoles: ['admin'] },
-  { key: 'UI Elements', allowedRoles: ['admin'] },
-  { key: 'Authentication', allowedRoles: ['admin'] },
+  // { key: 'Calendar', allowedRoles: ['admin'] },
+  // { key: 'Forms', allowedRoles: ['admin'] },
+  // { key: 'Tables', allowedRoles: ['admin'] },
+  // { key: 'Pages', allowedRoles: ['admin'] },
+  // { key: 'Charts', allowedRoles: ['admin'] },
+  // { key: 'UI Elements', allowedRoles: ['admin'] },
+  // { key: 'Authentication', allowedRoles: ['admin'] },
 ];
 
 

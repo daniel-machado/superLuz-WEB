@@ -28,12 +28,11 @@ const IndividualEvaluation = () => {
 
   const [unit, setUnit] = useState<Unit | null>(null);
   const [dbvs, setDbvs] = useState([]);
-  const [evaluations, setEvaluations] = useState<any[]>([]);
+  const [_evaluations, setEvaluations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredDbvs, setFilteredDbvs] = useState<DBV[]>([]);
 
-console.log(evaluations, "evaluations")
   useEffect(() => {
     fetchData();
   }, [unitId]);

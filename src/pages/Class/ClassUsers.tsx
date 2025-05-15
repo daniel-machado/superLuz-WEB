@@ -210,106 +210,108 @@ export default function ClassUser() {
     }
   };
 
-
   return (
-    <motion.div 
-      initial="initial" 
-      animate="animate" 
-      exit="exit" 
-      variants={pageVariants}
-      className="min-h-screen"
-    >
-      <Toaster />
+    <>
       <PageMeta
-        title="Classes do clube de desbravadores"
-        description="Registro de todas as classes do clube de desbravadores associadas aos usuários"
+        title="Classes associadas a membros do clube | Luzeiros do Norte"
+        description="Clube de Desbravadores - Classes associadas a membros do clube"
       />
-      <PageBreadcrumb pageTitle="Classes" />
+      <motion.div 
+        initial="initial" 
+        animate="animate" 
+        exit="exit" 
+        variants={pageVariants}
+        className="min-h-screen"
+      >
+        <Toaster />
+        <PageBreadcrumb pageTitle="Classes" />
 
 
-      <div className="space-y-6 pb-10">
-        <ComponentCard title="Associação de usuários às classes">
-          <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
-            <div className="relative flex-grow max-w-md">
-              <Input
-                placeholder="Buscar por nome da classe"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 rounded-xl focus:ring-2 focus:ring-blue-500"
-              />
-              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            </div>
-            <motion.div 
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              {( userRole === "admin" || userRole === "director" || userRole === "lead") && (
-                    <Button
-                    size="sm"
-                    variant="primary"
-                    startIcon={<PlusIcon />}
-                    onClick={() => {
-                      setUserToRemove(null);
-                      setIsModalOpen(true);
-                    }}
-                    className="rounded-xl shadow-md hover:shadow-lg transition-all duration-300 bg-gradient-to-r from-blue-500 to-indigo-600"
-                  >
-                    Associar Usuário à Classe
-                  </Button>
-              )}
-              
-            </motion.div>
-          </div>
-
-
-          <AnimatePresence>
-            {isLoading ? (
+        <div className="space-y-6 pb-10">
+          <ComponentCard title="Associação de usuários às classes">
+            <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
+              <div className="relative flex-grow max-w-md">
+                <Input
+                  placeholder="Buscar por nome da classe"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-10 rounded-xl focus:ring-2 focus:ring-blue-500"
+                />
+                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              </div>
               <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex justify-center items-center py-20"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="flex items-center justify-center"
               >
-                <div className="flex flex-col items-center">
-                  <div className="w-12 h-12 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-                  <p className="mt-4 text-gray-500 dark:text-gray-400">Carregando classes...</p>
-                </div>
+                {( userRole === "admin" || userRole === "director" || userRole === "lead") && (
+                      <Button
+                      size="sm"
+                      variant="primary"
+                      startIcon={<PlusIcon />}
+                      onClick={() => {
+                        setUserToRemove(null);
+                        setIsModalOpen(true);
+                      }}
+                      className="rounded-xl shadow-md hover:shadow-lg transition-all duration-300 bg-gradient-to-r from-blue-500 to-indigo-600"
+                    >
+                      Associar Usuário à Classe
+                    </Button>
+                )}
+                
               </motion.div>
-            ) : (
-              <ClassAssociationView
-                data={data}
-                search={search}
-                onRemoveClick={handleRemoveClick}
-              />
-            )}
-          </AnimatePresence>
-        </ComponentCard>
-      </div>
+            </div>
 
 
-      <AnimatePresence>
-        {userToRemove && (
-          <RemoveUserModal
-            isOpen={!!userToRemove}
-            user={userToRemove}
-            onClose={() => setUserToRemove(null)}
-            onConfirm={confirmRemove}
-          />
-        )}
-      </AnimatePresence>
-      
-      <AnimatePresence>
-        {!userToRemove && isModalOpen && (
-          <AssociationModal
-            isOpen={!userToRemove && isModalOpen}
-            users={users || []}
-            classes={classes || []}
-            onClose={() => setIsModalOpen(false)}
-            onSave={handleSaveAssociation}
-          />
-        )}
-      </AnimatePresence>
-    </motion.div>
+            <AnimatePresence>
+              {isLoading ? (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex justify-center items-center py-20"
+                >
+                  <div className="flex flex-col items-center">
+                    <div className="w-12 h-12 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="mt-4 text-gray-500 dark:text-gray-400">Carregando classes...</p>
+                  </div>
+                </motion.div>
+              ) : (
+                <ClassAssociationView
+                  data={data}
+                  search={search}
+                  onRemoveClick={handleRemoveClick}
+                />
+              )}
+            </AnimatePresence>
+          </ComponentCard>
+        </div>
+
+
+        <AnimatePresence>
+          {userToRemove && (
+            <RemoveUserModal
+              isOpen={!!userToRemove}
+              user={userToRemove}
+              onClose={() => setUserToRemove(null)}
+              onConfirm={confirmRemove}
+            />
+          )}
+        </AnimatePresence>
+        
+        <AnimatePresence>
+          {!userToRemove && isModalOpen && (
+            <AssociationModal
+              isOpen={!userToRemove && isModalOpen}
+              users={users || []}
+              classes={classes || []}
+              onClose={() => setIsModalOpen(false)}
+              onSave={handleSaveAssociation}
+            />
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </>
   );
 }
 

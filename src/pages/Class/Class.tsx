@@ -9,8 +9,9 @@ import toast from "react-hot-toast";
 import { uploadImage } from "../../services/uploadService";
 import { useAuth } from "../../context/AuthContext";
 import { classService } from "../../services/classService";
-import ClassTable from "../../components/ui/table/classTable";
 import CreateClassModal from "../../components/ClassModais/createClassModal";
+import ClassGrid from "./ClassGrid";
+
 
 export default function Class() {
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -80,6 +81,58 @@ export default function Class() {
     }
   };
 
+  const handleDeleteClass = async (classId: string) => {
+    try {
+      await classService.deleteClass(classId)
+      toast.success('Classe deletada com sucesso!', {
+        position: 'bottom-right',
+      });
+      await findClass();  
+    } catch (error) {
+      toast.error(`Erro ao deletar: ${error}`, {
+        position: 'bottom-right',
+      });
+    } 
+  };
+
+  
+  const handleEditClass = async (data: { 
+      id: string;
+      name?: string; 
+      type?: string; 
+      minAge?: number; 
+      maxAge?: number;
+      emblem?: File | null;
+    }) => {
+
+      try {
+        setIsLoading(true);
+
+      let uploadedImageUrl = data.emblem;
+      if (data.emblem) {
+        uploadedImageUrl = await uploadImage(data.emblem);
+      } 
+
+      const payload: any = {};
+      if (data.name) payload.name = data.name;
+      if (data.type) payload.type = data.type;
+      if (uploadedImageUrl) payload.emblem = uploadedImageUrl;
+      if (data.minAge) payload.minAge = Number(data.minAge);
+
+    
+      await classService.updateClass(data.id, payload);
+        toast.success('Classe editada com sucesso!', {
+        position: 'bottom-right',
+      });
+      await findClass();
+    } catch (error) {
+      toast.error(`Erro: ${error}`, {
+        position: 'bottom-right',
+      });
+    }
+  };
+
+
   return (
     <>
       <PageMeta
@@ -107,10 +160,10 @@ export default function Class() {
           <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6">
             <div className="max-w-full overflow-x-auto">
               {classData.length > 0 ? (
-                  <ClassTable 
+                  <ClassGrid
                     classes={classData} 
-                    onEdit={(clas) => console.log("Editar", clas)} 
-                    onDelete={(id) => console.log("Excluir", id)} 
+                    onEdit={(clas) => handleEditClass(clas)} 
+                    onDelete={(id) => handleDeleteClass(id)} 
                     onViewRequirements={(id) => console.log("Ver requisitos", id)}
                   />
               ) : (

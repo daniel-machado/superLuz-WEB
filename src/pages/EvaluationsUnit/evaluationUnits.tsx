@@ -22,6 +22,8 @@ import EditEvaUnitModal from "../../components/EvaluationUnitComponents/EditEvaU
 
 // Components
 import { ReactNode } from "react";
+import PageMeta from "../../components/common/PageMeta";
+import { unitsService } from "../../services/unitsService";
 
 const Button = ({ children, variant = "primary", className = "", ...props }: { children: ReactNode; variant?: "primary" | "secondary" | "outline" | "danger"; className?: string; [key: string]: any }) => {
   const variants = {
@@ -117,9 +119,65 @@ export default function EvaluationUnits() {
   const fetchEvaluations = async () => {
     setIsLoading(true);
     try {
-      const data = await unitEvaluationService.ListAllEvaluation();
-      setEvaluations(data.evaluations);
-      setFilteredEvaluations(data.evaluations);
+      // Check user role to determine what data to fetch
+      if (user?.user?.user?.role === 'counselor' || user?.user?.user?.role === 'dbv') {
+        // Counselor or DBV sees only their unit's DBVs
+        const userId = user.user.user.id;
+        
+        const existingUnitResponse = 
+          user?.user?.user?.role === 'counselor' 
+          ? await unitsService.existCounselorUnit(userId)
+          : await unitsService.existDbvUnit(userId);
+      
+        if (!existingUnitResponse.success || !existingUnitResponse.result?.existingInOtherUnit) {
+          toast.error('Você não está associado a nenhuma unidade', {
+            position: 'bottom-right',
+            icon: '❌',
+            style: {
+              backgroundColor: '#1F2937',
+              color: '#F9FAFB',
+              border: '1px solid #374151',
+            },
+          });
+          setEvaluations([]);
+          setFilteredEvaluations([]);
+          setIsLoading(false);
+          return;
+        }
+      
+        const unitId = existingUnitResponse.result.existingInOtherUnit.unitId;
+        const data = await unitEvaluationService.ListAllEvaluation();
+        
+        // Filter evaluations for the specific unit
+        const filteredEvaluations = data.evaluations.filter(
+          (evaluation: Evaluation) => evaluation.unit.id === unitId
+        );
+  
+  
+        setEvaluations(filteredEvaluations);
+        setFilteredEvaluations(filteredEvaluations);
+      } else if (user?.user?.user?.role === 'admin' || 
+        user?.user?.user?.role === 'director' ||
+        user?.user?.user?.role === 'lead' ||
+        user?.user?.user?.role === 'secretary'
+      ) {
+        // Admin and director see all evaluations
+        const data = await unitEvaluationService.ListAllEvaluation();
+        setEvaluations(data.evaluations);
+        setFilteredEvaluations(data.evaluations);
+      } else {
+        toast.error('Você não tem permissão para visualizar avaliações', {
+          position: 'bottom-right',
+          icon: '❌',
+          style: {
+            backgroundColor: '#1F2937',
+            color: '#F9FAFB',
+            border: '1px solid #374151',
+          },
+        });
+        setEvaluations([]);
+        setFilteredEvaluations([]);
+      }
     } catch (err) {
       toast.error("Erro ao carregar avaliações", {
         position: 'bottom-right',
@@ -134,10 +192,11 @@ export default function EvaluationUnits() {
       setIsLoading(false);
     }
   };
+  
 
   useEffect(() => {
     fetchEvaluations();
-  }, []);
+  }, [ user?.user?.user?.role, user?.user?.user?.id ]);
 
   useEffect(() => {
     let filtered = [...evaluations];
@@ -307,297 +366,304 @@ export default function EvaluationUnits() {
   const uniqueWeeks = [...new Set(evaluations.map(e => e.week))].sort((a, b) => a - b);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100">
-      <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
-        >
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
-              Gerenciar Avaliações
-            </h1>
-            <p className="text-gray-400 mt-1">
-              Visualize, edite e organize as avaliações por unidade
-            </p>
-          </div>
-          
-          {( userRole === "admin" || userRole === "director" ) && (
-            <Button onClick={handleOpenCreate} className="w-full md:w-auto">
-              <Calendar size={18} />
-              Nova avaliação
-            </Button>
-          )}
-          
-        </motion.div>
+    <>
+      <PageMeta
+        title="Avaliação de unidades | Luzeiros do Norte"
+        description="Clube de Desbravadores - Avaliação de Unidades"
+      />
+      <div className="min-h-screen bg-gray-900 text-gray-100">
+        <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+          >
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
+                Gerenciar Avaliações
+              </h1>
+              <p className="text-gray-400 mt-1">
+                Visualize, edite e organize as avaliações por unidade
+              </p>
+            </div>
+            
+            {( userRole === "admin" || userRole === "director" ) && (
+              <Button onClick={handleOpenCreate} className="w-full md:w-auto">
+                <Calendar size={18} />
+                Nova avaliação
+              </Button>
+            )}
+            
+          </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="bg-gray-800 rounded-xl p-4 border border-gray-700 shadow-lg"
-        >
-          <div className="flex flex-col lg:flex-row gap-3 justify-between mb-4">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="flex-1">
-                <label className="text-xs text-gray-400 mb-1 block">Status</label>
-                <div className="flex gap-2">
-                  <Button 
-                    variant={filterStatus === "open" ? "primary" : "outline"} 
-                    className="text-sm py-1 flex-1"
-                    onClick={() => setFilterStatus(prev => prev === "open" ? null : "open")}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="bg-gray-800 rounded-xl p-4 border border-gray-700 shadow-lg"
+          >
+            <div className="flex flex-col lg:flex-row gap-3 justify-between mb-4">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex-1">
+                  <label className="text-xs text-gray-400 mb-1 block">Status</label>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant={filterStatus === "open" ? "primary" : "outline"} 
+                      className="text-sm py-1 flex-1"
+                      onClick={() => setFilterStatus(prev => prev === "open" ? null : "open")}
+                    >
+                      <CheckCircle size={16} />
+                      Abertas
+                    </Button>
+                    <Button 
+                      variant={filterStatus === "closed" ? "primary" : "outline"} 
+                      className="text-sm py-1 flex-1"
+                      onClick={() => setFilterStatus(prev => prev === "closed" ? null : "closed")}
+                    >
+                      <XCircle size={16} />
+                      Fechadas
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="flex-1">
+                  <label className="text-xs text-gray-400 mb-1 block">Rodada</label>
+                  <select 
+                    className="w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    value={filterWeek !== null ? filterWeek : ""}
+                    onChange={(e) => setFilterWeek(e.target.value ? Number(e.target.value) : null)}
                   >
-                    <CheckCircle size={16} />
-                    Abertas
-                  </Button>
-                  <Button 
-                    variant={filterStatus === "closed" ? "primary" : "outline"} 
-                    className="text-sm py-1 flex-1"
-                    onClick={() => setFilterStatus(prev => prev === "closed" ? null : "closed")}
-                  >
-                    <XCircle size={16} />
-                    Fechadas
-                  </Button>
+                    <option value="">Todas as rodadas</option>
+                    {uniqueWeeks.map(week => (
+                      <option key={week} value={week}>Rodada {week}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
               
-              <div className="flex-1">
-                <label className="text-xs text-gray-400 mb-1 block">Rodada</label>
-                <select 
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  value={filterWeek !== null ? filterWeek : ""}
-                  onChange={(e) => setFilterWeek(e.target.value ? Number(e.target.value) : null)}
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  className="text-sm"
+                  onClick={toggleSortOrder}
                 >
-                  <option value="">Todas as rodadas</option>
-                  {uniqueWeeks.map(week => (
-                    <option key={week} value={week}>Rodada {week}</option>
-                  ))}
-                </select>
+                  {sortAscending ? (
+                    <>
+                      <ChevronUp size={16} />
+                      Asc
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown size={16} />
+                      Desc
+                    </>
+                  )}
+                </Button>
+                
+                <Button 
+                  variant="secondary" 
+                  className="text-sm"
+                  onClick={resetFilters}
+                >
+                  <Filter size={16} />
+                  Limpar filtros
+                </Button>
               </div>
             </div>
-            
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                className="text-sm"
-                onClick={toggleSortOrder}
-              >
-                {sortAscending ? (
-                  <>
-                    <ChevronUp size={16} />
-                    Asc
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown size={16} />
-                    Desc
-                  </>
-                )}
-              </Button>
-              
-              <Button 
-                variant="secondary" 
-                className="text-sm"
-                onClick={resetFilters}
-              >
-                <Filter size={16} />
-                Limpar filtros
-              </Button>
-            </div>
-          </div>
 
-          {isLoading ? (
-            <div className="flex justify-center py-12">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+            {isLoading ? (
+              <div className="flex justify-center py-12">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                >
+                  <Loader2 className="h-10 w-10 text-indigo-500" />
+                </motion.div>
+              </div>
+            ) : filteredEvaluations.length === 0 ? (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-12 text-gray-400"
               >
-                <Loader2 className="h-10 w-10 text-indigo-500" />
+                <Book className="h-16 w-16 mx-auto mb-3 text-gray-600" />
+                <h3 className="text-lg font-medium">Nenhuma avaliação encontrada</h3>
+                <p className="mt-1">Tente ajustar seus filtros ou crie uma nova avaliação</p>
               </motion.div>
-            </div>
-          ) : filteredEvaluations.length === 0 ? (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-12 text-gray-400"
-            >
-              <Book className="h-16 w-16 mx-auto mb-3 text-gray-600" />
-              <h3 className="text-lg font-medium">Nenhuma avaliação encontrada</h3>
-              <p className="mt-1">Tente ajustar seus filtros ou crie uma nova avaliação</p>
-            </motion.div>
-          ) : (
-            <div className="space-y-4">
-              {Object.entries(evaluationsByWeek).map(([week, weekEvaluations]) => {
-                const isExpanded = expandedWeeks[Number(week)] !== false; // Default to expanded
-                
-                return (
-                  <motion.div 
-                    key={week}
-                    layout
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="border border-gray-700 rounded-lg overflow-hidden bg-gray-800/50"
-                  >
-                    <div 
-                      className="bg-gray-800 p-3 flex items-center justify-between cursor-pointer hover:bg-gray-750"
-                      onClick={() => toggleWeekExpansion(Number(week))}
+            ) : (
+              <div className="space-y-4">
+                {Object.entries(evaluationsByWeek).map(([week, weekEvaluations]) => {
+                  const isExpanded = expandedWeeks[Number(week)] !== false; // Default to expanded
+                  
+                  return (
+                    <motion.div 
+                      key={week}
+                      layout
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="border border-gray-700 rounded-lg overflow-hidden bg-gray-800/50"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="bg-indigo-600 w-10 h-10 rounded-full flex items-center justify-center">
-                          <Calendar size={18} />
+                      <div 
+                        className="bg-gray-800 p-3 flex items-center justify-between cursor-pointer hover:bg-gray-750"
+                        onClick={() => toggleWeekExpansion(Number(week))}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="bg-indigo-600 w-10 h-10 rounded-full flex items-center justify-center">
+                            <Calendar size={18} />
+                          </div>
+                          <div>
+                            <h3 className="font-medium">Rodada {week}</h3>
+                            <p className="text-sm text-gray-400">{weekEvaluations.length} avaliações</p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-medium">Rodada {week}</h3>
-                          <p className="text-sm text-gray-400">{weekEvaluations.length} avaliações</p>
-                        </div>
+                        <Button variant="outline" className="p-2">
+                          {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                        </Button>
                       </div>
-                      <Button variant="outline" className="p-2">
-                        {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-                      </Button>
-                    </div>
-                    
-                    <AnimatePresence>
-                      {isExpanded && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="divide-y divide-gray-700/50"
-                        >
-                          {weekEvaluations.map((evaluation) => (
-                            <motion.div
-                              key={evaluation.id}
-                              whileHover={{ backgroundColor: "rgba(75, 85, 99, 0.2)" }}
-                              className="p-4 cursor-pointer transition-colors duration-200"
-                              onClick={() => {
-                                if (userRole === "admin" || userRole === "director") {
-                                  handleOpenEdit(evaluation);
-                                }
-                              }}
-                            >
-                              <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                                <div className="md:col-span-5">
-                                  <div className="flex items-start gap-3">
-                                    <div className="bg-gray-700 p-2 rounded-lg">
-                                      <Book size={20} className="text-indigo-400" />
-                                    </div>
-                                    <div>
-                                      <h4 className="font-medium text-lg">{evaluation.unit.name}</h4>
-                                      <Badge status={evaluation.status as "open" | "closed"} />
-                                    </div>
-                                  </div>
-                                </div>
-                                
-                                <div className="md:col-span-5">
-                                  <div className="grid grid-cols-2 gap-3">
-                                    <div className="bg-gray-800/80 rounded-lg p-3 border border-gray-700">
-                                      <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
-                                        <Award size={14} />
-                                        <span>Pontuação do Exame</span>
+                      
+                      <AnimatePresence>
+                        {isExpanded && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="divide-y divide-gray-700/50"
+                          >
+                            {weekEvaluations.map((evaluation) => (
+                              <motion.div
+                                key={evaluation.id}
+                                whileHover={{ backgroundColor: "rgba(75, 85, 99, 0.2)" }}
+                                className="p-4 cursor-pointer transition-colors duration-200"
+                                onClick={() => {
+                                  if (userRole === "admin" || userRole === "director") {
+                                    handleOpenEdit(evaluation);
+                                  }
+                                }}
+                              >
+                                <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                                  <div className="md:col-span-5">
+                                    <div className="flex items-start gap-3">
+                                      <div className="bg-gray-700 p-2 rounded-lg">
+                                        <Book size={20} className="text-indigo-400" />
                                       </div>
-                                      <div className="text-xl font-semibold">{evaluation.examScore}</div>
-                                    </div>
-                                    
-                                    <div className="bg-gray-800/80 rounded-lg p-3 border border-gray-700">
-                                      <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
-                                        <Award size={14} />
-                                        <span>Pontuação Total</span>
+                                      <div>
+                                        <h4 className="font-medium text-lg">{evaluation.unit.name}</h4>
+                                        <Badge status={evaluation.status as "open" | "closed"} />
                                       </div>
-                                      <div className="text-xl font-semibold">{evaluation.totalScore}</div>
                                     </div>
                                   </div>
                                   
-                                  <div className="mt-3 grid grid-cols-2 gap-3">
-                                    <div className="flex items-center gap-2">
-                                      <div className="h-4 w-4 rounded-full bg-green-500/20 flex items-center justify-center">
-                                        <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                                  <div className="md:col-span-5">
+                                    <div className="grid grid-cols-2 gap-3">
+                                      <div className="bg-gray-800/80 rounded-lg p-3 border border-gray-700">
+                                        <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
+                                          <Award size={14} />
+                                          <span>Pontuação do Exame</span>
+                                        </div>
+                                        <div className="text-xl font-semibold">{evaluation.examScore}</div>
                                       </div>
-                                      <span className="text-sm text-gray-300">
-                                        {evaluation.correctAnswers} corretas
-                                      </span>
+                                      
+                                      <div className="bg-gray-800/80 rounded-lg p-3 border border-gray-700">
+                                        <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
+                                          <Award size={14} />
+                                          <span>Pontuação Total</span>
+                                        </div>
+                                        <div className="text-xl font-semibold">{evaluation.totalScore}</div>
+                                      </div>
                                     </div>
                                     
-                                    <div className="flex items-center gap-2">
-                                      <div className="h-4 w-4 rounded-full bg-red-500/20 flex items-center justify-center">
-                                        <div className="h-2 w-2 rounded-full bg-red-500"></div>
+                                    <div className="mt-3 grid grid-cols-2 gap-3">
+                                      <div className="flex items-center gap-2">
+                                        <div className="h-4 w-4 rounded-full bg-green-500/20 flex items-center justify-center">
+                                          <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                                        </div>
+                                        <span className="text-sm text-gray-300">
+                                          {evaluation.correctAnswers} corretas
+                                        </span>
                                       </div>
-                                      <span className="text-sm text-gray-300">
-                                        {evaluation.wrongAnswers} incorretas
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-                                
-                                {(userRole === "admin" || userRole === "director") && (
-                                  <div className="md:col-span-2 flex md:justify-end items-center">
-                                    <div className="flex gap-2 md:flex-col">
-                                      <Button 
-                                        variant="outline" 
-                                        className="p-2" 
-                                        onClick={(e: React.MouseEvent) => {
-                                          e.stopPropagation();
-                                          handleOpenEdit(evaluation);
-                                        }}
-                                      >
-                                        <Edit size={18} className="text-indigo-400" />
-                                      </Button>
                                       
-                                      <Button 
-                                        variant="outline" 
-                                        className="p-2" 
-                                        onClick={(e: React.MouseEvent) => handleOpenDelete(evaluation, e)}
-                                      >
-                                        <Trash2 size={18} className="text-red-400" />
-                                      </Button>
+                                      <div className="flex items-center gap-2">
+                                        <div className="h-4 w-4 rounded-full bg-red-500/20 flex items-center justify-center">
+                                          <div className="h-2 w-2 rounded-full bg-red-500"></div>
+                                        </div>
+                                        <span className="text-sm text-gray-300">
+                                          {evaluation.wrongAnswers} incorretas
+                                        </span>
+                                      </div>
                                     </div>
                                   </div>
-                                )}
-                              </div>
-                            </motion.div>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                );
-              })}
-            </div>
-          )}
-        </motion.div>
+                                  
+                                  {(userRole === "admin" || userRole === "director") && (
+                                    <div className="md:col-span-2 flex md:justify-end items-center">
+                                      <div className="flex gap-2 md:flex-col">
+                                        <Button 
+                                          variant="outline" 
+                                          className="p-2" 
+                                          onClick={(e: React.MouseEvent) => {
+                                            e.stopPropagation();
+                                            handleOpenEdit(evaluation);
+                                          }}
+                                        >
+                                          <Edit size={18} className="text-indigo-400" />
+                                        </Button>
+                                        
+                                        <Button 
+                                          variant="outline" 
+                                          className="p-2" 
+                                          onClick={(e: React.MouseEvent) => handleOpenDelete(evaluation, e)}
+                                        >
+                                          <Trash2 size={18} className="text-red-400" />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </motion.div>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  );
+                })}
+              </div>
+              
+            )}
+          </motion.div>
+        </div>
+
+        {/* Modal de Criação */}
+        {isCreateModalOpen && (
+          <CreateEvaUnitModal
+            isOpen={isCreateModalOpen}
+            onClose={() => setIsCreateModalOpen(false)}
+            onSave={handleCreate}
+          />
+        )}
+
+        {/* Modal de Edição */}
+        {isEditModalOpen && selectedEvaluation && (
+          <EditEvaUnitModal
+            isOpen={isEditModalOpen}
+            onClose={() => setIsEditModalOpen(false)}
+            onSave={handleEditEvaluation}
+            evaluation={selectedEvaluation}
+          />
+        )}
+
+        {/* Modal de Exclusão */}
+        {isDeleteModalOpen && selectedEvaluation && (
+          <ConfirmDeleteEvaUnitModal
+            isOpen={isDeleteModalOpen}
+            onClose={() => setIsDeleteModalOpen(false)}
+            onConfirmDelete={handleDeleteEvaluation}
+          />
+        )}
       </div>
-
-      {/* Modal de Criação */}
-      {isCreateModalOpen && (
-        <CreateEvaUnitModal
-          isOpen={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
-          onSave={handleCreate}
-        />
-      )}
-
-      {/* Modal de Edição */}
-      {isEditModalOpen && selectedEvaluation && (
-        <EditEvaUnitModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          onSave={handleEditEvaluation}
-          evaluation={selectedEvaluation}
-        />
-      )}
-
-      {/* Modal de Exclusão */}
-      {isDeleteModalOpen && selectedEvaluation && (
-        <ConfirmDeleteEvaUnitModal
-          isOpen={isDeleteModalOpen}
-          onClose={() => setIsDeleteModalOpen(false)}
-          onConfirmDelete={handleDeleteEvaluation}
-        />
-      )}
-    </div>
+    </>
   );
 }
 

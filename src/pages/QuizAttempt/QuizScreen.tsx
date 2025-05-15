@@ -63,7 +63,7 @@ export default function QuizScreen() {
   const [selectedAnswers, setSelectedAnswers] = useState<ISelectedAnswers>({});
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
   const [quizResult, setQuizResult] = useState<IQuizResult | null>(null);
   const [timer, setTimer] = useState(30);
   const [timerActive, setTimerActive] = useState(false);
@@ -73,7 +73,6 @@ export default function QuizScreen() {
   const [showScoreAnimation, setShowScoreAnimation] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
 
-console.log("ERROR", error)
   useEffect(() => {
     fetchQuestionsQuiz();
   }, [quizId]);

@@ -63,4 +63,21 @@ export const userService = {
       throw new Error(`Erro ao aprovar usuário: ${error}`);
     }
   },
+
+  getUser: async (userId: string): Promise<any>=> {
+    const token = localStorage.getItem('token')
+    try {
+      const response = await api.get(`/user/get-user/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      const data = response.data.user
+      console.log("DATA USER", data)
+      return data
+    } catch (error: any) {
+      console.error("❌ Erro não foi possível buscar usuário: ", error.response?.data || error.message);
+      throw new Error(`❌ Erro ao buscar dados do usuário: ${error}`);        
+    }
+  },
 };

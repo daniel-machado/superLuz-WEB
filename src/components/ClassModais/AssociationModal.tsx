@@ -104,10 +104,19 @@ export const AssociationModal = ({
       value: user.id,
     }));
 
+
+    
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Associar Usuário à Classe</h3>
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] m-4">
+      <div className="no-scrollbar relative w-full overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
+        <div className="px-2 pr-14">
+          <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
+            Associar membro
+          </h4>
+          <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+            Selecione um membro, uma classe e o responsável para associar.
+          </p>
+        </div>
         <div className="space-y-4">
           <div>
             <Select
@@ -144,7 +153,7 @@ export const AssociationModal = ({
         </div>
 
         <div className="flex justify-end gap-2 mt-6">
-          <Button onClick={onClose}>Cancelar</Button>
+          <Button variant="outline" onClick={onClose}>Cancelar</Button>
           <Button variant="primary" onClick={handleSave}>Salvar</Button>
         </div>
       </div>

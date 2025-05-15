@@ -5,6 +5,7 @@ import { Building2, UserCircle, Loader2, Search, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { unitsService } from '../../services/unitsService';
+import PageMeta from '../../components/common/PageMeta';
 
 
 const ManageAnswerIndividual = () => {
@@ -12,14 +13,13 @@ const ManageAnswerIndividual = () => {
   const [filteredUnits, setFilteredUnits] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
   const navigate = useNavigate();
 
 
   useEffect(() => {
     fetchUnits();
   }, []);
-
 
   const fetchUnits = async () => {
     setIsLoading(true);
@@ -55,13 +55,54 @@ const ManageAnswerIndividual = () => {
             duration: 3000,
           });
         }
-      } else if (user?.user?.user?.role === 'admin' || user?.user?.user?.role === 'director') {
+      } else if (user?.user?.user?.role === 'admin' 
+        || user?.user?.user?.role === 'director'
+        || user?.user?.user?.role === 'lead'
+        || user?.user?.user?.role === 'secretary'
+      ) {
         // Admin and director see all units
         const response = await unitsService.ListAllUnits();
         if (response.success && response.units?.units) {
           setUnits(response.units.units);
           setFilteredUnits(response.units.units);
           toast.success(`${response.units.units.length} unidades carregadas com sucesso`, {
+            position: 'bottom-right',
+            className: 'dark:bg-gray-800 dark:text-white',
+            duration: 3000,
+          });
+        }
+      } else if( user?.user?.user.role === "dbv"){
+        // DBV sees only themselves
+        const dbvId = user.user.user.id;
+        const dbvUnitResponse = await unitsService.existDbvUnit(dbvId);
+        
+        if (!dbvUnitResponse.success || !dbvUnitResponse.result?.existingInOtherUnit) {
+          toast.error('Você não está associado a nenhuma unidade', {
+            position: 'bottom-right',
+            className: 'dark:bg-gray-800 dark:text-white',
+            duration: 3000,
+          });
+          setUnits([]);
+          setFilteredUnits([]);
+          setIsLoading(false);
+          return;
+        }
+        
+        const unitId = dbvUnitResponse.result.existingInOtherUnit.unitId;
+        const unitResponse = await unitsService.getUnitById(unitId);
+        
+        if (unitResponse.success && unitResponse.unit?.unit) {
+          // Filter to show only the logged-in DBV
+          const unitData = {
+            ...unitResponse.unit.unit,
+            dbvs: unitResponse.unit.unit.dbvs.filter(
+              (dbvItem: { dbv: { id: string } }) => dbvItem.dbv.id === dbvId
+            )
+          };
+          
+          setUnits([unitData]);
+          setFilteredUnits([unitData]);
+          toast.success('Seus dados foram carregados', {
             position: 'bottom-right',
             className: 'dark:bg-gray-800 dark:text-white',
             duration: 3000,
@@ -161,150 +202,166 @@ const ManageAnswerIndividual = () => {
 
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      <div className="container mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8"
-        >
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">  
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-yellow-400 to-red-500 bg-clip-text text-transparent">
-                Avaliações Individuais
-              </h1>
-              <p className="text-gray-400 mt-1">
-                Gerencie as avaliações individuais dos desbravadores
-              </p>
-            </div>
-
-
-            <div className="relative mt-4 md:mt-0 w-full md:w-64">
-              <input
-                type="text"
-                placeholder="Buscar unidades ou desbravadores..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-              />
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-            </div>
-          </div>
-
-
-          <div className="flex items-center justify-between mb-4">
-            <div className="text-sm text-gray-400">
-              {filteredUnits.length}{' '}
-              {filteredUnits.length === 1 ? 'unidade encontrada' : 'unidades encontradas'}
-            </div>
-            {/* <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => {
-                toast.dismiss();
-                toast.loading('Recarregando dados...', {
-                  position: 'bottom-right',
-                  className: 'dark:bg-gray-800 dark:text-white',
-                });
-                fetchUnits();
-              }}
-              className="flex items-center text-sm px-3 py-1.5 bg-gray-800 text-gray-300 rounded-md hover:bg-gray-700 transition-colors"
-            >
-              <Loader2 className="w-3.5 h-3.5 mr-1.5" /> Atualizar
-            </motion.button> */}
-          </div>
-        </motion.div>
-
-
-        {filteredUnits.length > 0 ? (
+    <>
+      <PageMeta
+        title="Gerenciamento de respostas das avaliações | Luzeiros do Norte"
+        description="Clube de Desbravadores - Gerenciamento de respostas das avaliações"
+      />
+      <div className="min-h-screen bg-gray-900 text-white">
+        <div className="container mx-auto px-4 py-8">
           <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-1 gap-8"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8"
           >
-            {filteredUnits.map((unit) => (
-              <motion.div
-                key={unit.id}
-                variants={itemVariants}
-                className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 shadow-lg"
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">  
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-yellow-400 to-red-500 bg-clip-text text-transparent">
+                  {userRole === "admin" || userRole === "director" || userRole === "lead" || userRole === "secretary" 
+                  ? "Avaliações Individuais" 
+                  : "Sua avaliação individual"}
+                </h1>
+                <p className="text-gray-400 mt-1">
+                  
+                  {userRole === "admin" || userRole === "director" || userRole === "lead" || userRole === "secretary" 
+                  ? "Gerencie as avaliações individuais dos desbravadores" 
+                  : "Acompanhe suas avaliações individuais"}
+                </p>
+              </div>
+
+              { userRole !== "dbv" && (
+                  <div className="relative mt-4 md:mt-0 w-full md:w-64">
+                  <input
+                    type="text"
+                    placeholder="Buscar unidades ou desbravadores..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                  />
+                  <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                </div>
+              ) }
+            
+            </div>
+
+
+            <div className="flex items-center justify-between mb-4">
+              { userRole !== "dbv" && (
+                <div className="text-sm text-gray-400">
+                  {filteredUnits.length}{' '}
+                  {filteredUnits.length === 1 ? 'unidade encontrada' : 'unidades encontradas'}
+              </div>
+              ) }
+              
+              {/* <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  toast.dismiss();
+                  toast.loading('Recarregando dados...', {
+                    position: 'bottom-right',
+                    className: 'dark:bg-gray-800 dark:text-white',
+                  });
+                  fetchUnits();
+                }}
+                className="flex items-center text-sm px-3 py-1.5 bg-gray-800 text-gray-300 rounded-md hover:bg-gray-700 transition-colors"
               >
-                <div className="flex items-center p-4 bg-gray-750 border-b border-gray-700">
-                  <div className="flex items-center">
-                    {unit.photo ? (
-                      <img
-                        src={unit.photo}
-                        alt={unit.name}
-                        className="w-10 h-10 rounded-full object-cover mr-3"
-                      />
-                    ) : (
-                      <Building2 className="w-10 h-10 p-2 bg-gray-700 rounded-full text-yellow-400 mr-3" />
-                    )}
-                    <div>
-                      <h2 className="text-xl font-bold text-white">{unit.name}</h2>
-                      <div className="flex items-center text-sm text-gray-400">
-                        <Users className="w-4 h-4 mr-1" /> 
-                        {unit.dbvs.length} {unit.dbvs.length === 1 ? 'desbravador' : 'desbravadores'}
+                <Loader2 className="w-3.5 h-3.5 mr-1.5" /> Atualizar
+              </motion.button> */}
+            </div>
+          </motion.div>
+
+
+          {filteredUnits.length > 0 ? (
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-1 gap-8"
+            >
+              {filteredUnits.map((unit) => (
+                <motion.div
+                  key={unit.id}
+                  variants={itemVariants}
+                  className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 shadow-lg"
+                >
+                  <div className="flex items-center p-4 bg-gray-750 border-b border-gray-700">
+                    <div className="flex items-center">
+                      {unit.photo ? (
+                        <img
+                          src={unit.photo}
+                          alt={unit.name}
+                          className="w-10 h-10 rounded-full object-cover mr-3"
+                        />
+                      ) : (
+                        <Building2 className="w-10 h-10 p-2 bg-gray-700 rounded-full text-yellow-400 mr-3" />
+                      )}
+                      <div>
+                        <h2 className="text-xl font-bold text-white">{unit.name}</h2>
+                        <div className="flex items-center text-sm text-gray-400">
+                          <Users className="w-4 h-4 mr-1" /> 
+                          {unit.dbvs.length} {unit.dbvs.length === 1 ? 'desbravador' : 'desbravadores'}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
 
-                <div className="p-4">
-                  <h3 className="text-lg font-medium text-gray-300 mb-3">Desbravadores</h3>
-                  
-                  {unit.dbvs.length > 0 ? (
-                    <motion.div 
-                      variants={containerVariants}
-                      initial="hidden"
-                      animate="visible"
-                      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-                    >
-                      {unit.dbvs.map((dbvItem: { id: string; dbv: { id: string; name: string; photoUrl?: string } }) => (
-                        <motion.div
-                          key={dbvItem.id}
-                          variants={dbvItemVariants}
-                          whileHover={{ scale: 1.03 }}
-                          whileTap={{ scale: 0.97 }}
-                          onClick={() => handleDBVClick(unit.id, dbvItem.dbv.id, dbvItem.dbv.name)}
-                          className="bg-gray-750 rounded-lg p-4 flex items-center cursor-pointer transition-all border border-gray-700 hover:border-yellow-500/70"
-                        >
-                          {dbvItem.dbv.photoUrl ? (
-                            <img
-                              src={dbvItem.dbv.photoUrl}
-                              alt={dbvItem.dbv.name}
-                              className="w-12 h-12 rounded-full object-cover mr-3"
-                            />
-                          ) : (
-                            <UserCircle className="w-12 h-12 text-gray-500 mr-3" />
-                          )}
-                          <div>
-                            <h4 className="font-medium text-white">{dbvItem.dbv.name}</h4>
-                            <p className="text-sm text-gray-400">Ver avaliações</p>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </motion.div>
-                  ) : (
-                    <p className="text-center text-gray-500 py-4">Nenhum desbravador encontrado nesta unidade.</p>
-                  )}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        ) : (
-          <div className="flex flex-col items-center justify-center bg-gray-800 rounded-xl p-10 text-center">
-            <Users className="w-16 h-16 text-gray-600 mb-4" />
-            <h3 className="text-xl font-semibold text-gray-300">Nenhuma unidade encontrada</h3>
-            <p className="text-gray-500 mt-2 max-w-md">
-              Não foi possível encontrar unidades ou desbravadores correspondentes à sua pesquisa.
-            </p>
-          </div>
-        )}
+                  <div className="p-4">
+                    <h3 className="text-lg font-medium text-gray-300 mb-3">Desbravadores</h3>
+                    
+                    {unit.dbvs.length > 0 ? (
+                      <motion.div 
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="visible"
+                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+                      >
+                        {unit.dbvs.map((dbvItem: { id: string; dbv: { id: string; name: string; photoUrl?: string } }) => (
+                          <motion.div
+                            key={dbvItem.id}
+                            variants={dbvItemVariants}
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => handleDBVClick(unit.id, dbvItem.dbv.id, dbvItem.dbv.name)}
+                            className="bg-gray-750 rounded-lg p-4 flex items-center cursor-pointer transition-all border border-gray-700 hover:border-yellow-500/70"
+                          >
+                            {dbvItem.dbv.photoUrl ? (
+                              <img
+                                src={dbvItem.dbv.photoUrl}
+                                alt={dbvItem.dbv.name}
+                                className="w-12 h-12 rounded-full object-cover mr-3"
+                              />
+                            ) : (
+                              <UserCircle className="w-12 h-12 text-gray-500 mr-3" />
+                            )}
+                            <div>
+                              <h4 className="font-medium text-white">{dbvItem.dbv.name}</h4>
+                              <p className="text-sm text-gray-400">Ver avaliações</p>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </motion.div>
+                    ) : (
+                      <p className="text-center text-gray-500 py-4">Nenhum desbravador encontrado nesta unidade.</p>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          ) : (
+            <div className="flex flex-col items-center justify-center bg-gray-800 rounded-xl p-10 text-center">
+              <Users className="w-16 h-16 text-gray-600 mb-4" />
+              <h3 className="text-xl font-semibold text-gray-300">Nenhuma unidade encontrada</h3>
+              <p className="text-gray-500 mt-2 max-w-md">
+                Não foi possível encontrar unidades ou desbravadores correspondentes à sua pesquisa.
+              </p>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -18,8 +18,8 @@ interface RankingProps {
 const RankingList = ({ rankings, handleOpenDetail }: RankingProps) => {
 
   // Helper function to get trend icon (up, down, stable)
-  const getTrendIcon = (index: number, previousPosition: number | null) => {
-    console.log("INDEX", index, "PREVIOUS POSITION", previousPosition);
+  const getTrendIcon = (_index: number, _previousPosition: number | null) => {
+    
     // This is a mock implementation - replace with your actual logic
     const trend = Math.floor(Math.random() * 3); // 0: up, 1: down, 2: stable
     

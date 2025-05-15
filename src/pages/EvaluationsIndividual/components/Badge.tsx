@@ -1,6 +1,6 @@
 import { CheckCircle, XCircle } from "lucide-react";
 
-const Badge = ({ status }: { status: "open" | "closed" }) => {
+export const Badge = ({ status }: { status: "open" | "closed" }) => {
   const variants = {
     open: "bg-green-900/30 text-green-400 border-green-500",
     closed: "bg-red-900/30 text-red-400 border-red-500",
@@ -24,5 +24,3 @@ const Badge = ({ status }: { status: "open" | "closed" }) => {
     </span>
   );
 };
-
-export default Badge;

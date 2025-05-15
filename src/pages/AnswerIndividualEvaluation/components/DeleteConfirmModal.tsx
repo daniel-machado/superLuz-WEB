@@ -1,18 +1,19 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, X } from 'lucide-react';
+import { Modal } from '../../../components/ui/modal';
 
 
 interface DeleteConfirmModalProps {
   isOpen: boolean;
-  answer: any; // Replace 'any' with the appropriate type for 'answer'
+  answer?: { text: string; id?: string } | null
   onClose: () => void;
   onConfirm: () => void;
 }
 
 export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({ 
   isOpen, 
-  //answer, 
+  answer, 
   onClose, 
   onConfirm }) => {
   if (!isOpen) return null;
@@ -30,13 +31,12 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
     visible: { opacity: 1, y: 0, scale: 1, transition: { delay: 0.1 } }
   };
 
-
   return (
+    <Modal isOpen={isOpen} onClose={onClose} className="w-full max-w-[400px] ">
     <AnimatePresence>
-      {isOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <motion.div
-            className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
+            className="fixed inset-0 "
             variants={backdrop}
             initial="hidden"
             animate="visible"
@@ -70,6 +70,18 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                     Confirmar exclusão
                   </h3>
+
+                  <div className='flex items-center text-center'>
+                    <h4 className="text-md font-bold text-gray-900 dark:text-white mb-2 mr-3">
+                      Resposta:
+                    </h4>
+                    {answer && answer.text && (
+                      <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 max-h-32 overflow-y-auto">
+                        <p className="text-gray-700 dark:text-gray-300 text-sm italic">"{answer.text.substring(0, 150)}{answer.text.length > 150 ? '...' : ''}"</p>
+                      </div>
+                    )}
+
+                  </div>
                   
                   <p className="text-gray-600 dark:text-gray-400 mb-6">
                     Tem certeza que deseja excluir esta resposta? Esta ação não pode ser desfeita.
@@ -94,7 +106,8 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
             </motion.div>
           </div>
         </div>
-      )}
+
     </AnimatePresence>
+    </Modal>
   );
 };

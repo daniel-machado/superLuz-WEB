@@ -10,8 +10,8 @@ interface DeleteConfirmModalProps {
 
 export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({ isOpen, answer, onClose, onConfirm }) => {
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="p-6 space-y-4">
+    <Modal isOpen={isOpen} onClose={onClose} className="w-full max-w-[400px] ">
+      <div className="p-6 space-y-4 no-scrollbar">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Confirmar Exclusão</h3>
         <p className="text-gray-600 dark:text-gray-300">
           Tem certeza que deseja excluir esta resposta?

@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import PageMeta from "../components/common/PageMeta";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
-import useSmoothScroll from "./useSmoothScroll";
+import useSmoothScroll from './useScrool'
 
 //import PageBreadcrumb from "../components/common/PageBreadCrumb";
 
@@ -269,7 +269,6 @@ const Hero = () => {
         transition={{ duration: 0.8, delay: 0.6 }}
         className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6"
         >
-          const scrollToSection = useSmoothScroll();
           <a
             href="/sobre"
             onClick={(e) => {

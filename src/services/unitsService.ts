@@ -89,6 +89,22 @@ export const unitsService = {
     }
   },
 
+  existDbvUnit: async (userId: string): Promise<any> => {
+    const token = localStorage.getItem('token')
+    try {
+      const response = await api.get(`unit/exist-dbv-unit/${userId}`, {
+        headers: { 
+          "Content-Type": "application/json", 
+          Authorization: `Bearer ${token}`
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error na busca", error);
+      throw new Error(`Erro na busca${error}`);
+    }
+  },
+
   removeCounselorFromUnit: async (unitId: string, userId: string): Promise<any> => {
     const token = localStorage.getItem('token')
     const res = await api.delete(`/unit/removecounselor/${unitId}/counselor/${userId}`, {

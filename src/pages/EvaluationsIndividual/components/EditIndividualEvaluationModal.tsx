@@ -11,7 +11,7 @@ interface IndividualEvaluation {
   userId: string;
   counselorId: string | null;
   evaluationDate: string | null;
-  totalScore: number;
+  totalScore: number | string;
   status: string;
   week: number;
   createdAt: string;

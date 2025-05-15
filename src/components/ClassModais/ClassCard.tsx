@@ -3,6 +3,7 @@ import { motion, AnimatePresence, Variants } from "framer-motion";
 import { ChevronRight, ClipboardCopy, Download, Users, Calendar } from "lucide-react";
 import { TrashBinIcon } from "../../icons";
 import toast from "react-hot-toast";
+import { useAuth } from "../../context/AuthContext";
 
 
 interface ClassUser {
@@ -50,6 +51,8 @@ export const ClassCard = ({
   const [hoveredUserId, setHoveredUserId] = useState<string | null>(null);
   
   const isOpen = selectedClassId === classId;
+
+  const { userRole } = useAuth();
 
 
   // Get class type color
@@ -245,7 +248,8 @@ export const ClassCard = ({
                     </div>
                   </div>
                   
-                  {hoveredUserId === user.id && (
+                  {hoveredUserId === user.id 
+                  && ( userRole === "admin" || userRole === "director" || userRole === "lead") &&(
                     <motion.button
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
