@@ -24,7 +24,7 @@ interface UserMetaCardProps {
   userId: string | undefined;
 }
 // Class Card Component
-export function ClassCard({userId}: UserMetaCardProps) {
+export function UserClassCardUser({userId}: UserMetaCardProps) {
   const [classes, setClasses] = useState<ClassUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");

@@ -38,7 +38,7 @@ interface UserMetaCardProps {
 }
 
 // Specialty Card Component
-export function SpecialtyCard({userId}: UserMetaCardProps) {
+export function UserSpecialtyCardUser({userId}: UserMetaCardProps) {
   const [specialties, setSpecialties] = useState<SpecialtyUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, Trophy, Award, Star, BarChart2, Check, AlertCircle, Zap, TrendingUp, Target, Shield } from "lucide-react";
+import { motion } from "framer-motion";
+import { Trophy, Award, Star, BarChart2, Check, AlertCircle, Zap, TrendingUp, Target, Shield } from "lucide-react";
 import confetti from "canvas-confetti";
 import { Modal } from "../../../components/ui/modal";
 
@@ -114,7 +114,7 @@ interface RankUnitDetailModalProps {
 }
 
 const RankUnitDetailModal: React.FC<RankUnitDetailModalProps> = ({ unit, isOpen, onClose }) => {
-  const [showConfetti, setShowConfetti] = useState(false);
+  const [_showConfetti, setShowConfetti] = useState(false);
 
 
   // Trigger confetti animation when modal opens

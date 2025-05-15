@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Eye, Pencil, Trash, X, ChevronRight } from "lucide-react";
+import { Pencil, Trash, X, ChevronRight } from "lucide-react";
 import toast from "react-hot-toast";
 import { Modal } from "../../components/ui/modal";
 import Badge, { BadgeColor } from "../../components/ui/badge/Badge";
