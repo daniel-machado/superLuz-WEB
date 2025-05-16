@@ -243,6 +243,8 @@ import TextArea from '../../../components/form/input/TextArea';
 import Radio from '../../../components/form/input/Radio';
 import Input from '../../../components/form/input/InputField';
 import { useAuth } from '../../../context/AuthContext';
+import Label from '../../../components/form/Label';
+import RangeSlider from './RangeSlider'
 
 interface Question {
   id: string;
@@ -260,15 +262,22 @@ interface Evaluation {
   status: 'open' | 'closed';
   createdAt?: string;
 }
+interface AnswerModalAnswer {
+  id?: string;
+  text?: string;
+  observation?: string;
+}
+
 interface AnswerModalProps {
   isOpen: boolean;
   evaluation: Evaluation | null;
   questions: Question[] | null
-  answers: Record<string, { id?: string; text?: string }>;
+  answers: Record<string, AnswerModalAnswer>;
   isSubmitting: boolean;
   onClose: () => void;
   onSubmit: () => void;
-  onInputChange: (id: string, value: string) => void;
+  progress: number;
+  onInputChange: (questionId: string, value: string, field: "text" | "observation") => void;
   onDeleteClick: (id: string) => void;
 }
 
@@ -280,11 +289,13 @@ export const AnswerModal: React.FC<AnswerModalProps> = ({
   isSubmitting, 
   onClose, 
   onSubmit, 
+  progress,
   onInputChange, 
   onDeleteClick 
 }) => {
   if (!isOpen || !evaluation) return null;
 
+  console.log("sds", answers)
   const { userRole } = useAuth() 
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.8 },
@@ -374,23 +385,29 @@ export const AnswerModal: React.FC<AnswerModalProps> = ({
                       {isEditable ? (
                         <>
                           {question.typeQuestion === "text" && (
-                            // <textarea
-                            //   value={answers[question.id]?.text || ''}
-                            //   onChange={(e) => onInputChange(question.id, e.target.value)}
-                            //   placeholder="Digite sua resposta aqui..."
-                            //   className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white transition-all"
-                            //   rows={3}
-                            // />
-                            <TextArea
-                            value={answers[question.id]?.text || ''}
-                            onChange={(value: string) => onInputChange(question.id, value)}
-                            placeholder="Digite sua resposta aqui..."
-                            rows={3}
-                            disabled={!!(answers[question.id] && answers[question.id].id && isEditable)}
-                          />
+                            <>
+                              <TextArea
+                                value={answers[question.id]?.text || ''}
+                                onChange={(value: string) => onInputChange(question.id, value, 'text')}
+                                placeholder="Digite sua resposta aqui..."
+                                rows={3}
+                                disabled={!!(answers[question.id]?.id && isEditable)}
+                              />
+
+                              <Label>Observação</Label>
+                              <Input
+                                type="text"
+                                placeholder="Opcional"
+                                className="dark:bg-dark-900"
+                                value={answers[question.id]?.observation || ''}
+                                onChange={(e) => onInputChange(question.id, e.target.value, 'observation')}
+                                disabled={!!(answers[question.id]?.id && isEditable)}
+                              />
+
+                            </>
                           )}
                           
-                          {question.typeQuestion === "number" && (
+                          {/* {question.typeQuestion === "number" && (
                             <Input
                               type="number"
                               value={answers[question.id]?.text || ''}
@@ -399,9 +416,29 @@ export const AnswerModal: React.FC<AnswerModalProps> = ({
                               min={0}
                               disabled={!!(answers[question.id] && answers[question.id].id && isEditable)}
                             />
+                          )} */}
+                            {question.typeQuestion === "number" && (
+                              <>
+                                <RangeSlider
+                                  questionId={question.id}
+                                  value={Number(answers[question.id]?.text) || 0}
+                                  onChange={(e) => onInputChange(question.id, String(e.target.value), 'text')}
+                                  disabled={!!(answers[question.id] && answers[question.id].id && isEditable)}
+                                />
+                                <Label>Observação</Label>
+                                  <Input
+                                    type="text"
+                                    placeholder="Opcional"
+                                    className="dark:bg-dark-900"
+                                    value={answers[question.id]?.observation || ''}
+                                    onChange={(e) => onInputChange(question.id, e.target.value, 'observation')}
+                                    disabled={!!(answers[question.id]?.id && isEditable)}
+                                  />
+                            </>
                           )}
-                          
+
                           {question.typeQuestion === "yes_no" && (
+                            <>
                             <div className="flex flex-wrap items-center gap-8">
                               
                                 {/* <input
@@ -416,7 +453,7 @@ export const AnswerModal: React.FC<AnswerModalProps> = ({
                                   name={`yes_no_${question.id}`}
                                   value="option1"
                                   checked={answers[question.id]?.text === 'sim'}
-                                  onChange={() => onInputChange(question.id, 'sim')}
+                                  onChange={() => onInputChange(question.id, 'sim', 'text')}
                                   label="Sim"
                                   disabled={!!(answers[question.id] && answers[question.id].id && isEditable)}
                                   
@@ -434,12 +471,23 @@ export const AnswerModal: React.FC<AnswerModalProps> = ({
                                   name={`yes_no_${question.id}`}
                                   value="option2"
                                   checked={answers[question.id]?.text === 'não'}
-                                  onChange={() => onInputChange(question.id, 'não')}
+                                  onChange={() => onInputChange(question.id, 'não', 'text')}
                                   label="Não"
                                   disabled={!!(answers[question.id] && answers[question.id].id && isEditable)}
                                   
                                 />                     
                             </div>
+                              <Label>Observação</Label>
+                                <Input
+                                  type="text"
+                                  placeholder="Opcional"
+                                  className="dark:bg-dark-900"
+                                  value={answers[question.id]?.observation || ''}
+                                  onChange={(e) => onInputChange(question.id, e.target.value, 'observation')}
+                                  disabled={!!(answers[question.id]?.id && isEditable)}
+                                />
+                            </>
+
                           )}
                         </>
                       ) : (
@@ -452,6 +500,24 @@ export const AnswerModal: React.FC<AnswerModalProps> = ({
                 </div>
               )}
             </div>
+
+            {isSubmitting && (
+              <div style={{ marginBottom: '1rem' }}>
+                <div style={{ height: '10px', background: '#eee', borderRadius: '5px' }}>
+                  <div
+                    style={{
+                      width: `${progress}%`,
+                      height: '100%',
+                      background: '#4caf50',
+                      borderRadius: '5px',
+                      transition: 'width 0.3s ease-in-out'
+                    }}
+                  />
+                </div>
+                <p>{Math.round(progress)}% concluído</p>
+              </div>
+            )}
+
         
             <div className="p-6 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex justify-end">
               <Button
@@ -477,7 +543,7 @@ export const AnswerModal: React.FC<AnswerModalProps> = ({
                   ) : (
                     <>
                       <Save className="w-4 h-4 mr-2" />
-                      Salvar Respostas
+                      Salvar Resposta
                     </>
                   )}
                 </Button>

@@ -372,6 +372,7 @@ export default function EvaluationUnits() {
         description="Clube de Desbravadores - Avaliação de Unidades"
       />
       <div className="min-h-screen bg-gray-900 text-gray-100">
+
         <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
           <motion.div 
             initial={{ opacity: 0, y: -20 }}

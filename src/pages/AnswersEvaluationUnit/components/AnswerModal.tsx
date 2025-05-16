@@ -376,8 +376,10 @@ import { Evaluation, Question } from '../@types';
 import { Modal } from '../../../components/ui/modal';
 import TextArea from '../../../components/form/input/TextArea';
 import Radio from '../../../components/form/input/Radio';
-import Input from '../../../components/form/input/InputField';
 import { useAuth } from '../../../context/AuthContext';
+import RangeSlider from '../../AnswerIndividualEvaluation/components/RangeSlider';
+
+
 
 interface AnswerModalProps {
   isOpen: boolean;
@@ -500,24 +502,35 @@ export const AnswerModal: React.FC<AnswerModalProps> = ({
                             //   className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white transition-all"
                             //   rows={3}
                             // />
-                            <TextArea
-                            value={answers[question.id]?.text || ''}
-                            onChange={(value: string) => onInputChange(question.id, value)}
-                            placeholder="Digite sua resposta aqui..."
-                            rows={3}
-                            disabled={!!(answers[question.id] && answers[question.id].id && isEditable)}
-                          />
+                            
+                            
+                                <TextArea
+                                value={answers[question.id]?.text || ''}
+                                onChange={(value: string) => onInputChange(question.id, value)}
+                                placeholder="Digite sua resposta aqui..."
+                                rows={3}
+                                disabled={!!(answers[question.id] && answers[question.id].id && isEditable)}
+                              />
+                              
+                          
                           )}
                           
                           {question.typeQuestion === "number" && (
-                            <Input
-                              type="number"
-                              value={answers[question.id]?.text || ''}
-                              onChange={(e) => onInputChange(question.id, e.target.value)}
-                              placeholder="Digite um número"
-                              min={0}
-                              disabled={!!(answers[question.id] && answers[question.id].id && isEditable)}
-                            />
+                              // <Input
+                              //   type="number"
+                              //   value={answers[question.id]?.text || ''}
+                              //   onChange={(e) => onInputChange(question.id, e.target.value)}
+                              //   placeholder="Digite um número"
+                              //   min={0}
+                              //   disabled={!!(answers[question.id] && answers[question.id].id && isEditable)}
+                              // />
+                              <RangeSlider
+                                questionId={question.id}
+                                value={Number(answers[question.id]?.text) || 0}
+                                onChange={(e) => onInputChange(question.id, String(e.target.value))}
+                                disabled={!!(answers[question.id] && answers[question.id].id && isEditable)}
+                              />
+                            
                           )}
                           
                           {question.typeQuestion === "yes_no" && (

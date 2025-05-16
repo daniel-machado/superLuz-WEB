@@ -1,7 +1,7 @@
 
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Save, HelpCircle, Trash2 } from 'lucide-react';
+import { HelpCircle } from 'lucide-react';
 import Button from '../../../components/ui/button/Button';
 
 // Utils
@@ -9,8 +9,8 @@ import { getEvaluationStatusIcon } from "./getEvaluationStatusIcon"
 import { Modal } from '../../../components/ui/modal';
 import TextArea from '../../../components/form/input/TextArea';
 import Radio from '../../../components/form/input/Radio';
-import Input from '../../../components/form/input/InputField';
-import { useAuth } from '../../../context/AuthContext';
+import RangeSlider from './RangeSlider';
+import Label from '../../../components/form/Label';
 
 interface Question {
   id: string;
@@ -28,33 +28,30 @@ interface Evaluation {
   status: 'open' | 'closed';
   createdAt?: string;
 }
+interface AnswerModalAnswer {
+  id?: string;
+  text?: string;
+  observation?: string;
+}
 
 interface AnswerModalProps {
   isOpen: boolean;
   evaluation: Evaluation | null;
   questions: Question[] | null
-  answers: Record<string, { id?: string; text?: string }>;
-  isSubmitting: boolean;
+  answers: Record<string, AnswerModalAnswer>;
   onClose: () => void;
-  onSubmit: () => void;
-  onInputChange: (id: string, value: string) => void;
-  onDeleteClick: (id: string) => void;
 }
+
 
 export const ViewOnlyModal: React.FC<AnswerModalProps> = ({ 
   isOpen, 
   evaluation, 
   questions, 
   answers, 
-  isSubmitting, 
   onClose, 
-  onSubmit, 
-  onInputChange, 
-  onDeleteClick 
 }) => {
   if (!isOpen || !evaluation) return null;
 
-  const { userRole } = useAuth() 
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: {
@@ -69,7 +66,7 @@ export const ViewOnlyModal: React.FC<AnswerModalProps> = ({
     }
   };
 
-  const isEditable = false
+  //const isEditable = false
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} className='w-full max-w-[700px] bg-black bg-opacity-50 dark:bg-opacity-50'>
@@ -99,7 +96,7 @@ export const ViewOnlyModal: React.FC<AnswerModalProps> = ({
                   </h2>
                 </div>
                 <p className="text-gray-500 dark:text-gray-400 mt-1">
-                  {isEditable ? "Responda as perguntas abaixo" : "Visualizando respostas"}
+                  "Visualizando respostas
                 </p>
               </div>
             </div>
@@ -129,18 +126,9 @@ export const ViewOnlyModal: React.FC<AnswerModalProps> = ({
                             </span>
                           )}
                         </label>
-                        {(answers[question.id] && answers[question.id].id && isEditable) && (userRole === 'admin' || userRole === "director") && (
-                            <button
-                            onClick={() => onDeleteClick(question.id)}
-                            className="text-red-500 hover:text-red-700 dark:hover:text-red-400 transition-colors"
-                            aria-label="Excluir resposta"
-                          >
-                            <Trash2 className="h-5 w-5" />
-                          </button>
-                        )}
                       </div>
                   
-                      {isEditable ? (
+                      {answers[question.id] && answers[question.id].id ? (
                         <>
                           {question.typeQuestion === "text" && (
                             // <textarea
@@ -150,27 +138,40 @@ export const ViewOnlyModal: React.FC<AnswerModalProps> = ({
                             //   className="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white transition-all"
                             //   rows={3}
                             // />
+                            <>
                             <TextArea
                             value={answers[question.id]?.text || ''}
-                            onChange={(value: string) => onInputChange(question.id, value)}
+                            //onChange={(value: string) => onInputChange(question.id, value)}
                             placeholder="Digite sua resposta aqui..."
                             rows={3}
-                            disabled={!!(answers[question.id] && answers[question.id].id && isEditable)}
+                            disabled
                           />
+                            <Label>Observação</Label>
+                            <div className={`dark:text-gray-400 bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-600 rounded-md min-h-[50px]`} >
+                              {answers[question.id]?.observation || 'Sem observação'}
+                            </div>
+                          </>
                           )}
-                          
-                          {question.typeQuestion === "number" && (
-                            <Input
-                              type="number"
-                              value={answers[question.id]?.text || ''}
-                              onChange={(e) => onInputChange(question.id, e.target.value)}
-                              placeholder="Digite um número"
-                              min={0}
-                              disabled={!!(answers[question.id] && answers[question.id].id && isEditable)}
-                            />
-                          )}
-                          
+                           
+                            {
+                              question.typeQuestion === "number" && (
+                                <>
+                                <RangeSlider
+                                  questionId={question.id}
+                                  value={Number(answers[question.id]?.text) || 0}
+                                  //onChange={(e) => onInputChange(question.id, String(e.target.value))}
+                                  disabled
+                                />
+                                  <Label>Observação</Label>
+                                  <div className={`dark:text-gray-400bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-600 rounded-md min-h-[50px]`} >
+                                    {answers[question.id]?.observation || 'Sem observação'}
+                                  </div>
+                              </>
+                            )}
+
+
                           {question.typeQuestion === "yes_no" && (
+                            <>
                             <div className="flex flex-wrap items-center gap-8">
                               
                                 {/* <input
@@ -185,9 +186,9 @@ export const ViewOnlyModal: React.FC<AnswerModalProps> = ({
                                   name={`yes_no_${question.id}`}
                                   value="option1"
                                   checked={answers[question.id]?.text === 'sim'}
-                                  onChange={() => onInputChange(question.id, 'sim')}
+                                  onChange={() => {}}
                                   label="Sim"
-                                  disabled={!!(answers[question.id] && answers[question.id].id && isEditable)}
+                                  disabled
                                   
                                 />
                               
@@ -203,16 +204,22 @@ export const ViewOnlyModal: React.FC<AnswerModalProps> = ({
                                   name={`yes_no_${question.id}`}
                                   value="option2"
                                   checked={answers[question.id]?.text === 'não'}
-                                  onChange={() => onInputChange(question.id, 'não')}
+                                  onChange={() => {}}
                                   label="Não"
-                                  disabled={!!(answers[question.id] && answers[question.id].id && isEditable)}
+                                  disabled
                                   
-                                />                     
+                                />  
+
                             </div>
+                              <Label>Observação</Label>
+                              <div className={`dark:text-gray-400 bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-600 rounded-md min-h-[50px]`} >
+                                {answers[question.id]?.observation || 'Sem observação'}
+                              </div>
+                            </>
                           )}
                         </>
                       ) : (
-                        <div className={`${answers[question.id]?.text ? 'dark:text-gray-400' : 'dark:text-red-400 text-sm'}  bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-600 rounded-md min-h-[80px]`} >
+                        <div className={`${answers[question.id]?.text ? 'dark:text-gray-400' : 'dark:text-red-400 text-sm'}  bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-600 rounded-md min-h-[50px]`} >
                           {answers[question.id]?.text || 'Sem resposta meu patrão....'}
                         </div>
                       )}
@@ -230,27 +237,6 @@ export const ViewOnlyModal: React.FC<AnswerModalProps> = ({
               >
                 Fechar
               </Button>
-          
-              {isEditable && (
-                <Button
-                  onClick={onSubmit}
-                  disabled={isSubmitting}
-                  variant="primary"
-                  className="flex items-center"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                      Enviando...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4 mr-2" />
-                      Salvar Respostas
-                    </>
-                  )}
-                </Button>
-              )}
             </div>
           </motion.div>
         </motion.div>

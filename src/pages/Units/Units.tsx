@@ -12,11 +12,20 @@ import toast from "react-hot-toast";
 import { uploadImage } from "../../services/uploadService";
 import { unitsService } from "../../services/unitsService";
 import { useAuth } from "../../context/AuthContext";
+import AddDbvFromUnitModal from "../../components/UnitModais/AddDbvFromUnitModal";
+import AddCounselorFromUnitModal from "../../components/UnitModais/AddCounselorFromUnitModal";
+
+type Association = {
+  userId: string;
+  unitId: string;
+};
 
 export default function Units() {
   const [isOpenModal, setIsOpenModal] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [role, setRole] = useState<string | undefined>('');
+  const [isOpenModalDbv, setIsOpenModalDbv] = useState(false)
+  const [isOpenModalCounselor, setIsOpenModalCounselor] = useState(false)
 
   const { findUnits, userRole } = useAuth();
 
@@ -55,6 +64,35 @@ export default function Units() {
     }
   };
 
+  
+  const AdicionarCounselor = async (unitId: string, counselorId: string) => {
+    try {
+      setIsLoading(true);
+      await unitsService.addCounselorFromUnit(unitId as string, counselorId);
+      await findUnits();
+      toast.success("Conselheiro adicionado na unidade", { position: 'bottom-right' });
+    } catch (error: any) {
+      toast.error(`Erro ao adicionar conselheiro: ${error.data.message}`, { position: 'bottom-right' });
+    } finally {
+      setIsLoading(false);
+      setIsOpenModalCounselor(false);
+    }
+  };
+
+    const AdicionarDbv = async (unitId: string, dbvId: string) => {
+    try {
+      setIsLoading(true);
+      await unitsService.addDbvFromUnit(unitId as string, dbvId);
+      await findUnits();
+      toast.success("Desbravador adicionado na unidade", { position: 'bottom-right' });
+    } catch (error) {
+      toast.error(`Erro ao adicionar desbravador: ${error}`, { position: 'bottom-right' });
+    } finally {
+      setIsLoading(false);
+      setIsOpenModalDbv(false);
+    }
+  };
+
   return (
     <>
       <PageMeta
@@ -71,10 +109,33 @@ export default function Units() {
               variant="primary" 
               startIcon={<PlusIcon />}
               onClick={() => setIsOpenModal(true)}
+              className="mr-3"
             >
-              {isLoading && "Criando unidade..."}
+              {isLoading ? "Criando unidade..." : "Unit"}
             </Button>
             )}  
+            {(role === "admin" || role === "director") && (
+              <Button  
+              size="sm" 
+              variant="outline" 
+              startIcon={<PlusIcon />}
+              onClick={() => setIsOpenModalCounselor(true)}
+              className="mr-3"
+            >
+              {isLoading ? "Adicionando" : "Conselheiro"}
+            </Button>
+            )}
+            {(role === "admin" || role === "director") && (
+              <Button  
+              size="sm" 
+              variant="outline" 
+              startIcon={<PlusIcon />}
+              onClick={() => setIsOpenModalDbv(true)}
+              className="mr-3"
+            >
+              {isLoading ? "Adicionando" : "Dbv"}
+            </Button>
+            )}
           </div>
 
           <TableUnits />
@@ -87,6 +148,24 @@ export default function Units() {
             loading={isLoading}
             onClose={() => setIsOpenModal(false)}
             onSave={handleCreateUnit}
+          />
+        )}
+
+        {isOpenModalDbv && (
+          <AddDbvFromUnitModal
+            isOpen={isOpenModalDbv}
+            loading={isLoading}
+            onClose={() => setIsOpenModalDbv(false)}
+            onSave={(unitData: Association) => AdicionarDbv(unitData.unitId, unitData.userId)}
+          />
+        )}
+
+        {isOpenModalCounselor && (
+          <AddCounselorFromUnitModal
+            isOpen={isOpenModalCounselor}
+            loading={isLoading}
+            onClose={() => setIsOpenModalCounselor(false)}
+            onSave={(unitData: Association) => AdicionarCounselor(unitData.unitId, unitData.userId)}
           />
         )}
 

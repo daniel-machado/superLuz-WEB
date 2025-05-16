@@ -306,7 +306,6 @@ const SpecialtyManager = () => {
         icon: '📝',
         duration: 3000,
       });
-      fetchSpecialtyUsers();
       fetchInitialData();
       setIsReportModalOpen(false);
       

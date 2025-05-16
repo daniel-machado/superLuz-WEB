@@ -182,7 +182,7 @@ export default function Users() {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Buscar por nome ou email..."
+                placeholder="Buscar por nome..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 w-full rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
@@ -201,29 +201,33 @@ export default function Users() {
           </div>
           
           {/* Filtros nativos */}
-          <div className="flex flex-wrap gap-2">
-            <select
-              value={statusFilter || ""}
-              onChange={(e) => setStatusFilter(e.target.value || null)}
-              className="px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-            >
-              <option value="">Todos os status</option>
-              {statusOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            
-            {(searchTerm || statusFilter) && (
-              <button
-                onClick={clearFilters}
-                className="px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+          { (userRole === "admin" || userRole === "director") && (
+            <div className="flex flex-wrap gap-2">
+              <select
+                value={statusFilter || ""}
+                onChange={(e) => setStatusFilter(e.target.value || null)}
+                className="px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               >
-                Limpar filtros
-              </button>
-            )}
-          </div>
+                <option value="">Todos os status</option>
+                {statusOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              
+              {(searchTerm || statusFilter) && (
+                <button
+                  onClick={clearFilters}
+                  className="px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+                >
+                  Limpar filtros
+                </button>
+              )}
+            </div>
+          )}
+          
+          
         </div>
 
 

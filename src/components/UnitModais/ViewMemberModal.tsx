@@ -60,9 +60,9 @@ const MembersModal: React.FC<Props> = ({
   const handleConfirmRemove = () => {
     if (selectedMember) {
       if (selectedMember.type === "dbv") {
-        onRemoveDbv(selectedMember.id);
+        onRemoveDbv(selectedMember.id); 
       } else {
-        onRemoveCounselor(selectedMember.id);
+        onRemoveCounselor(selectedMember.id); 
       }
       setConfirmModal(false);
       setSelectedMember(null);

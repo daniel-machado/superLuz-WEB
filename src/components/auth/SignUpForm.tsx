@@ -14,6 +14,7 @@ import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import avatarDefault from '../../assets/avatarDefault.png'
+import fabri from '../../assets/fabri.png'
 //import classNames from "react-day-picker/style.module.css";
 import { uploadImage } from "../../services/uploadService";
 
@@ -91,6 +92,33 @@ export default function SignUpForm() {
     }
   };
 
+  const handlePhotoUploadDefault = async (photo: any): Promise<File | null> => {
+    if (photo) {
+      try {
+        const options = {
+          maxSizeMB: 0.1,
+          maxWidthOrHeight: 200,
+          useWebWorker: true,
+        };
+        const compressed = await imageCompression(photo, options);
+      
+        return compressed;
+      } catch(error) {
+        toast.error(`Erro ao processar a imagem. ${error}`, {position: 'bottom-right'});
+        return null;
+      }
+    }
+    return null;
+  };
+
+  
+const urlToFile = async (url: string, filename: string, mimeType: string): Promise<File> => {
+  const res = await fetch(url);
+  const buffer = await res.arrayBuffer();
+  return new File([buffer], filename, { type: mimeType });
+};
+
+
   const onSubmit = async (data: SignUpFormData) => {
     try {
       if (!birthDate) {
@@ -104,11 +132,16 @@ export default function SignUpForm() {
   
       if (compressedFile) {
         uploadedImageUrl = await uploadImage(compressedFile); // 🔥 Faz o upload agora!
+      } else {
+        const auxFile = await urlToFile(fabri, "fabri.jpg", "image/jpeg");
+        const aux = await handlePhotoUploadDefault(auxFile);
+        uploadedImageUrl = await uploadImage(aux as File);
       }
 
       const nomeCompleto = `${data.name.trim()} ${data.sobrenome.trim()}`.trim();
   
       const formattedBirthDate = format(birthDate, "dd/MM/yyyy");
+
 
       const payload = {
         name: nomeCompleto,

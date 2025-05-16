@@ -29,8 +29,20 @@ export default function UserMetaCardUser({ userId }: UserMetaCardProps) {
       try {
         const data = await userService.getAllUsers()
         const userFiltered = data.find((user: IUser) => user.id === userId);     
-        setUser(userFiltered)
-        toast.success("!!", {position: 'bottom-right'});
+        setUser(userFiltered) 
+        toast.success('👀 Curiando', {
+          position: 'bottom-right',
+          style: {
+            background: '#1f2937', // Tailwind's gray-800
+            color: '#fff',
+            border: '1px solid #4b5563', // Tailwind's gray-600
+          },
+            iconTheme: {
+            primary: '#10b981', // Tailwind's green-500
+            secondary: '#1f2937', // background match
+          },
+        });
+
       } catch (error) {
         console.error("Erro ao buscar user", error);
         toast.error("Erro ao buscar user", {position: 'bottom-right'});

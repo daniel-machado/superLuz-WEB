@@ -141,7 +141,7 @@ console.log(openDropdownId)
   const removeCounselor = async (counselorId: string) => {
     try {
       setIsLoading(true);
-      await unitsService.removeDbvFromUnit(selectedUnit?.id as string, counselorId);
+      await unitsService.removeCounselorFromUnit(selectedUnit?.id as string, counselorId);
       await findUnits();
       toast.success("Conselheiro removido da unidade", { position: 'bottom-right' });
     } catch (error) {
@@ -151,7 +151,6 @@ console.log(openDropdownId)
       setIsMembersModalOpen(false);
     }
   };
-
 
   return (
     <div className="w-full">
@@ -500,7 +499,6 @@ console.log(openDropdownId)
           dbvs={selectedUnit.dbvs?.map((d) => (
             { id: d.dbv.id, name: d.dbv.name, photoUrl: d.dbv.photoUrl })) || []}
           onClose={() => setIsMembersModalOpen(false)}
-          //onAddMember={() => console.log("Adicionar membro")}
           onRemoveDbv={(dbvId) => removeDbv(dbvId)}
           onRemoveCounselor={(counselorId) => removeCounselor(counselorId)}
         />

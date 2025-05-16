@@ -15,8 +15,8 @@ import { AnswerModal } from './components/AnswerModal'
 import { DeleteConfirmModal } from './components/DeleteConfirmModal'
 import { LoadingSpinner } from '../../components/ui/loading/loading';
 import { useAuth } from '../../context/AuthContext';
-import { ViewOnlyModal } from './components/ViewOnlyModal';
 import PageMeta from '../../components/common/PageMeta';
+import { ViewOnlyModal } from './components/ViewOnlyModal';
 
 
 const ReportAnswerIndividual = () => {
@@ -40,11 +40,13 @@ const ReportAnswerIndividual = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedEvaluation, setSelectedEvaluation] = useState<Evaluation | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [answers, setAnswers] = useState<Record<string, { text: string; id?: string }>>({});
+  const [modalOpenView, setModalOpenView] = useState(false);
+  const [answers, setAnswers] = useState<Record<string, { text: string; observation?: string; id?: string }>>({});
   const [_allAnswers, setAllAnswers] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<{ text: string; id?: string } | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [progress, setProgress] = useState(0)
 
   useEffect(() => {
     fetchData();
@@ -122,15 +124,18 @@ const ReportAnswerIndividual = () => {
       const data = await individualAnswerService.ListUserAnswer(dbvId);
       
       // Filter answers by week to get only answers for the selected evaluation
-      const weekAnswers = data.filter((answer: { week: number; questionId: string; answer: string; id: string }) => answer.week === week);
+      const weekAnswers = data.filter((answer: { week: number; questionId: string; answer: string; id: string, observation: string }) => answer.week === week);
       setAllAnswers(weekAnswers);
+
+      console.log("f", weekAnswers)
       
       // Create a map of questionId -> answer
-      const evaluationAnswers: Record<string, { text: string; id: string }> = {};
-      weekAnswers.forEach((answer: { week: number; questionId: string; answer: string; id: string }) => {
+      const evaluationAnswers: Record<string, { text: string; observation?: string; id: string }> = {};
+      weekAnswers.forEach((answer: { week: number; questionId: string; answer: string; id: string, observation?: string }) => {
         evaluationAnswers[answer.questionId] = {
           text: answer.answer,
-          id: answer.id
+          id: answer.id,
+          observation: answer.observation
         };
       });
       
@@ -161,20 +166,82 @@ const ReportAnswerIndividual = () => {
     }
   };
 
+  const handleEvaluationClickView = async (evaluation: Evaluation) => {
+    setSelectedEvaluation(evaluation);
 
-  const handleInputChange = (questionId: string, value: string) => {
+
+    if (evaluation.status === "open" || evaluation.status === "closed") {
+      await fetchAnswers(evaluation.week);
+      setModalOpenView(true);
+    }
+  };
+
+  const handleInputChange = (questionId: string, value: string, field: 'text' | 'observation') => {
     setAnswers(prev => ({
       ...prev,
       [questionId]: {
         ...(prev[questionId] || {}),
-        text: value
+        [field]: value
       }
     }));
   };
 
-  const handleSubmitAnswers = async () => {
-    if (!selectedEvaluation) return;
+
+  // const handleSubmitAnswers = async () => {
+  //   if (!selectedEvaluation) return;
     
+  //   try {
+  //     setIsSubmitting(true);
+
+  //     const answersToSubmit = Object.keys(answers).reduce((acc, questionId) => {
+  //       const answer = answers[questionId];
+  //       if (!answer.id && answer.text?.trim()) {
+  //         acc[questionId] = answer;
+  //       }
+  //       return acc;
+  //     }, {} as Record<string, any>);
+
+  //      // Se não houver respostas para enviar
+  //     if (Object.keys(answersToSubmit).length === 0) {
+  //       toast.success("Nenhuma resposta nova para enviar", { position: 'bottom-right' });
+  //       setModalOpen(false);
+  //       return;
+  //     }
+    
+  //     // For each question with an answer, send the answer
+  //     const answersPromises = Object.keys(answersToSubmit).map(questionId => {
+  //       const payload = {
+  //         userId: dbvId,
+  //         questionId,
+  //         counselorId: user?.user.user.id,
+  //         evaluationDate: new Date().toISOString(),
+  //         answer: answers[questionId].text,
+  //         week: selectedEvaluation.week || 1
+  //       };
+
+  //       return individualAnswerService.createAnswer(payload);
+  //     });
+    
+  //     await Promise.all(answersPromises);
+    
+  //     toast.success("Respostas enviadas com sucesso!", {position: 'bottom-right'});
+  //     setModalOpen(false);
+  //     setIsSubmitting(false);
+  //     fetchEvaluations(); // Update evaluations list
+  //   } catch (error) {
+  //     console.error("Erro ao enviar respostas:", error);
+  //     toast.error("Erro ao enviar respostas. Tente novamente.", {position: 'bottom-right'});
+  //     setIsSubmitting(false);
+  //   } finally {
+  //     setModalOpen(false);
+  //     setIsSubmitting(false);
+  //     fetchEvaluations();
+  //   }
+  // };
+
+    const handleSubmitAnswers = async () => {
+    if (!selectedEvaluation) return;
+
     try {
       setIsSubmitting(true);
 
@@ -186,47 +253,56 @@ const ReportAnswerIndividual = () => {
         return acc;
       }, {} as Record<string, any>);
 
-       // Se não houver respostas para enviar
-      if (Object.keys(answersToSubmit).length === 0) {
+      const totalAnswers = Object.keys(answersToSubmit).length;
+
+      if (totalAnswers === 0) {
         toast.success("Nenhuma resposta nova para enviar", { position: 'bottom-right' });
         setModalOpen(false);
         return;
       }
-    
-      // For each question with an answer, send the answer
-      const answersPromises = Object.keys(answersToSubmit).map(questionId => {
+
+      let current = 0;
+
+      for (const questionId of Object.keys(answersToSubmit)) {
         const payload = {
           userId: dbvId,
           questionId,
-          counselorId: user?.user.user.id,
+          counselorId: user?.user.user.id,          
+          observation: answers[questionId].observation || null,
           evaluationDate: new Date().toISOString(),
           answer: answers[questionId].text,
           week: selectedEvaluation.week || 1
         };
-        
-        return individualAnswerService.createAnswer(payload);
-      });
-    
-      await Promise.all(answersPromises);
-    
-      toast.success("Respostas enviadas com sucesso!", {position: 'bottom-right'});
+
+        await individualAnswerService.createAnswer(payload);
+
+        current++;
+        const progress = (current / totalAnswers) * 100;
+        setProgress(progress); // Atualiza a barra de progresso
+      }
+
+      toast.success("Respostas enviadas com sucesso!", { position: 'bottom-right' });
       setModalOpen(false);
-      setIsSubmitting(false);
-      fetchEvaluations(); // Update evaluations list
+      fetchEvaluations();
+
     } catch (error) {
       console.error("Erro ao enviar respostas:", error);
-      toast.error("Erro ao enviar respostas. Tente novamente.", {position: 'bottom-right'});
-      setIsSubmitting(false);
+      toast.error("Erro ao enviar uma das respostas. Tente novamente.", { position: 'bottom-right' });
     } finally {
-      setModalOpen(false);
       setIsSubmitting(false);
-      fetchEvaluations();
     }
   };
 
 
+
   const handleCloseModal = () => {
     setModalOpen(false);
+    setSelectedEvaluation(null);
+    setAnswers({});
+  };
+
+    const handleCloseModalView = () => {
+    setModalOpenView(false);
     setSelectedEvaluation(null);
     setAnswers({});
   };
@@ -393,7 +469,13 @@ const ReportAnswerIndividual = () => {
                       exit={{ opacity: 0, scale: 0.95 }}
                       whileHover={{ y: -5, transition: { duration: 0.2 } }}
                       className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md border border-gray-100 dark:border-gray-700 cursor-pointer"
-                      onClick={() => handleEvaluationClick(evaluation)}
+                      onClick={() => {
+                        if (userRole === "admin" || userRole === "director" || userRole === "counselor"){
+                          handleEvaluationClick(evaluation)
+                        } else {
+                          handleEvaluationClickView(evaluation)
+                        }
+                      }}
                     >
                       <div className="p-6">
                         <div className="flex items-center justify-between mb-4">
@@ -440,36 +522,32 @@ const ReportAnswerIndividual = () => {
 
 
         {/* Answer Modal */}
-        {selectedEvaluation && (
-          <>
-            {( userRole === "admin" || userRole === "director" || userRole === "counselor") && (
-              <AnswerModal
-                isOpen={modalOpen}
-                evaluation={selectedEvaluation}
-                questions={questions}
-                answers={answers}
-                isSubmitting={isSubmitting}
-                onClose={handleCloseModal}
-                onSubmit={handleSubmitAnswers}
-                onInputChange={handleInputChange}
-                onDeleteClick={handleOpenDelete}
-              />
-            )}
-            {( userRole === "dbv" || userRole === "lead" || userRole === "secretary") && (
-              <ViewOnlyModal
+        {modalOpen && ( userRole === "admin" || userRole === "director" || userRole === "counselor") && (
+            <AnswerModal
               isOpen={modalOpen}
               evaluation={selectedEvaluation}
               questions={questions}
               answers={answers}
               isSubmitting={isSubmitting}
               onClose={handleCloseModal}
+              progress={progress}
               onSubmit={handleSubmitAnswers}
               onInputChange={handleInputChange}
               onDeleteClick={handleOpenDelete}
-              />
-            )}
-          </>
-        )}
+            />
+          )}
+
+          {modalOpenView && (
+            <ViewOnlyModal
+            isOpen={modalOpenView}
+            evaluation={selectedEvaluation}
+            questions={questions}
+            answers={answers}
+            onClose={handleCloseModalView}
+            />
+          )}
+          
+        
 
         {/* Delete Confirmation Modal */}
         <DeleteConfirmModal

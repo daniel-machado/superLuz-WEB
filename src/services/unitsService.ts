@@ -112,12 +112,34 @@ export const unitsService = {
         Authorization: `Bearer ${token}`
       }
     });
+
     return res.data;
   },
 
   removeDbvFromUnit: async (unitId: string, userId: string): Promise<any> => {
     const token = localStorage.getItem('token')
     const res = await api.delete(`/unit/removedbv/${unitId}/dbv/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return res.data;
+  },
+
+    addCounselorFromUnit: async (unitId: string, userId: string): Promise<any> => {
+    const token = localStorage.getItem('token')
+    const res = await api.post(`/unit/${unitId}/counselor`, { userId }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    return res.data;
+  },
+
+  addDbvFromUnit: async (unitId: string, userId: string): Promise<any> => {
+    const token = localStorage.getItem('token')
+    const res = await api.post(`/unit/${unitId}/dbv`, {userId}, {
       headers: {
         Authorization: `Bearer ${token}`
       }
