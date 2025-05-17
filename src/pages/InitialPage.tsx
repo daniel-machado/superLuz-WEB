@@ -786,9 +786,13 @@ const Contato = () => {
       if (assuntoRef.current) assuntoRef.current.value = "";
       if (messageRef.current) messageRef.current.value = "";
 
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
-      toast.error("Erro ao enviar mensagem.", { position: "bottom-right" });
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
     } finally {
       setLoading(false);
     }  

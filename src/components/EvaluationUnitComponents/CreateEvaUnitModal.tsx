@@ -6,6 +6,7 @@ import Select from "../form/Select";
 import { useAuth } from "../../context/AuthContext";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
+import toast from "react-hot-toast";
 
 interface evaluationUnitInput {
   selectedUnit: string;
@@ -38,8 +39,9 @@ const CreateEvaUnitModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
   const fetchUnits = async () => {
     try {
       setUnitsData(units);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao carregar unidades:", error);
+      toast.error(`Error: ${error.message}`, {position: 'bottom-right', duration: 5000,});
     }
   };
 

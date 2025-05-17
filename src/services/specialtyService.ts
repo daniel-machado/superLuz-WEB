@@ -15,9 +15,18 @@ export const specialtyService = {
       });
       return response.data;
 
-    } catch (error) {
-      console.error("Erro na criação da Especialidade", error);
-      throw new Error(`Erro na criação da especialidade: ${error}`);
+    } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao criar'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -31,9 +40,18 @@ export const specialtyService = {
         },
       });
       return response.data;
-    } catch (error) {
-      console.error("Erro na atualização da Especialidade:", error);
-      throw new Error(`Erro na atualização da especialidade: ${error}`);
+   } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao atualizar'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -47,9 +65,18 @@ export const specialtyService = {
       });
       return response.data;
 
-    } catch (error) {
-      console.error("Erro ao deleter especialidade:", error);
-      throw new Error(`Erro ao deletar a especialidade: ${error}`);
+    } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao deletar'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 

@@ -48,7 +48,7 @@ const RankIndividualDetailModal = ({ ranking, isOpen, onClose }: RankIndividualD
 
 
   // Format score with comma as decimal separator (e.g., "800.00" to "800,00")
-  const formattedScore = ranking.totalScore.replace(".", ",");
+//  const formattedScore = ranking.totalScore.replace(".", ",");
 
 
   // Generate random stats for visualization
@@ -68,7 +68,7 @@ const RankIndividualDetailModal = ({ ranking, isOpen, onClose }: RankIndividualD
   };
 
 
-  const badge = getBadgeInfo(ranking.totalScore);
+  const badge = getBadgeInfo(Math.floor(Number(ranking.totalScore)).toLocaleString('pt-BR'));
   const BadgeIcon = badge.icon;
 
 
@@ -155,7 +155,8 @@ const RankIndividualDetailModal = ({ ranking, isOpen, onClose }: RankIndividualD
               <div className="flex items-center justify-between">
                 <h3 className="text-gray-400 font-medium">Pontuação Total</h3>
                 <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent">
-                  {formattedScore}
+                  {/* {formattedScore} */}
+                  {Math.floor(Number(ranking.totalScore)).toLocaleString('pt-BR')}
                 </div>
               </div>
             </motion.div>

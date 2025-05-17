@@ -102,9 +102,14 @@ export default function ClassUser() {
           secondary: '#FFFFFF',
         }
       });
-    } catch (error) {
+    } catch (error: any) {
       toast.dismiss(loadingToast);
-      toast.error("Erro ao carregar alguns dados", { position: 'bottom-center' });
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }
@@ -117,11 +122,13 @@ export default function ClassUser() {
       const allClasses: ClassUser[] = response?.result?.classes || [];
       setData(allClasses);
       return allClasses;
-    } catch (error) {
-      toast.error("Erro ao carregar as classes de usuários", {
-        position: 'bottom-right',
-        icon: '🚫',
-      });
+    } catch (error: any) {
+     toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
       return [];
     }
   };
@@ -132,11 +139,13 @@ export default function ClassUser() {
       const response = await userService.getAllUsers();
       setUsers(response);
       return response;
-    } catch (error) {
-      toast.error("Erro ao carregar os usuários", {
-        position: 'bottom-right',
-        icon: '🚫',
-      });
+    } catch (error: any) {
+     toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
       return [];
     }
   };
@@ -147,11 +156,13 @@ export default function ClassUser() {
       const response = await classService.ListAllClass();
       setClasses(response.result.classAll);
       return response.result.classAll;
-    } catch (error) {
-      toast.error("Erro ao carregar as classes", {
-        position: 'bottom-right',
-        icon: '🚫',
-      });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
       return [];
     }
   };
@@ -176,12 +187,14 @@ export default function ClassUser() {
         icon: '✅',
       });
       await fetchClassUsers();
-    } catch (err) {
+    } catch (error: any) {
       toast.dismiss(loadingToast);
-      toast.error("Erro ao remover usuário", {
-        position: 'bottom-right',
-        icon: '❌',
-      });
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setUserToRemove(null);
     }
@@ -201,12 +214,14 @@ export default function ClassUser() {
       });
       await fetchClassUsers();
       setIsModalOpen(false);
-    } catch (error) {
+    } catch (error: any) {
       toast.dismiss(loadingToast);
-      toast.error("Erro ao criar associação", {
-        position: 'bottom-right',
-        icon: '❌',
-      });
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     }
   };
 

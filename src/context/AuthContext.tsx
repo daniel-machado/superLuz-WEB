@@ -8,6 +8,7 @@ import { Unit } from '../dtos/UnitDTO';
 import { specialtyService } from '../services/specialtyService';
 import { classService } from '../services/classService';
 import { UserRole } from '../services/permissions/permissionsService';
+import toast from 'react-hot-toast';
 
 export interface UserResponseDTO {
   success: boolean;
@@ -65,10 +66,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(user);
         setUserRole(user.user.user.role); // Armazena o papel do usuário
         setIsAuthenticated(true);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Erro ao decodificar token:", error);
         setUser(null);
         setIsAuthenticated(false);
+        toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
       }
     } else {
       setUser(null);
@@ -104,8 +110,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await unitsService.ListAllUnits(token);
       setUnits(response.units.units);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao buscar unidades', error);
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
     }
   }, []);
 
@@ -114,8 +125,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await specialtyService.ListAllSpecialty(token);
       setSpecialtys(response.result.specialty);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao buscar especialidades', error);
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
     }
   }, []);
 
@@ -124,8 +140,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await classService.ListAllClass(token);
       setClasse(response.result.classAll);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao buscar classes', error);
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
     }
   }, []);
 
@@ -134,7 +155,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (refreshToken) {
         await authService.signout(refreshToken); // Apenas se houver refreshToken
       }
-    } catch (error) {
+    } catch (error: any) {
       console.warn("Erro ao deslogar no backend:", error);
     } finally {
       localStorage.removeItem("token");
@@ -184,6 +205,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsAuthenticated(true);
     } catch (error: any) {
       console.error("Erro ao tentar renovar o token:", error);
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
       
       if (!error.response) {
         console.warn("Erro inesperado: sem resposta do servidor.");
@@ -207,9 +233,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await authService.signup(userData);
       signin(userData.email, userData.password);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro no cadastro:", error);
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
       throw new Error(`Erro no cadastro ${error}`);
+      
     } finally {
       setLoading(false);
     }

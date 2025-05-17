@@ -93,8 +93,13 @@ export const exportToImage = async () => {
     if (watermark.parentNode) watermark.parentNode.removeChild(watermark);
     
     toast.success('Imagem baixada com sucesso!');
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erro ao exportar para imagem:', error);
-    toast.error('Erro ao gerar imagem: ' + error);
+    toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
   }
 };

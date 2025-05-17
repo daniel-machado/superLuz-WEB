@@ -15,9 +15,18 @@ export const individualQuestionService = {
       });
       return response.data;
 
-    } catch (error) {
-      console.error("Erro na criação da Question individual:", error);
-      throw new Error(`Erro na criação da Question individual: ${error}`);
+    } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao criar'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -31,9 +40,18 @@ export const individualQuestionService = {
         },
       });
       return response.data;
-    } catch (error) {
-      console.error("Erro atualização da question individual:", error);
-      throw new Error(`Erro na atualização da question individual: ${error}`);
+    } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao atualizar'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -47,9 +65,18 @@ export const individualQuestionService = {
       });
       return response.data;
 
-    } catch (error) {
-      console.error("Erro ao excluir Question individual:", error);
-      throw new Error(`Erro ao excluir Question individual: ${error}`);
+   } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao excluir'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 

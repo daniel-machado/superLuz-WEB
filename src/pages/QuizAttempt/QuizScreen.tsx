@@ -173,8 +173,13 @@ export default function QuizScreen() {
       }
       const data = await questionsService.getRandomQuestions(quizId);
       setQuestions(data.questions);
-    } catch (err) {
-      toast.error("Erro ao carregar Questions", { position: 'bottom-right' });
+    } catch (error: any) {
+     toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }
@@ -245,8 +250,14 @@ export default function QuizScreen() {
 
         const result = await quizAttemptService.submitQuiz(requestBody);
         setQuizResult(result.result);
-    } catch (err) {
+    } catch (error: any) {
         setError('Erro ao enviar o quiz. Tente novamente.');
+        toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
         setSubmitting(false);
     }

@@ -572,7 +572,9 @@ export default function EvaluationUnits() {
                                           <Award size={14} />
                                           <span>Pontuação Total</span>
                                         </div>
-                                        <div className="text-xl font-semibold">{evaluation.totalScore}</div>
+                                        <div className="text-xl font-semibold">
+                                          {Math.floor(Number(evaluation.totalScore)).toLocaleString('pt-BR')}
+                                        </div>
                                       </div>
                                     </div>
                                     

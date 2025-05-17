@@ -117,13 +117,14 @@ const ManageAnswerIndividual = () => {
         setUnits([]);
         setFilteredUnits([]);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao carregar unidades:", error);
-      toast.error('Não foi possível carregar as unidades', {
-        position: 'bottom-right',
-        className: 'dark:bg-gray-800 dark:text-white',
-        duration: 3000,
-      });
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }

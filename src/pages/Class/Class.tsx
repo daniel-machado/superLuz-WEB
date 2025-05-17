@@ -71,10 +71,13 @@ export default function Class() {
       });
       await findClass();  // Certifique-se de que findClass está trazendo os dados atualizados
       setIsOpenModal(false);
-    } catch (error) {
-      toast.error(`Erro: ${error}`, {
-        position: 'bottom-right',
-      });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsOpenModal(false);
       setIsLoading(false);
@@ -88,10 +91,13 @@ export default function Class() {
         position: 'bottom-right',
       });
       await findClass();  
-    } catch (error) {
-      toast.error(`Erro ao deletar: ${error}`, {
-        position: 'bottom-right',
-      });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } 
   };
 
@@ -125,10 +131,13 @@ export default function Class() {
         position: 'bottom-right',
       });
       await findClass();
-    } catch (error) {
-      toast.error(`Erro: ${error}`, {
-        position: 'bottom-right',
-      });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     }
   };
 

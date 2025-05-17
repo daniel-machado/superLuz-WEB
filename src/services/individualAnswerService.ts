@@ -16,9 +16,18 @@ export const individualAnswerService = {
       });
       return response.data;
 
-    } catch (error) {
-      console.error("Erro na criação da Answer individual:", error);
-      throw new Error(`Erro na criação da Answer individual: ${error}`);
+   } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao criar'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -32,14 +41,25 @@ export const individualAnswerService = {
       });
       return response.data;
 
-    } catch (error) {
-      console.error("Erro ao excluir Answer individual:", error);
-      throw new Error(`Erro ao excluir Answer individual: ${error}`);
+    } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao excluir'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
   ListUserAnswer: async (userId: string, token?: string | null): Promise<any> => {
     const tokenAux = localStorage.getItem('token')
+   
+        try {
     const res = await api.get(`individual-answer/list-answer/${userId}`, {
       headers: {
         Authorization: `Bearer ${token ? token : tokenAux}`
@@ -47,16 +67,48 @@ export const individualAnswerService = {
     });
     const data = res.data.answers;
     return data
+
+
+  } catch (error: any) {
+    //Extraindo a resposta de error da mensagem da API
+    if(error.response && error.response.data){
+      //Se a API retornar um objetode erro com uma mensagem
+      const errorMessage = error.response.data.error 
+      || error.response.data.message 
+      || 'Error ao fazer Login'
+      throw new Error(errorMessage)
+    } else {
+      console.error("Erro ao registrar", error.message);
+      throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+    }
+  }
   },
 
   ListAllAnswer: async (): Promise<any> => {
     const token = localStorage.getItem('token')
-    const res = await api.get(`individual-answer/list-all-answers`, {
+   
+
+         try {
+     const res = await api.get(`individual-answer/list-all-answers`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
     return res.data;
+
+  } catch (error: any) {
+    //Extraindo a resposta de error da mensagem da API
+    if(error.response && error.response.data){
+      //Se a API retornar um objetode erro com uma mensagem
+      const errorMessage = error.response.data.error 
+      || error.response.data.message 
+      || 'Error ao fazer Login'
+      throw new Error(errorMessage)
+    } else {
+      console.error("Erro ao registrar", error.message);
+      throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+    }
+  }
   },
 
 };

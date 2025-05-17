@@ -86,16 +86,13 @@ const ManageQuestions = () => {
 
       setQuestions(data);
       setFilteredQuestions(data);
-    } catch (err) {
-      toast.error("Erro ao carregar perguntas.", {
-        position: 'bottom-right',
-        icon: '❌',
-        style: {
-          backgroundColor: '#1F2937',
-          color: '#F9FAFB',
-          border: '1px solid #374151',
-        },
-      });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }
@@ -177,16 +174,13 @@ const ManageQuestions = () => {
       });
       setIsCreateModalOpen(false);
       await fetchQuestions();
-    } catch (err) {
-      toast.error("Erro ao criar questão.", {
-        position: 'bottom-right',
-        icon: '❌',
-        style: {
-          backgroundColor: '#1F2937',
-          color: '#F9FAFB',
-          border: '1px solid #374151',
-        },
-      });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     }
   };
 
@@ -218,15 +212,12 @@ const ManageQuestions = () => {
         });
         setIsEditModalOpen(false);
         await fetchQuestions();
-      } catch (err) {
-        toast.error("Erro ao atualizar questão.", {
+      } catch (error: any) {
+       toast.error(`Error: ${error.message}`, {
           position: 'bottom-right',
-          icon: '❌',
-          style: {
-            backgroundColor: '#1F2937',
-            color: '#F9FAFB',
-            border: '1px solid #374151',
-          },
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
         });
       }
     }
@@ -247,15 +238,12 @@ const ManageQuestions = () => {
         });
         setIsDeleteModalOpen(false);
         await fetchQuestions();
-      } catch (err) {
-        toast.error("Erro ao excluir questão.", {
+      } catch (error: any) {
+        toast.error(`Error: ${error.message}`, {
           position: 'bottom-right',
-          icon: '❌',
-          style: {
-            backgroundColor: '#1F2937',
-            color: '#F9FAFB',
-            border: '1px solid #374151',
-          },
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
         });
       }
     }

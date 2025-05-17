@@ -1686,9 +1686,14 @@ const reportAnswerUnit = () => {
       const data = await unitEvaluationService.ListEvaluationFromUnit(unitId as string);
       setEvaluations(data.evaluation);
       setIsLoading(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao carregar avaliações:", error);
-      toast.error("Erro ao carregar avaliações da unidade", {position: 'bottom-right'});
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
       setIsLoading(false);
     }
   };
@@ -1697,9 +1702,14 @@ const reportAnswerUnit = () => {
     try {
       const data = await unitQuestionService.ListQuestions();
       setQuestions(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao carregar perguntas:", error);
-      toast.error("Erro ao carregar perguntas", {position: 'bottom-right'});
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     }
   };
 
@@ -1723,9 +1733,14 @@ const reportAnswerUnit = () => {
       
       setAnswers(evaluationAnswers);
       return evaluationAnswers;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao carregar respostas:", error);
-      toast.error("Erro ao carregar respostas anteriores", {position: 'bottom-right'});
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
       return {};
     }
   };
@@ -1795,9 +1810,14 @@ const reportAnswerUnit = () => {
       toast.success("Respostas enviadas com sucesso!", { position: 'bottom-right' });
       setModalOpen(false);
       fetchEvaluations(); // Update evaluations list
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao enviar respostas:", error);
-      toast.error("Erro ao enviar respostas. Tente novamente.", { position: 'bottom-right' });
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsSubmitting(false);
       fetchEvaluations();
@@ -1831,8 +1851,13 @@ const reportAnswerUnit = () => {
         if (selectedEvaluation) {
           await fetchAnswers(selectedEvaluation.id, selectedEvaluation.week);
         }
-      } catch (err) {
-        toast.error(`Erro ao excluir: ${err}`, { position: 'bottom-right' });
+      } catch (error: any) {
+        toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
       }
     }
   };

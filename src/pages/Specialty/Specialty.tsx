@@ -120,8 +120,13 @@ export default function Specialty() {
     try {
       const data = await quizService.ListAllQuiz();
       setQuizzes(data);
-    } catch (err) {
-      toast.error("Erro ao carregar Quizzes", { position: 'bottom-right' });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }
@@ -132,8 +137,13 @@ export default function Specialty() {
     try {
       const data = await specialtyUserService.getAllSpecialtyAssociation()
       setQuizMake(data);
-    } catch (err) {
-      toast.error("Erro ao carregar Quizzes", { position: 'bottom-right' });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }
@@ -173,8 +183,13 @@ export default function Specialty() {
       await findSpecialtys();
       resetForm();
       setIsCreateModalOpen(false);
-    } catch (error) {
-      toast.error(`Erro ao criar especialidade: ${error}`, { position: 'bottom-right' });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }
@@ -212,8 +227,13 @@ export default function Specialty() {
       await findSpecialtys();
       resetForm();
       setIsEditModalOpen(false);
-    } catch (error) {
-      toast.error(`Erro ao atualizar especialidade: ${error}`, { position: 'bottom-right' });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }
@@ -230,8 +250,13 @@ export default function Specialty() {
       toast.success("Especialidade excluída com sucesso!", { position: 'bottom-right' });
       await findSpecialtys();
       setIsDeleteModalOpen(false);
-    } catch (error) {
-      toast.error(`Erro ao excluir especialidade: ${error}`, { position: 'bottom-right' });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }

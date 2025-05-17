@@ -46,8 +46,12 @@ export default function SignInForm() {
     try {
       await signin(data.email, data.password);
       navigate("/home");
-    } catch (error) {
-      toast.error("Credenciais incorretas", {position: 'bottom-right'});
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+                position: 'bottom-right',
+                icon: '🚫',
+                duration: 5000,
+              });
     }
   };
 

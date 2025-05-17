@@ -63,10 +63,11 @@ const AddDbvFromUnitModal: React.FC<Props> = ({ isOpen, loading, onClose, onSave
         const filteredUsers = response.filter((user: UserInfo) => user.role === "dbv");
         setUsers(filteredUsers);
         return filteredUsers;
-      } catch (error) {
-        toast.error("Erro ao carregar os usuários", {
+      } catch (error: any) {
+        toast.error(`Error: ${error.message}`, {
           position: 'bottom-right',
           icon: '🚫',
+          duration: 5000,
         });
         return [];
       } finally {
@@ -82,11 +83,12 @@ const AddDbvFromUnitModal: React.FC<Props> = ({ isOpen, loading, onClose, onSave
       setUnits(response.units.units);
       setIsLoading(false)
       return response.units.units
-    } catch (error) {
-      toast.error("Erro ao carregar as classes", {
-        position: 'bottom-right',
-        icon: '🚫',
-      });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
       return [];
     }finally {
       setIsLoading(false)

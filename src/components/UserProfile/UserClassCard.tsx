@@ -64,7 +64,11 @@ export function UserClassCard() {
       setClasses(data.result.classUser || []);
     } catch (error: any) {
       console.error("Error fetching classes:", error);
-      toast.error("Falha ao carregar classes");
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
     } finally {
       setLoading(false);
     }

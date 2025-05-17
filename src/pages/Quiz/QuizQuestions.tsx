@@ -83,8 +83,13 @@ export default function QuizQuestions() {
       const data = await questionsService.getAllByQuizId(quizId!);
       setCountQuestions(data.count);
       setQuestions(data.questions);
-    } catch (error) {
-      toast.error('Erro ao carregar perguntas', { position: 'bottom-right' });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }
@@ -173,8 +178,13 @@ export default function QuizQuestions() {
       setAnswers(Array(4).fill({ text: '', isCorrect: false }));
       await fetchQuestions();
       scrollToTop();
-    } catch (error) {
-      toast.error('Erro ao salvar a pergunta.', { position: 'bottom-right' });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsCreating(false);
     }
@@ -245,8 +255,13 @@ export default function QuizQuestions() {
       toast.success('Pergunta atualizada com sucesso.', { position: 'bottom-right' });
       await fetchQuestions();
       scrollToTop();
-    } catch (error) {
-      toast.error('Erro ao atualizar a pergunta.', { position: 'bottom-right' });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsUpdating(false);
       setShowEditModal(false);
@@ -293,8 +308,13 @@ export default function QuizQuestions() {
       toast.success('Pergunta excluída com sucesso.', { position: 'bottom-right' });
       await fetchQuestions();
       scrollToTop();
-    } catch (error) {
-      toast.error('Erro ao excluir a pergunta.', { position: 'bottom-right' });
+    } catch (error:any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsDeleting(false);
       setShowDeleteModal(false);

@@ -157,7 +157,8 @@ const TableView = ({ ranking }: { ranking: IndividualRank[] }) => {
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", delay: 0.3 + index * 0.05 }}
                 >
-                  {person.totalScore}
+                  {/* {person.totalScore} */}
+                  {Math.floor(Number(person.totalScore)).toLocaleString('pt-BR')}
                   <span className="ml-1 text-xs text-purple-300">pts</span>
                 </motion.span>
               </td>

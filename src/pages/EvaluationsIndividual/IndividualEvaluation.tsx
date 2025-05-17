@@ -180,13 +180,14 @@ export default function IndividualEvaluations() {
         });
         setUnits([]);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao carregar unidades:", error);
-      toast.error('Não foi possível carregar as unidades', {
-        position: 'bottom-right',
-        className: 'dark:bg-gray-800 dark:text-white',
-        duration: 3000,
-      });
+     toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }
@@ -273,16 +274,13 @@ export default function IndividualEvaluations() {
       setEvaluations(allEvaluations);
       setFilteredEvaluations(allEvaluations);
       
-    } catch (err) {
-      toast.error("Erro ao carregar avaliações", {
-        position: 'bottom-right',
-        icon: '❌',
-        style: {
-          backgroundColor: '#1F2937',
-          color: '#F9FAFB',
-          border: '1px solid #374151',
-        },
-      });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }
@@ -393,16 +391,13 @@ export default function IndividualEvaluations() {
       });
       setIsCreateModalOpen(false);
       await fetchEvaluations();
-    } catch (err) {
-      toast.error('Erro ao criar avaliação individual.', {
-        position: 'bottom-right',
-        icon: '❌',
-        style: {
-          backgroundColor: '#1F2937',
-          color: '#F9FAFB',
-          border: '1px solid #374151',
-        },
-      });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     }
   };
 
@@ -429,15 +424,12 @@ export default function IndividualEvaluations() {
        
         setIsEditModalOpen(false);  
         await fetchEvaluations();
-      } catch (err) {
-        toast.error(`Erro na atualização: ${err}`, {
+      } catch (error: any) {
+        toast.error(`Error: ${error.message}`, {
           position: 'bottom-right',
-          icon: '❌',
-          style: {
-            backgroundColor: '#1F2937',
-            color: '#F9FAFB',
-            border: '1px solid #374151',
-          },
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
         });
       }
     }
@@ -459,15 +451,12 @@ export default function IndividualEvaluations() {
         });
         setIsDeleteModalOpen(false);
         await fetchEvaluations();
-      } catch (err) {
-        toast.error(`Erro ao excluir avaliação individual: ${err}`, {
+      } catch (error: any) {
+        toast.error(`Error: ${error.message}`, {
           position: 'bottom-right',
-          icon: '❌',
-          style: {
-            backgroundColor: '#1F2937',
-            color: '#F9FAFB',
-            border: '1px solid #374151',
-          },
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
         });
       }
     }
@@ -873,7 +862,10 @@ export default function IndividualEvaluations() {
                                                           <div className="flex items-center gap-2 mt-1">
                                                             <Award className="text-yellow-500" size={18} />
                                                             <span className="font-medium text-white">
-                                                              {evaluation.totalScore === "" ? "Não avaliado" : evaluation.totalScore}
+                                                              {evaluation.totalScore === "" 
+                                                              ? "Não avaliado" 
+                                                              : Math.floor(Number(evaluation.totalScore)).toLocaleString('pt-BR')
+                                                              }
                                                             </span>
                                                           </div>
                                                         </div>

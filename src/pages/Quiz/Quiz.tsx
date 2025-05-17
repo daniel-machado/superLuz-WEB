@@ -57,8 +57,13 @@ export default function Quiz() {
       setIsLoading(true);
       const response = await quizService.ListAllQuiz();
       setQuizzes(response);
-    } catch (error) {
-      toast.error("Erro ao carregar dados dos quizzes", {position: 'bottom-right'});
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }
@@ -77,8 +82,13 @@ export default function Quiz() {
       await quizService.createQuiz({ title, specialtyId });
       toast.success("Quiz criado com sucesso!", {position: 'bottom-right'});
       await loadData();
-    } catch (error) {
-      toast.error("Erro ao criar quiz", {position: 'bottom-right'});
+    } catch (error: any) {
+     toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
       setIsOpenModal(false);
@@ -114,8 +124,13 @@ export default function Quiz() {
       });
       toast.success(`Quiz ${!quiz.is_active ? 'ativado' : 'desativado'} com sucesso!`, {position: 'bottom-right'});
       await loadData();
-    } catch (error) {
-      toast.error("Erro ao alterar status do quiz", {position: 'bottom-right'});
+    } catch (error: any) {
+     toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }
@@ -136,8 +151,13 @@ export default function Quiz() {
       await quizService.deleteQuiz(quizToDelete);
       toast.success("Quiz deletado com sucesso!", {position: 'bottom-right'});
       await loadData();
-    } catch (error) {
-      toast.error("Erro ao deletar quiz", {position: 'bottom-right'});
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
       setIsDeleteModalOpen(false);

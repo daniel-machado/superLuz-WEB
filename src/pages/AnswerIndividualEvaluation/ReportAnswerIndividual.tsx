@@ -82,9 +82,14 @@ const ReportAnswerIndividual = () => {
       // Fetch questions
       await fetchQuestions();
       
-    } catch (error) {
-      console.error("Erro ao carregar dados:", error);
-      toast.error("Erro ao carregar informações do desbravador", {position: 'bottom-right'});
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
+      console.error("Erro: ", error);
     } finally {
       setIsLoading(false);
     }
@@ -98,9 +103,14 @@ const ReportAnswerIndividual = () => {
       }
       const data = await individualEvaluationService.ListEvaluationFromUser(dbvId);
       setEvaluations(data.evaluation || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao carregar avaliações:", error);
-      toast.error("Erro ao carregar avaliações do desbravador", {position: 'bottom-right'});
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     }
   };
 
@@ -109,9 +119,14 @@ const ReportAnswerIndividual = () => {
     try {
       const data = await individualQuestionService.ListQuestions();
       setQuestions(data || []);
-    } catch (error) {
-      console.error("Erro ao carregar perguntas:", error);
-      toast.error("Erro ao carregar perguntas", {position: 'bottom-right'});
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
+      console.error("Erro: ", error);
     }
   };
 
@@ -126,7 +141,6 @@ const ReportAnswerIndividual = () => {
       // Filter answers by week to get only answers for the selected evaluation
       const weekAnswers = data.filter((answer: { week: number; questionId: string; answer: string; id: string, observation: string }) => answer.week === week);
       setAllAnswers(weekAnswers);
-
       console.log("f", weekAnswers)
       
       // Create a map of questionId -> answer
@@ -141,10 +155,14 @@ const ReportAnswerIndividual = () => {
       
       setAnswers(evaluationAnswers);
       return evaluationAnswers;
-    } catch (error) {
-      console.error("Erro ao carregar respostas:", error);
-      toast.error("Erro ao carregar respostas anteriores", {position: 'bottom-right'});
-      return {};
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
+      console.error("Erro: ", error);
     }
   };
 
@@ -285,9 +303,14 @@ const ReportAnswerIndividual = () => {
       setModalOpen(false);
       fetchEvaluations();
 
-    } catch (error) {
-      console.error("Erro ao enviar respostas:", error);
-      toast.error("Erro ao enviar uma das respostas. Tente novamente.", { position: 'bottom-right' });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
+      console.error("Erro: ", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -330,8 +353,14 @@ const ReportAnswerIndividual = () => {
         if (selectedEvaluation) {
           await fetchAnswers(selectedEvaluation.week);
         }
-      } catch (err) {
-        toast.error(`Erro ao excluir: ${err}`, { position: 'bottom-right' });
+      } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
+      console.error("Erro: ", error);
       }
     }
   };

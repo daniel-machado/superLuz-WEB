@@ -57,7 +57,12 @@ export function UserSpecialtyCardUser({userId}: UserMetaCardProps) {
       setSpecialties(data.result.specialty || []);
     } catch (error: any) {
       console.error("Error fetching specialties:", error);
-      toast.error("Falha ao carregar especialidades");
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setLoading(false);
     }

@@ -86,8 +86,8 @@ export default function SignUpForm() {
 
         toast.success("Imagem processada com sucesso!", {position: 'bottom-right'});
 
-      } catch(error) {
-        toast.error(`Erro ao processar a imagem. ${error}`, {position: 'bottom-right'});
+      } catch(error:any) {
+        toast.error(`Erro ao processar a imagem. ${error.message}`, {position: 'bottom-right', duration: 5000,});
       }
     }
   };
@@ -103,8 +103,8 @@ export default function SignUpForm() {
         const compressed = await imageCompression(photo, options);
       
         return compressed;
-      } catch(error) {
-        toast.error(`Erro ao processar a imagem. ${error}`, {position: 'bottom-right'});
+      } catch(error:any) {
+        toast.error(`Erro ao processar a imagem. ${error.message}`, {position: 'bottom-right'});
         return null;
       }
     }
@@ -158,8 +158,12 @@ const urlToFile = async (url: string, filename: string, mimeType: string): Promi
   
       toast.success("Cadastro realizado com sucesso!", {position: 'bottom-right'});
       navigate("/"); 
-    } catch (error) {
-      toast.error(`Erro: ${error}`, {position: 'bottom-right'});
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+                position: 'bottom-right',
+                icon: '🚫',
+                duration: 5000,
+              });
     } finally {
       setIsLoading(false);
     }

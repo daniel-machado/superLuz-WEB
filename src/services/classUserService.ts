@@ -15,9 +15,18 @@ export const classUserService = {
       });
       return response.data;
 
-    } catch (error) {
-      console.error("Erro ao associar classe a usuário", error);
-      throw new Error(`Erro ao associar classe ao usuário: ${error}`);
+   } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao criar associação'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -32,9 +41,18 @@ export const classUserService = {
       });
       return response.data;
 
-    } catch (error) {
-      console.error("Erro ao buscar classe a usuário", error);
-      throw new Error(`Erro ao buscar classe ao usuário: ${error}`);
+    } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao buscar'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },  
 
@@ -48,9 +66,18 @@ export const classUserService = {
         },
       });
       return response.data;
-    } catch (error) {
-      console.error("Erro na atualização da Especialidade:", error);
-      throw new Error(`Erro na atualização da especialidade: ${error}`);
+    } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao atualizar'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -64,31 +91,73 @@ export const classUserService = {
       });
       return response.data;
 
-    } catch (error) {
-      console.error("Erro ao deleter especialidade:", error);
-      throw new Error(`Erro ao deletar a especialidade: ${error}`);
+   } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao deletar'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
   getAll: async (): Promise<any> => {
     const token = localStorage.getItem('token')
-    const res = await api.get("class-user/list-all", {
+
+     try {
+   const res = await api.get("class-user/list-all", {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
     const data = res.data;
     return data;
+
+  } catch (error: any) {
+    //Extraindo a resposta de error da mensagem da API
+    if(error.response && error.response.data){
+      //Se a API retornar um objetode erro com uma mensagem
+      const errorMessage = error.response.data.error 
+      || error.response.data.message 
+      || 'Error ao fazer Login'
+      throw new Error(errorMessage)
+    } else {
+      console.error("Erro ao registrar", error.message);
+      throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+    }
+  }
+    
   },
 
   ListSpecialtyID: async (specialtyId: string): Promise<any> => {
     const token = localStorage.getItem('token')
-    const res = await api.get(`specialty/list-one-specialty${specialtyId}`, {
+    
+      try {
+   const res = await api.get(`specialty/list-one-specialty${specialtyId}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
     return res.data;
+
+  } catch (error: any) {
+    //Extraindo a resposta de error da mensagem da API
+    if(error.response && error.response.data){
+      //Se a API retornar um objetode erro com uma mensagem
+      const errorMessage = error.response.data.error 
+      || error.response.data.message 
+      || 'Error ao fazer Login'
+      throw new Error(errorMessage)
+    } else {
+      console.error("Erro ao registrar", error.message);
+      throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+    }
+  }
   },
 
   ListFromCategory: async (category: string): Promise<any> => {

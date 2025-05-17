@@ -8,6 +8,7 @@ import Input from '../../../components/form/input/InputField';
 import { useAuth } from '../../../context/AuthContext'
 import { userService } from '../../../services/userService'
 import { unitsService } from "../../../services/unitsService";
+import toast from "react-hot-toast";
 
 interface User {
   id: string;
@@ -112,10 +113,16 @@ const CreateIndividualEvaluationModal: React.FC<Props> = ({ isOpen, onClose, onS
         setError("Você não tem permissão para criar avaliações individuais.");
         setUsers([]);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao carregar usuários:", error);
       setError("Ocorreu um erro ao carregar os usuários. Tente novamente.");
       setUsers([]);
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }

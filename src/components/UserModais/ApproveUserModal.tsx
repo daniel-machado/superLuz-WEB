@@ -6,6 +6,7 @@ import Select from "../form/Select";
 import { useAuth } from "../../context/AuthContext";
 import Label from "../form/Label";
 import { userService } from "../../services/userService";
+import toast from "react-hot-toast";
 
 interface Props {
   isOpen: boolean;
@@ -41,8 +42,13 @@ const ApproveUserModal: React.FC<Props> = ({ isOpen, user, onClose, onApproved }
   const fetchUnits = async () => {
     try {
       setUnitsData(units);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao carregar unidades:", error);
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
     }
   };
 
@@ -57,8 +63,13 @@ const ApproveUserModal: React.FC<Props> = ({ isOpen, user, onClose, onApproved }
         });
       onApproved();
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao aprovar usuário:", error);
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }

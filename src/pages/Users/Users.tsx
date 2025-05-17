@@ -7,6 +7,7 @@ import { Eye, Search, UserRound } from "lucide-react";
 import Badge from "../../components/ui/badge/Badge";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router";
+import toast from "react-hot-toast";
 
 
 interface IUser {
@@ -85,8 +86,13 @@ export default function Users() {
       const data = await userService.getAllUsers();
       setUsers(data);
       applyFilters(data, searchTerm, statusFilter);
-    } catch (error) {
-      console.error("Erro ao carregar usuários:", error);
+    } catch (error: any) {
+     toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }

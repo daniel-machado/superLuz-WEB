@@ -172,9 +172,14 @@ const SpecialtyManager = () => {
           secondary: '#FFFFFF',
         }
       });
-    } catch (error) {
+    } catch (error: any) {
       toast.dismiss(loadingToast);
-      toast.error("Erro ao carregar alguns dados", { position: 'bottom-center' });
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }
@@ -186,11 +191,13 @@ const SpecialtyManager = () => {
       const response = await specialtyUserService.getAllSpecialtyAssociation();
       setData(response || []);
       return response;
-    } catch (error) {
-      toast.error("Erro ao carregar associações de especialidades", {
-        position: 'bottom-right',
-        icon: '🚫',
-      });
+    } catch (error: any) {
+     toast.error(`Error: ${error.message}`, {
+               position: 'bottom-right',
+               icon: '🚫',
+               className: 'dark:bg-gray-800 dark:text-white',
+               duration: 5000,
+             });
       return [];
     }
   };
@@ -200,11 +207,13 @@ const SpecialtyManager = () => {
       const response = await userService.getAllUsers();
       setUsers(response);
       return response;
-    } catch (error) {
-      toast.error("Erro ao carregar os usuários", {
-        position: 'bottom-right',
-        icon: '🚫',
-      });
+    } catch (error: any) {
+     toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
       return [];
     }
   };
@@ -215,11 +224,13 @@ const SpecialtyManager = () => {
       const response = await specialtyService.ListAllSpecialty();
       setSpecialties(response.result.specialty);
       return response.result.specialty;
-    } catch (error) {
-      toast.error("Erro ao carregar as especialidades", {
-        position: 'bottom-right',
-        icon: '🚫',
-      });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+                position: 'bottom-right',
+                icon: '🚫',
+                className: 'dark:bg-gray-800 dark:text-white',
+                duration: 5000,
+              });
       return [];
     }
   };
@@ -229,11 +240,13 @@ const SpecialtyManager = () => {
       const data = await userService.getAllUsers();
       setUsersAll(data);
       return data;
-    } catch (error) {
-      toast.error("Erro ao carregar usuários", {
-        position: 'bottom-right',
-        icon: '🚫',
-      });
+    } catch (error: any) {
+     toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
       return [];
     }
   };
@@ -252,12 +265,14 @@ const SpecialtyManager = () => {
         icon: '✅',
       });
       await fetchSpecialtyUsers();
-    } catch (err) {
+    } catch (error: any) {
       toast.dismiss(loadingToast);
-      toast.error("Erro ao remover associação", {
-        position: 'bottom-right',
-        icon: '❌',
-      });
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setSpecialtyToRemove(null);
     }
@@ -277,12 +292,14 @@ const SpecialtyManager = () => {
       });
       await fetchSpecialtyUsers();
       setIsModalOpen(false);
-    } catch (error) {
+    } catch (error: any) {
       toast.dismiss(loadingToast);
-      toast.error("Erro ao criar associação", {
-        position: 'bottom-right',
-        icon: '❌',
-      });
+      toast.error(`Error: ${error.message}`, {
+                position: 'bottom-right',
+                icon: '🚫',
+                className: 'dark:bg-gray-800 dark:text-white',
+                duration: 5000,
+              });
     }
   };
 
@@ -309,12 +326,14 @@ const SpecialtyManager = () => {
       fetchInitialData();
       setIsReportModalOpen(false);
       
-    } catch (error) {
+    } catch (error: any) {
       toast.dismiss(loadingToast);
-      toast.error("Erro ao enviar relatório", {
-        position: 'bottom-right',
-        icon: '❌',
-      });
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     }
   };
 
@@ -340,12 +359,14 @@ const SpecialtyManager = () => {
       fetchInitialData()
       setIsApprovalModalOpen(false);
 
-    } catch (error) {
+    } catch (error: any) {
       toast.dismiss(loadingToast);
-      toast.error("Erro ao processar aprovação", {
-        position: 'bottom-right',
-        icon: '❌',
-      });
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     }
   };
 
@@ -373,12 +394,14 @@ const SpecialtyManager = () => {
       fetchInitialData()
       setIsApprovalModalOpen(false);
 
-    } catch (error) {
+    } catch (error: any) {
       toast.dismiss(loadingToast);
-      toast.error("Erro ao processar rejeição", {
-        position: 'bottom-right',
-        icon: '❌',
-      });
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     }
   };
 
@@ -406,8 +429,14 @@ const SpecialtyManager = () => {
         if (response.success) {
           setUnits(response.units.units);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Failed to fetch units:", error);
+        toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
       }
     };
     
@@ -419,8 +448,14 @@ const SpecialtyManager = () => {
           if (response.success) {
             setCounselorUnit(response.result.existingInOtherUnit);
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error("Failed to fetch counselor unit:", error);
+          toast.error(`Error: ${error.message}`, {
+                    position: 'bottom-right',
+                    icon: '🚫',
+                    className: 'dark:bg-gray-800 dark:text-white',
+                    duration: 5000,
+                  });
         }
       }
     };

@@ -15,9 +15,18 @@ export const classService = {
       });
       return response.data;
 
-    } catch (error) {
-      console.error("Erro na criação da Class", error);
-      throw new Error(`Erro na criação da Class ${error}`);
+    } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao criar classe'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -31,9 +40,18 @@ export const classService = {
         },
       });
       return response.data;
-    } catch (error) {
-      console.error("Erro na atualização da class", error);
-      throw new Error(`Erro na atualização da class ${error}`);
+  } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao atualizar classe'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -47,40 +65,97 @@ export const classService = {
       });
       return response.data;
 
-    } catch (error) {
-      console.error("Erro ao deleter class", error);
-      throw new Error(`Erro ao deletar a class ${error}`);
+   } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao deletar classe'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
   ListAllClass: async (token?: string | null): Promise<any> => {
     const tokenAux = localStorage.getItem('token')
+    
+
+  try {
     const res = await api.get("class/list-all", {
       headers: {
         Authorization: `Bearer ${token ? token : tokenAux}`
       }
     });
     return res.data;
+  } catch (error: any) {
+    //Extraindo a resposta de error da mensagem da API
+    if(error.response && error.response.data){
+      //Se a API retornar um objetode erro com uma mensagem
+      const errorMessage = error.response.data.error 
+      || error.response.data.message 
+      || 'Error ao fazer Login'
+      throw new Error(errorMessage)
+    } else {
+      console.error("Erro ao registrar", error.message);
+      throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+    }
+  }
   },
 
   ListClassID: async (classId: string): Promise<any> => {
     const token = localStorage.getItem('token')
-    const res = await api.get(`class/list-one-id/${classId}`, {
+    
+    try {
+   const res = await api.get(`class/list-one-id/${classId}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
     return res.data;
+
+  } catch (error: any) {
+    //Extraindo a resposta de error da mensagem da API
+    if(error.response && error.response.data){
+      //Se a API retornar um objetode erro com uma mensagem
+      const errorMessage = error.response.data.error 
+      || error.response.data.message 
+      || 'Error ao fazer Login'
+      throw new Error(errorMessage)
+    } else {
+      console.error("Erro ao registrar", error.message);
+      throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+    }
+  }
   },
 
   ListFromType: async (category: string): Promise<any> => {
     const token = localStorage.getItem('token')
-    const response = await api.put(`class/list-class-type`, category, {
+    
+     try {
+   const response = await api.put(`class/list-class-type`, category, {
       headers: { 
         "Content-Type": "application/json", 
         Authorization: `Bearer ${token}`
       },
     });
     return response.data;
+
+  } catch (error: any) {
+    //Extraindo a resposta de error da mensagem da API
+    if(error.response && error.response.data){
+      //Se a API retornar um objetode erro com uma mensagem
+      const errorMessage = error.response.data.error 
+      || error.response.data.message 
+      || 'Error ao fazer Login'
+      throw new Error(errorMessage)
+    } else {
+      console.error("Erro ao registrar", error.message);
+      throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+    }
+  }
   },
 };

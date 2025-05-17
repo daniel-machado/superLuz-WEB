@@ -43,9 +43,14 @@ export default function UserMetaCardUser({ userId }: UserMetaCardProps) {
           },
         });
 
-      } catch (error) {
+      } catch (error: any) {
         console.error("Erro ao buscar user", error);
-        toast.error("Erro ao buscar user", {position: 'bottom-right'});
+        toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
       }
     };
 

@@ -58,7 +58,11 @@ export function UserSpecialtyCard() {
       setSpecialties(data.result.specialty || []);
     } catch (error: any) {
       console.error("Error fetching specialties:", error);
-      toast.error("Falha ao carregar especialidades");
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
     } finally {
       setLoading(false);
     }

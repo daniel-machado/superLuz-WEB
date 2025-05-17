@@ -6,6 +6,7 @@ import Badge from "../ui/badge/Badge";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import Button from "../ui/button/Button";
+import toast from "react-hot-toast";
 
 
 interface Quiz {
@@ -30,7 +31,12 @@ export default function QuizList({ quizzes, onDelete, onToggleActive, onViewQues
   const formatDate = (dateString: string) => {
     try {
       return format(new Date(dateString), "dd/MM/yyyy", { locale: ptBR });
-    } catch (error) {
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
       return "Data inválida";
     }
   };

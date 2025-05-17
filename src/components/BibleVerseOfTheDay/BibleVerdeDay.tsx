@@ -1,8 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { biblicalService } from "../../services/biblicalService";
-import { Book, ChevronRight, Calendar, Star, Heart, Share2, X } from "lucide-react";
+import {
+  Book,
+  ChevronRight,
+  Calendar,
+  Star,
+  X,
+  Flame,
+  Award,
+  Sparkles,
+  CheckCircle,
+  CloudLightning,
+} from "lucide-react";
 import { Modal } from "../ui/modal";
+import Confetti from 'react-confetti';
+import toast from "react-hot-toast";
+
+
 
 
 // Tipos
@@ -20,6 +35,12 @@ interface BibleChapter {
 }
 
 
+// Props para o componente principal
+interface BibleVerseOfTheDayProps {
+  onRegisterReading: (data: { book: string, chapter: number, verse: number }) => Promise<void>;
+}
+
+
 // Componente Modal
 interface ModalProps {
   isOpen: boolean;
@@ -27,6 +48,42 @@ interface ModalProps {
   children: React.ReactNode;
 }
 
+
+// Componentes de efeitos
+const ParticleEffect = () => {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {[...Array(12)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            width: Math.random() * 8 + 2,
+            height: Math.random() * 8 + 2,
+            backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.random() * 0.4 + 0.1})`,
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+          }}
+          animate={{
+            y: [0, -(Math.random() * 50 + 20)],
+            x: [0, (Math.random() * 30 - 15)],
+            opacity: [0.4, 0],
+            scale: [1, Math.random() * 0.8 + 0.5],
+          }}
+          transition={{
+            duration: Math.random() * 5 + 2,
+            repeat: Infinity,
+            ease: "easeOut",
+            repeatDelay: Math.random() * 2,
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+
+// Componente Modal melhorado
 const ModalNew = ({ isOpen, onClose, children }: ModalProps) => {
   if (!isOpen) return null;
 
@@ -37,18 +94,43 @@ const ModalNew = ({ isOpen, onClose, children }: ModalProps) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70"
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80"
         onClick={onClose}
       >
         <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
+          initial={{ scale: 0.9, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.9, opacity: 0, y: 20 }}
           transition={{ type: "spring", damping: 15 }}
-          className="relative w-full max-w-3xl max-h-[80vh] overflow-y-auto bg-gray-900 rounded-xl shadow-2xl"
+          className="relative w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-xl shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
-          {children}
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 overflow-hidden">
+            {/* Padrão geométrico de fundo */}
+            <div className="absolute inset-0 opacity-10">
+              <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <pattern id="smallGrid" width="8" height="8" patternUnits="userSpaceOnUse">
+                    <path d="M 8 0 L 0 0 0 8" fill="none" stroke="white" strokeWidth="0.5" />
+                  </pattern>
+                  <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
+                    <rect width="80" height="80" fill="url(#smallGrid)" />
+                    <path d="M 80 0 L 0 0 0 80" fill="none" stroke="white" strokeWidth="1" />
+                  </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+              </svg>
+            </div>
+           
+            {/* Círculos decorativos */}
+            <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-purple-500/20 to-pink-600/5 rounded-full filter blur-3xl opacity-30 -translate-y-1/2 translate-x-1/3"></div>
+            <div className="absolute left-0 bottom-0 w-80 h-80 bg-gradient-to-tr from-blue-500/20 to-emerald-600/5 rounded-full filter blur-3xl opacity-30 translate-y-1/2 -translate-x-1/3"></div>
+          </div>
+         
+          {/* Conteúdo real */}
+          <div className="relative flex flex-col h-[80vh]">
+            {children}
+          </div>
         </motion.div>
       </motion.div>
     </Modal>
@@ -56,15 +138,124 @@ const ModalNew = ({ isOpen, onClose, children }: ModalProps) => {
 };
 
 
+// Componente de recompensa
+const ReadingReward = ({ streak, onClose }: { streak: number, onClose: () => void }) => {
+  const [showConfetti, setShowConfetti] = useState(true);
+ 
+  // Desativar confetti após alguns segundos
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowConfetti(false);
+    }, 5000);
+   
+    return () => clearTimeout(timer);
+  }, []);
+
+
+  const messages = [
+    "Nossa! Você está em chamas! 🔥",
+    "Mantenha essa chama acesa! 💪",
+    "Impressionante! Continue assim! ✨",
+    "Você está brilhando a cada dia! ⭐",
+    "Sua luz está mais forte! ☀️",
+    "Seu esforço está valendo a pena! 🙌"
+  ];
+
+
+  // Selecionar mensagem baseada no streak ou aleatoriamente
+  const getMessage = () => {
+    if (streak <= 0) return messages[0];
+    return messages[streak % messages.length];
+  };
+
+
+  return (
+    <div className="relative">
+      {showConfetti && <Confetti recycle={false} numberOfPieces={200} />}
+     
+      <div className="p-6 text-center">
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", damping: 12, delay: 0.2 }}
+          className="w-30 h-30 mx-auto mb-4 relative"
+        >
+          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-yellow-400 to-orange-600 opacity-25 animate-pulse"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            {streak >= 50 ? (
+              <Award className="w-16 h-16 text-amber-400" />
+            ) : streak >= 30 ? (
+              <CloudLightning className="w-16 h-16 text-orange-400" />
+            ) : streak >= 10 ? (
+              <Flame className="w-16 h-16 text-red-500" />
+            ) : (
+              <Sparkles className="w-16 h-16 text-yellow-400" />
+            )}
+          </div>
+        </motion.div>
+       
+        <motion.h2
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="text-2xl font-bold text-white mb-2"
+        >
+          Leitura Registrada!
+        </motion.h2>
+       
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.6 }}
+        >
+          <p className="text-lg mb-2 text-brand-300">{getMessage()}</p>
+         
+          <div className="flex justify-center items-center gap-3 mb-4">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-brand-400">{streak}</div>
+              <div className="text-xs uppercase text-gray-400">
+                { 
+                streak === 1 ? 'dia' : 'dias' 
+              }
+              </div>
+            </div>
+           
+            {streak > 0 && streak % 10 === 0 && (
+              <div className="px-3 py-1.5 rounded-full bg-brand-900/50 border border-brand-700">
+                <span className="text-sm font-medium text-brand-400">+1 Nível</span>
+              </div>
+            )}
+          </div>
+         
+          <div className="flex justify-center mt-6">
+            <button
+              onClick={onClose}
+              className="px-5 py-2.5 bg-gradient-to-r from-brand-600 to-brand-700 hover:to-brand-600 rounded-lg text-white font-medium transform transition hover:scale-105 active:scale-95"
+            >
+              Continuar
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
+
 // Componente principal
-const BibleVerseOfTheDay = () => {
+const BibleVerseOfTheDay: React.FC<BibleVerseOfTheDayProps> = ({ onRegisterReading }) => {
   const [verseData, setVerseData] = useState<BibleChapter | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeTab, _setActiveTab] = useState('verses');
-//  const [isFavorited, setIsFavorited] = useState(false);
-//  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [_activeTab, _setActiveTab] = useState('verses');
+  const [streak, setStreak] = useState(0);
+  const [showReward, setShowReward] = useState(false);
+  const [hasReadToday, setHasReadToday] = useState(false);
+  const [highlightedVerse, setHighlightedVerse] = useState<number | null>(null);
+ 
+  // Referência para scroll automático
+  const selectedVerseRef = useRef<HTMLDivElement>(null);
 
 
   useEffect(() => {
@@ -72,8 +263,13 @@ const BibleVerseOfTheDay = () => {
       try {
         const response = await biblicalService.bibleChapterDay();
         setVerseData(response);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Erro desconhecido");
+      } catch (erro: any) {
+        setError(erro instanceof Error ? erro.message : "Erro desconhecido");
+        toast.error(`Error: ${erro.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
       } finally {
         setLoading(false);
       }
@@ -84,20 +280,62 @@ const BibleVerseOfTheDay = () => {
   }, []);
 
 
+  // Efeito para scroll quando um versículo é destacado
+  useEffect(() => {
+    if (highlightedVerse !== null && selectedVerseRef.current) {
+      selectedVerseRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }
+  }, [highlightedVerse]);
+
+
   const handleClose = () => {
+    if (showReward) {
+      setShowReward(false);
+    } else {
+      setIsModalOpen(false);
+      setHighlightedVerse(null);
+    }
+  };
+
+
+  const handleRegisterReading = async () => {
+    if (!verseData) return;
+   
+    try {
+      await onRegisterReading({
+        book: verseData.livro,
+        chapter: verseData.capitulo,
+        verse: verseData.verses[0].numero
+      });
+     
+      // Atualizar state para mostrar recompensa
+      setStreak(prev => prev + 1);
+      setHasReadToday(true);
+      setShowReward(true);
+    } catch (error: any) {
+      console.error("Erro ao registrar leitura:", error.message);
+      toast.error(`Error ao registrar leitura: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
+    }
+  };
+
+  // Fechar modal de recompensa
+  const handleCloseReward = () => {
+    setShowReward(false);
     setIsModalOpen(false);
   };
 
 
-  // // Agrupar versículos em pares para layout visual no modal
-  // const getGroupedVerses = () => {
-  //   if (!verseData?.verses) return [];
-  //   const grouped = [];
-  //   for (let i = 0; i < verseData.verses.length; i += 2) {
-  //     grouped.push(verseData.verses.slice(i, i + 2));
-  //   }
-  //   return grouped;
-  // };
+  // Destacar um versículo específico
+  const handleVerseHighlight = (numero: number) => {
+    setHighlightedVerse(numero);
+  };
 
 
   if (loading) {
@@ -125,7 +363,7 @@ const BibleVerseOfTheDay = () => {
             <p className="text-red-300/80">{error}</p>
           </div>
         </div>
-        <button 
+        <button
           className="mt-4 w-full py-2 bg-red-900/40 hover:bg-red-800/60 text-red-400 rounded-lg transition-colors"
           onClick={() => window.location.reload()}
         >
@@ -141,129 +379,101 @@ const BibleVerseOfTheDay = () => {
 
   const firstVerse = verseData.verses[0];
   const bgPatterns = [
-    "radial-gradient(circle at 10% 20%, rgb(69, 86, 102) 0%, rgb(34, 34, 34) 90%)",
+    "linear-gradient(to right, rgb(29, 78, 216), rgb(30, 64, 175), rgb(17, 24, 39))",
     "linear-gradient(109.6deg, rgb(36, 45, 57) 11.2%, rgb(16, 37, 60) 51.2%, rgb(0, 0, 0) 98.6%)",
-    "linear-gradient(to right, rgb(29, 78, 216), rgb(30, 64, 175), rgb(17, 24, 39))"
+    "linear-gradient(to right, rgb(15, 23, 42), rgb(88, 28, 135), rgb(15, 23, 42))"
   ];
-  
+ 
   const randomBg = bgPatterns[Math.floor(Math.random() * bgPatterns.length)];
 
+
   const messages = [
-  'Nos lembra que a fé pode mover montanhas e transformar vidas.',
-  'Nos ensina a confiar em Deus em todas as circunstâncias.',
-  'Nos mostra que o amor de Deus é incondicional e eterno.',
-  'Nos inspira a sermos fortes e corajosos, pois Deus está conosco.',
-  'Nos lembra que a oração é uma poderosa ferramenta de conexão com Deus.',
-  'Nos ensina a importância do perdão e da reconciliação.',
-  'Nos mostra que a esperança em Deus nunca falha.',
-  'Nos inspira a viver uma vida de gratidão e louvor.',
-  'Nos lembra que Deus é nosso refúgio e fortaleza.',
-  'Nos ensina a amar ao próximo como a nós mesmos.',
-  'Nos mostra que a fé sem obras é morta.',
-  'Nos inspira a buscar a justiça e a verdade.',
-  'Nos lembra que Deus é fiel e cumpre suas promessas.',
-  'Nos ensina a importância da humildade e do serviço.',
-  'Nos mostra que Deus é a fonte de toda sabedoria.',
-  'Nos inspira a viver em paz e harmonia com os outros.',
-  'Nos lembra que Deus é nosso pastor e nada nos faltará.',
-  'Nos ensina a importância da paciência e da perseverança.',
-  'Nos mostra que Deus é nosso guia e protetor.',
-  'Nos inspira a confiar no plano de Deus para nossas vidas.',
-  'Nos lembra que Deus é amor e quem permanece no amor permanece em Deus.',
-  'Nos ensina a importância da fé e da confiança em Deus.',
-  'Nos mostra que Deus é nossa luz e salvação.',
-  'Nos inspira a viver uma vida de integridade e honestidade.',
-  'Nos lembra que Deus é nosso consolo em tempos de aflição.',
-  'Nos ensina a importância da obediência à palavra de Deus.',
-  'Nos mostra que Deus é nosso ajudador e amigo.',
-  'Nos inspira a viver uma vida de fé e confiança em Deus.',
-  'Nos lembra que Deus é nosso protetor e defensor.',
-  'Nos ensina a importância da esperança e da fé em Deus.',
-];
+    'Nos lembra que a fé pode mover montanhas e transformar vidas.',
+    'Nos ensina a confiar em Deus em todas as circunstâncias.',
+    'Nos mostra que o amor de Deus é incondicional e eterno.',
+    'Nos inspira a sermos fortes e corajosos, pois Deus está conosco.',
+    'Nos lembra que a oração é uma poderosa ferramenta de conexão com Deus.',
+    'Nos ensina a importância do perdão e da reconciliação.',
+    'Nos mostra que a esperança em Deus nunca falha.',
+    'Nos inspira a viver uma vida de gratidão e louvor.',
+    'Nos lembra que Deus é nosso refúgio e fortaleza.',
+    'Nos ensina a amar ao próximo como a nós mesmos.',
+    'Nos mostra que a fé sem obras é morta.',
+    'Nos inspira a buscar a justiça e a verdade.',
+    'Nos lembra que Deus é fiel e cumpre suas promessas.',
+    'Nos ensina a importância da humildade e do serviço.',
+    'Nos mostra que Deus é a fonte de toda sabedoria.',
+    'Nos inspira a viver em paz e harmonia com os outros.',
+    'Nos lembra que Deus é nosso pastor e nada nos faltará.',
+    'Nos ensina a importância da paciência e da perseverança.',
+    'Nos mostra que Deus é nosso guia e protetor.',
+    'Nos inspira a confiar no plano de Deus para nossas vidas.',
+    'Nos lembra que Deus é amor e quem permanece no amor permanece em Deus.',
+    'Nos ensina a importância da fé e da confiança em Deus.',
+    'Nos mostra que Deus é nossa luz e salvação.',
+    'Nos inspira a viver uma vida de integridade e honestidade.',
+    'Nos lembra que Deus é nosso consolo em tempos de aflição.',
+    'Nos ensina a importância da obediência à palavra de Deus.',
+    'Nos mostra que Deus é nosso ajudador e amigo.',
+    'Nos inspira a viver uma vida de fé e confiança em Deus.',
+    'Nos lembra que Deus é nosso protetor e defensor.',
+    'Nos ensina a importância da esperança e da fé em Deus.',
+  ];
 
-const getRandomMessage = () => {
-  const today = new Date();
-  const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000);
-  return messages[dayOfYear % messages.length];
-};
 
-const randomMessage = getRandomMessage();
+  const getRandomMessage = () => {
+    const today = new Date();
+    const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000);
+    return messages[dayOfYear % messages.length];
+  };
 
+
+  const randomMessage = getRandomMessage();
 
 
   return (
     <>
-      {/* Card do Versículo do Dia - Redesenhado */}
+      {/* Card do Versículo do Dia - Redesenhado para Adolescentes */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         className="mb-8"
       >
-        <div className="overflow-hidden rounded-2xl bg-gray-900 shadow-lg border border-gray-800 hover:shadow-xl transition-all duration-300">
-          {/* Header com gradiente */}
-          <div 
-            className="p-6 relative" 
+        <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 shadow-xl border border-gray-800 hover:shadow-2xl transition-all duration-300 relative">
+          {/* Efeito de partículas */}
+          <ParticleEffect />
+         
+          {/* Banner de fundo */}
+          <div
+            className="h-24 relative overflow-hidden"
             style={{ background: randomBg }}
           >
-            {/* Efeito de partículas (simulado com elementos absolutos) */}
-            <div className="absolute inset-0 overflow-hidden">
-              {[...Array(6)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute rounded-full bg-white/10"
-                  style={{
-                    width: Math.random() * 8 + 2,
-                    height: Math.random() * 8 + 2,
-                    top: `${Math.random() * 100}%`,
-                    left: `${Math.random() * 100}%`,
-                  }}
-                  animate={{
-                    y: [0, -10, 0],
-                    opacity: [0.4, 1, 0.4],
-                  }}
-                  transition={{
-                    duration: Math.random() * 3 + 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                />
-              ))}
+            {/* Padrão de ondas sobrepostas */}
+            <svg className="absolute bottom-0 left-0 w-full opacity-30" viewBox="0 0 1200 120" preserveAspectRatio="none">
+              <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="rgba(255, 255, 255, 0.1)"></path>
+            </svg>
+            <svg className="absolute bottom-0 left-0 w-full opacity-20" viewBox="0 0 1200 120" preserveAspectRatio="none">
+              <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" fill="rgba(255, 255, 255, 0.1)"></path>
+            </svg>
+           
+            {/* Título flutuante */}
+            <div className="absolute bottom-4 left-6 z-10">
+              <h3 className="text-xl font-bold text-white tracking-wide flex items-center">
+                <Book className="w-5 h-5 mr-2" />
+                Versículo do Dia
+              </h3>
             </div>
-            
-            <div className="relative z-10 flex justify-between items-start">
-              <div className="flex items-center">
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-brand-500/30 flex items-center justify-center mr-4">
-                  <Book className="h-6 w-6 text-brand-400" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-white mb-1">Versículo do Dia</h3>
-                  <div className="flex items-center text-brand-300 text-sm">
-                    <Calendar className="w-4 h-4 mr-1.5" />
-                    <span>{verseData.livro} {verseData.capitulo}</span>
-                  </div>
-                </div>
+           
+            {/* Badge com informação do livro */}
+            <div className="absolute top-4 right-6 px-3 py-1 bg-black/30 backdrop-blur-sm rounded-full">
+              <div className="flex items-center text-white/90 text-sm">
+                <Calendar className="w-3.5 h-3.5 mr-1.5" />
+                <span>{verseData.livro} {verseData.capitulo}</span>
               </div>
-              
-              {/* <div className="flex space-x-2">
-                <motion.button
-                  whileTap={{ scale: 0.9 }}
-                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${isFavorited ? 'bg-pink-500/30 text-pink-400' : 'bg-gray-800/40 text-gray-400 hover:text-pink-400'}`}
-                  onClick={() => setIsFavorited(!isFavorited)}
-                >
-                  <Heart className="w-4 h-4" fill={isFavorited ? "currentColor" : "none"} />
-                </motion.button>
-                <motion.button
-                  whileTap={{ scale: 0.9 }}
-                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${isBookmarked ? 'bg-brand-500/30 text-brand-400' : 'bg-gray-800/40 text-gray-400 hover:text-brand-400'}`}
-                  onClick={() => setIsBookmarked(!isBookmarked)}
-                >
-                  <Bookmark className="w-4 h-4" fill={isBookmarked ? "currentColor" : "none"} />
-                </motion.button>
-              </div> */}
             </div>
           </div>
-          
+         
           {/* Conteúdo */}
           <div className="p-6">
             <div className="flex items-center text-sm text-gray-400 mb-3">
@@ -276,46 +486,36 @@ const randomMessage = getRandomMessage();
               <ChevronRight className="w-4 h-4 mx-2 text-gray-600" />
               <span>Versículo {firstVerse.numero}</span>
             </div>
-            
+           
+            {/* Versículo principal com efeito de digitação */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.5 }}
               className="relative"
             >
-              <div className="absolute -left-2 top-0 text-4xl text-brand-700/30 font-serif">"</div>
-              <p className="text-xl text-gray-300 pl-6 leading-relaxed italic">
+              <div className="absolute -left-2 -top-2 text-5xl text-brand-700/30 font-serif">"</div>
+              <p className="text-xl text-gray-300 pl-6 pr-2 leading-relaxed italic">
                 {firstVerse.texto}
               </p>
-              <div className="absolute -right-2 bottom-0 text-4xl text-brand-700/30 font-serif">"</div>
+              <div className="absolute -right-2 -bottom-2 text-5xl text-brand-700/30 font-serif">"</div>
             </motion.div>
-            
-            <motion.div 
-              className="mt-8 flex flex-wrap justify-end items-center"
+           
+            <motion.div
+              className="mt-8 flex flex-wrap justify-between items-center"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.5 }}
             >
-              {/* <div className="flex space-x-2 mb-4 sm:mb-0">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-800 text-gray-400 hover:bg-gray-700 transition-colors flex items-center"
-                >
-                  <Share2 className="w-3.5 h-3.5 mr-1.5" />
-                  Compartilhar
-                </motion.button>
-                
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-800 text-gray-400 hover:bg-gray-700 transition-colors flex items-center"
-                >
+              {/* Tag do tema do dia */}
+              <div className="mb-4 sm:mb-0">
+                <div className="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-800/70 text-brand-400 border border-brand-800/50 inline-flex items-center">
                   <Star className="w-3.5 h-3.5 mr-1.5" />
-                  Reflexão
-                </motion.button>
-              </div> */}
-              
+                  Tema: Inspiração Diária
+                </div>
+              </div>
+             
+              {/* Botão principal animado */}
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -326,18 +526,40 @@ const randomMessage = getRandomMessage();
                 <ChevronRight className="w-4 h-4 ml-1" />
               </motion.button>
             </motion.div>
+           
+            {/* Indicador de leitura feita */}
+            {hasReadToday && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-4 pt-4 border-t border-gray-800 flex items-center text-green-400"
+              >
+                <CheckCircle className="w-4 h-4 mr-2" />
+                <span className="text-sm">Leitura de hoje já registrada! 🔥</span>
+              </motion.div>
+            )}
           </div>
         </div>
       </motion.div>
 
 
-      {/* Modal Completo */}
+      {/* Modal para recompensa após marcar como lido */}
       <AnimatePresence>
-        {isModalOpen && (
+        {isModalOpen && showReward && (
+          <ModalNew isOpen={isModalOpen} onClose={handleCloseReward}>
+            <ReadingReward streak={streak} onClose={handleCloseReward} />
+          </ModalNew>
+        )}
+      </AnimatePresence>
+
+
+      {/* Modal para leitura do capítulo completo */}
+      <AnimatePresence>
+        {isModalOpen && !showReward && (
           <ModalNew isOpen={isModalOpen} onClose={handleClose}>
-            <div className="relative">
-              {/* Header */}
-              <div className="sticky top-0 z-10 px-6 py-4 bg-gray-900 border-b border-gray-800 flex justify-between items-center">
+            <div className="flex flex-col h-full">
+              {/* Header - fixado no topo */}
+              <div className="sticky top-0 z-10 px-6 py-4 bg-gray-900/95 backdrop-blur-md border-b border-gray-800 flex justify-between items-center">
                 <div className="flex items-center">
                   <div className="h-10 w-10 rounded-lg bg-brand-900/50 border border-brand-800/50 flex items-center justify-center mr-3">
                     <Book className="h-5 w-5 text-brand-400" />
@@ -354,159 +576,115 @@ const randomMessage = getRandomMessage();
                   <X className="h-4 w-4" />
                 </button>
               </div>
-              
-{/*  
-              <div className="px-6 pt-4 pb-2 flex border-b border-gray-800/80">
-                           
-                <button
-                  onClick={() => setActiveTab('verses')}
-                  className={`mr-4 pb-2 font-medium text-sm flex items-center ${
-                    activeTab === 'verses' 
-                      ? 'text-brand-400 border-b-2 border-brand-500' 
-                      : 'text-gray-400 hover:text-gray-300'
-                  }`}
-                >
-                  <Book className="w-4 h-4 mr-1.5" />
-                  Versículos
-                </button>
-                <button
-                  onClick={() => setActiveTab('notes')}
-                  className={`mr-4 pb-2 font-medium text-sm flex items-center ${
-                    activeTab === 'notes' 
-                      ? 'text-brand-400 border-b-2 border-brand-500' 
-                      : 'text-gray-400 hover:text-gray-300'
-                  }`}
-                >
-                  <Star className="w-4 h-4 mr-1.5" />
-                  Comentários
-                </button>
-              </div>
-             */}
 
-              {/* Conteúdo da Tab */}
-              <div className="p-6">
-                {activeTab === 'verses' && (
-                  <div className="space-y-6">
-                    {/* Cabeçalho com tema do capítulo */}
-                    <div className="mb-8 p-4 bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg border border-gray-800">
-                      <h4 className="text-lg font-bold text-white mb-2 flex items-center">
-                        <Star className="w-5 h-5 mr-2 text-yellow-500" />
-                        Tema do Capítulo
-                      </h4>
-                      {/* <p className="text-gray-300">{verseData.livro} {verseData.capitulo} nos ensina sobre a importância da fé e como Deus está sempre conosco, mesmo nos momentos mais difíceis.</p> */}
-                        <p className="text-gray-300">{verseData.livro} {verseData.capitulo} {randomMessage}</p>
-                    </div>
-                    
-                    {/* Versículos */}
-                    <div className="space-y-6">
-                      {verseData.verses.map((verse) => (
-                        <motion.div
-                          key={verse.numero}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: verse.numero * 0.03 }}
-                          className="group"
+
+              {/* Conteúdo principal com scroll */}
+              <div className="flex-1 overflow-y-auto custom-scrollbar">
+                <div className="p-6">
+                  {/* Cabeçalho com tema do capítulo */}
+                  <div className="mb-8 p-4 bg-gradient-to-r from-brand-900/40 to-gray-900 rounded-lg border border-gray-800">
+                    <h4 className="text-lg font-bold text-white mb-2 flex items-center">
+                      <Star className="w-5 h-5 mr-2 text-yellow-500" />
+                      Tema do Capítulo
+                    </h4>
+                    <p className="text-gray-300">{verseData.livro} {verseData.capitulo} {randomMessage}</p>
+                  </div>
+                 
+                  {/* Navegação rápida */}
+                  <div className="mb-6 overflow-auto">
+                    <div className="flex space-x-2 pb-2">
+                      {[1, 5, 10, 15, 20, 25].filter(num => num <= verseData.verses.length).map((num) => (
+                        <button
+                          key={`nav-${num}`}
+                          onClick={() => handleVerseHighlight(num)}
+                          className="flex-shrink-0 w-8 h-8 rounded-md bg-gray-800 hover:bg-gray-700 text-gray-300 flex items-center justify-center text-sm transition-colors"
                         >
-                          <div className="flex">
-                            <div className="flex-shrink-0 mr-4 pt-1 flex items-center justify-center">
-                              <span className="inline-block w-8 h-8 rounded-lg bg-gray-800 text-gray-400 flex items-center justify-center text-sm font-mono group-hover:bg-brand-900/40 group-hover:text-brand-400 transition-colors">
-                                {verse.numero}
-                              </span>
-                            </div>
-
-
-
-                            <div className="flex-grow">
-                              <p className="text-gray-300 leading-relaxed group-hover:text-white transition-colors">
-                                {verse.texto}
-                              </p>
-                              <div className="mt-2 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button className="text-xs text-gray-500 hover:text-gray-300 flex items-center">
-                                  <Heart className="w-3 h-3 mr-1" />
-                                  Favoritar
-                                </button>
-                                <button className="text-xs text-gray-500 hover:text-gray-300 flex items-center">
-                                  <Share2 className="w-3 h-3 mr-1" />
-                                  Compartilhar
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {activeTab === 'notes' && (
-                  <div className="space-y-6">
-                    <div className="p-4 rounded-lg bg-gray-800/50 border border-gray-700">
-                      <h4 className="text-md font-semibold text-white mb-3">Comentários do Pastor</h4>
-                      <p className="text-gray-300">Este capítulo nos ensina sobre perseverança e fé. A história mostra como devemos confiar em Deus mesmo quando enfrentamos desafios que parecem impossíveis.</p>
-                    </div>
-                    
-                    <div className="p-4 rounded-lg bg-brand-900/20 border border-brand-800/50">
-                      <h4 className="text-md font-semibold text-white mb-3">Para Refletir</h4>
-                      <ul className="space-y-3">
-                        <li className="flex">
-                          <div className="flex-shrink-0 mr-2 mt-1">
-                            <div className="w-4 h-4 rounded-full bg-brand-900 border border-brand-700"></div>
-                          </div>
-                          <p className="text-gray-300 text-sm">Como você pode aplicar esta passagem na sua vida diária?</p>
-                        </li>
-                        <li className="flex">
-                          <div className="flex-shrink-0 mr-2 mt-1">
-                            <div className="w-4 h-4 rounded-full bg-brand-900 border border-brand-700"></div>
-                          </div>
-                          <p className="text-gray-300 text-sm">Qual versículo mais chamou sua atenção e por quê?</p>
-                        </li>
-                        <li className="flex">
-                          <div className="flex-shrink-0 mr-2 mt-1">
-                            <div className="w-4 h-4 rounded-full bg-brand-900 border border-brand-700"></div>
-                          </div>
-                          <p className="text-gray-300 text-sm">Compartilhe com seus amigos o que você aprendeu!</p>
-                        </li>
-                      </ul>
-                    </div>
-                    
-                    <div className="mt-6">
-                      <h4 className="text-md font-semibold text-white mb-3">Adicione sua anotação</h4>
-                      <textarea
-                        className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:border-brand-500 focus:ring focus:ring-brand-500/20 outline-none transition-all"
-                        rows={3}
-                        placeholder="Escreva suas reflexões sobre este capítulo..."
-                      ></textarea>
-                      <div className="mt-2 flex justify-end">
-                        <button className="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-sm transition-colors">
-                          Salvar anotação
+                          {num}
                         </button>
-                      </div>
+                      ))}
+                      {verseData.verses.length > 25 && (
+                        <button className="flex-shrink-0 h-8 px-2 rounded-md bg-gray-800 hover:bg-gray-700 text-gray-300 flex items-center justify-center text-sm transition-colors">
+                          <span>+ Ver todos</span>
+                        </button>
+                      )}
                     </div>
                   </div>
-                )}
+                 
+                  {/* Versículos com animação e interação */}
+                  <div className="space-y-6 pb-32">
+                    {verseData.verses.map((verse) => (
+                      <motion.div
+                        key={verse.numero}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: verse.numero * 0.03 }}
+                        className={`group rounded-lg p-2 -mx-2 ${highlightedVerse === verse.numero ? 'bg-brand-900/30 border border-brand-800/50' : 'hover:bg-gray-800/50'}`}
+                        ref={highlightedVerse === verse.numero ? selectedVerseRef : null}
+                      >
+                        <div className="flex">
+                          <div className="flex-shrink-0 mr-4 pt-1 flex items-center justify-center">
+                            <span className={`inline-block w-8 h-8 rounded-lg ${
+                              highlightedVerse === verse.numero
+                                ? 'bg-brand-800 text-brand-400'
+                                : 'bg-gray-800 text-gray-400 group-hover:bg-gray-700 group-hover:text-gray-300'
+                              } font-medium text-sm flex items-center justify-center transition-colors`}
+                            >
+                              {verse.numero}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-gray-300 leading-relaxed group-hover:text-white transition-colors">
+                            {verse.texto}
+                          </p>
+                          
+                          {/* Ações do versículo - Aparecem apenas no hover */}
+                          <div className="mt-2 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {/* <button className="p-1.5 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors">
+                              <Heart className="h-3.5 w-3.5" />
+                            </button>
+                            <button className="p-1.5 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors">
+                              <Share2 className="h-3.5 w-3.5" />
+                            </button> */}
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
               </div>
               
-              {/* Footer */}
-              <div className="sticky bottom-0 bg-gray-900 border-t border-gray-800 p-4 flex justify-end">
-                {/* <div className="flex space-x-2">
-                  <button className="p-2 rounded-lg bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white">
-                    <Share2 className="w-5 h-5" />
-                  </button>
-                  <button className="p-2 rounded-lg bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white">
-                    <Bookmark className="w-5 h-5" />
-                  </button>
+              {/* Barra de ações fixada na parte inferior */}
+              <div className="sticky bottom-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-800 p-4 flex justify-center items-center">
+                {/* <div className="text-sm text-gray-400 flex items-center">
+                  <Compass className="h-4 w-4 mr-2 text-brand-500" />
+                  <span>Navegando: {verseData.livro} {verseData.capitulo}</span>
                 </div> */}
                 
-                <div className="flex space-x-3">
-                  <button 
-                    className="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg text-sm hover:bg-gray-700 transition-colors"
-                    onClick={handleClose}
-                  >
-                    Fechar
-                  </button>
-                  <button onClick={handleClose} className="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-sm transition-colors">
-                    Marcar como Lido
-                  </button>
+                <div className="flex space-x-2">
+                  {!hasReadToday && (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleRegisterReading}
+                      className="px-4 py-2 bg-gradient-to-r from-brand-600 to-brand-700 hover:to-brand-600 text-white rounded-lg font-medium text-sm flex items-center shadow-lg shadow-brand-900/30 transition-all"
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Marcar como lido
+                    </motion.button>
+                  )}
+                  
+                  {hasReadToday && (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      disabled
+                      className="px-4 py-2 bg-green-900/40 text-green-400 rounded-lg font-medium text-sm flex items-center cursor-not-allowed"
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Leitura registrada
+                    </motion.button>
+                  )}
                 </div>
               </div>
             </div>
@@ -519,188 +697,4 @@ const randomMessage = getRandomMessage();
 
 
 export default BibleVerseOfTheDay;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import { useState, useEffect } from "react";
-// import Card from "../../components/ui/Card/Card";
-// import Button from "../../components/ui/button/Button";
-// import { motion, AnimatePresence } from "framer-motion";
-// import { biblicalService } from "../../services/biblicalService";
-// import { Modal } from "../ui/modal";
-
-
-// interface BibleVerse {
-//   numero: number;
-//   texto: string;
-// }
-
-// interface BibleChapter {
-//   dia: number;
-//   livro: string;
-//   capitulo: number;
-//   verses: BibleVerse[]
-// }
-
-// const BibleVerseOfTheDay = () => {
-//   const [verseData, setVerseData] = useState<BibleChapter | null>(null);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState<string | null>(null);
-//   const [isModalOpen, setIsModalOpen] = useState(false);
-
-
-//   useEffect(() => {
-//     const fetchVerseOfTheDay = async () => {
-//       try {
-//         const response = await biblicalService.bibleChapterDay();
-//         setVerseData(response);
-//       } catch (err) {
-//         setError(err instanceof Error ? err.message : "Erro desconhecido");
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchVerseOfTheDay();
-//   }, []);
-
-//   const handleClose = () => {
-//     setIsModalOpen(false)
-//   }
-
-
-//   if (loading) {
-//     return (
-//       <div className="flex justify-center items-center h-64">
-//         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-500"></div>
-//       </div>
-//     );
-//   }
-
-
-//   if (error) {
-//     return (
-//       <Card color="error" variant="light">
-//         <p className="text-center">{error}</p>
-//       </Card>
-//     );
-//   }
-
-
-//   if (!verseData) {
-//     return null;
-//   }
-
-
-//   const firstVerse = verseData.verses[0];
-
-//   return (
-//     <>
-//       {/* Card do Versículo do Dia */}
-//       <motion.div
-//         initial={{ opacity: 0, y: 20 }}
-//         animate={{ opacity: 1, y: 0 }}
-//         transition={{ duration: 0.6 }}
-//         className="mb-8"
-//       >
-//         <Card variant="light" color="primary" size="md">
-//           <div className="flex flex-col md:flex-row gap-6">
-//             <div className="flex-shrink-0">
-//               <svg
-//                 className="w-16 h-16 text-brand-500"
-//                 fill="none"
-//                 stroke="currentColor"
-//                 viewBox="0 0 24 24"
-//                 xmlns="http://www.w3.org/2000/svg"
-//               >
-//                 <path
-//                   strokeLinecap="round"
-//                   strokeLinejoin="round"
-//                   strokeWidth={1.5}
-//                   d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-//                 />
-//               </svg>
-//             </div>
-//             <div className="flex-grow">
-//               <div className="flex justify-between items-start">
-//                 <div>
-//                   <h3 className="text-xl font-bold text-gray-800 dark:text-white/90 mb-2">
-//                     Versículo do Dia
-//                   </h3>
-//                   <p className="text-sm text-gray-500 dark:text-gray-400">
-//                     {verseData.livro} {verseData.capitulo}:{firstVerse.numero}
-//                   </p>
-//                 </div>
-//                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-brand-100 text-brand-800 dark:bg-brand-900/30 dark:text-brand-400">
-//                   Dia {verseData.dia}
-//                 </span>
-//               </div>
-//               <motion.div
-//                 initial={{ opacity: 0 }}
-//                 animate={{ opacity: 1 }}
-//                 transition={{ delay: 0.3, duration: 0.5 }}
-//                 className="mt-4"
-//               >
-//                 <p className="text-lg italic text-gray-700 dark:text-gray-300">
-//                   "{firstVerse.texto}"
-//                 </p>
-//               </motion.div>
-//               <div className="mt-6 text-right">
-//                 <Button
-//                   size="sm"
-//                   onClick={() => setIsModalOpen(true)}
-//                   className="bg-brand-500 hover:bg-brand-600"
-//                 >
-//                   Ler capítulo completo
-//                 </Button>
-//               </div>
-//             </div>
-//           </div>
-//         </Card>
-//       </motion.div>
-
-
-//       {/* Modal */}
-//       <AnimatePresence>
-//         {isModalOpen && (
-//            <Modal isOpen={isModalOpen} onClose={handleClose} className="max-w-[700px] m-4">
-//               <p></p>                
-//             </Modal>
-//         )}
-//       </AnimatePresence>
-//     </>
-//   );
-// };
-
-
-// export default BibleVerseOfTheDay;
+                      

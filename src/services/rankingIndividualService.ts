@@ -14,9 +14,18 @@ export const rankingIndividualService = {
       });
       return response.data.ranking;
 
-    } catch (error) {
-      console.error("Erro ao buscar Ranking Individual:", error);
-      throw new Error(`Erro ao buscar ranking Individual: ${error}`);
+    } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao buscar'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -30,9 +39,18 @@ export const rankingIndividualService = {
         },
       });
       return response.data;
-    } catch (error) {
-      console.error("Erro ao buscar ranking Individual", error);
-      throw new Error(`Erro ao buscar ranking Individual ${error}`);
+   } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao buscar'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -46,9 +64,18 @@ export const rankingIndividualService = {
       });
       return response.data;
 
-    } catch (error) {
-      console.error("Erro ao buscar semana do Ranking:", error);
-      throw new Error(`Erro ao buscar semana do Ranking ${error}`);
+   } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao buscar'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -62,9 +89,18 @@ export const rankingIndividualService = {
       });
       return response.data;
 
-    } catch (error) {
-      console.error("Erro ao buscar semana do Ranking:", error);
-      throw new Error(`Erro ao buscar semana do Ranking ${error}`);
+    } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao deletar'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 };

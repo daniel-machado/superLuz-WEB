@@ -42,8 +42,13 @@ export default function RankingUnits() {
     try {
       const data = await rankingUnitService.listRanking();
       setRanking(data);
-    } catch (err) {
-      toast.error("Erro ao carregar ranking", {position: 'bottom-right'});
+    } catch (error: any) {
+     toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }

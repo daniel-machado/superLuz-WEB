@@ -11,9 +11,18 @@ export const userService = {
         }
       });
       return response.data;  
-    } catch (error: any) {
-      console.error("❌ Erro ao buscar dados do usuário:", error.response?.data || error.message);
-      throw new Error(`❌ Erro ao buscar dados do usuário: ${error}`);    
+   } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao buscar dados'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -26,9 +35,18 @@ export const userService = {
         }
       });
       return response.data.usersPending.usersPending;  
-    } catch (error: any) {   
-      console.error("❌ Erro não foi possível buscar usuários pendentes", error.response?.data || error.message);
-      throw new Error(`❌ Erro ao buscar dados do usuário pendentes: ${error}`);    
+   } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao buscar usuários pendentes'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -42,8 +60,17 @@ export const userService = {
       });
       return response.data.users.users;  
     } catch (error: any) {
-      console.error("❌ Erro não foi possível buscar usuários: ", error.response?.data || error.message);
-      throw new Error(`❌ Erro ao buscar dados do usuário: ${error}`);        
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao buscar usuários'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -59,8 +86,17 @@ export const userService = {
       return response.data;
 
     } catch (error: any) {
-      console.error("Error ao aprovar usuário", error.response?.data || error.message);
-      throw new Error(`Erro ao aprovar usuário: ${error}`);
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao aprovar usuário'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -73,11 +109,19 @@ export const userService = {
         }
       });
       const data = response.data.user
-      console.log("DATA USER", data)
       return data
     } catch (error: any) {
-      console.error("❌ Erro não foi possível buscar usuário: ", error.response?.data || error.message);
-      throw new Error(`❌ Erro ao buscar dados do usuário: ${error}`);        
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao buscar user'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 };

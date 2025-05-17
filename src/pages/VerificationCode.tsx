@@ -58,9 +58,13 @@ export default function VerificationCode() {
       await authService.verifyVerificationCode(email, verificationCode);
       toast.success("Conta verificada com sucesso", {position: 'bottom-right'});
       navigate("/home")
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao verificar conta", error);
-      toast.error("Error ao verificar conta", {position: 'bottom-right'});
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
     }finally{
       setLoading(false)
     }
@@ -76,9 +80,13 @@ export default function VerificationCode() {
     try {
       await authService.sendVerificationCode(email);
       toast.success("Código Renviado com sucesso para o email", {position: 'bottom-right'});
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao renviar codigo", error);
-      toast.error("Error ao renviar código", {position: 'bottom-right'});
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
     }
   };
 

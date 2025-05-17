@@ -142,7 +142,10 @@ const IndividualPodium = ({ topThree }: IndividualPodiumProps) => {
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", delay: 0.5 + i * 0.2 }}
               >
-                <span>{person.totalScore}</span>
+                <span>
+                  {/* {person.totalScore} */}
+                  {Math.floor(Number(person.totalScore)).toLocaleString('pt-BR')}
+                  </span>
                 <motion.span 
                   className="ml-1 text-xs text-purple-300"
                   animate={{ opacity: [0.5, 1, 0.5] }}

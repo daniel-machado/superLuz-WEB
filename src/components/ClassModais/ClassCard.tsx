@@ -123,8 +123,10 @@ export const ClassCard = ({
         month: '2-digit',
         year: 'numeric',
       }).format(date);
-    } catch (error) {
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {position: 'bottom-right', duration: 5000,});
       return dateString;
+
     }
   };
 

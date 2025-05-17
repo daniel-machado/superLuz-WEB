@@ -17,9 +17,18 @@ export const authService = {
       const response = await api.post<LoginResponse>("/auth/signin", { email, password });
       
       return response.data;
-    } catch (error: any) {
-      console.error("Erro no login:", error.response?.data || error.message);
-      throw new Error("Falha no login. Verifique suas credenciais.");
+   } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'Error ao fazer Login'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrarr", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -31,8 +40,17 @@ export const authService = {
 
       return response.data;
     } catch (error: any) {
-      console.error("Erro ao criar conta:", error.response?.data || error.message);
-      throw new Error(error.response?.data?.error || "Erro ao criar conta");
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao criar conta'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -45,9 +63,18 @@ export const authService = {
           Authorization: `Bearer ${token}`
         },
       });
-    } catch (error: any) {
-      console.error("Erro ao fazer signout:", error.response?.data || error.message);
-      throw new Error(error);
+   } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao sair'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -60,8 +87,17 @@ export const authService = {
       });
       return response.data.accessToken
     } catch (error: any) {
-        console.error("Erro ao fazer refreshToken:", error.response?.data || error.message);
-        throw new Error(`Error no refresh Token ${error}`);
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro no refresh token'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -86,9 +122,18 @@ export const authService = {
         headers: { "Content-Type": "application/json" },
       });
       return response.data;
-    } catch (error: any) {
-      console.error("Erro ao enviar codigo de verificação:", error.response?.data || error.message);
-      throw new Error(`Erro ao enviar o código de recuperação. ${error}`);
+   } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao enviar código com verificação'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -100,9 +145,18 @@ export const authService = {
         newPassword,
       }, {headers: { "Content-Type": "application/json" }});
       return response.data;
-    } catch (error: any) {
-      console.error("Erro ao verificar codigo de verificação:", error.response?.data || error.message);
-      throw new Error(`Erro ao verificar o código de recuperação. ${error}`);
+   } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao verificar código de verificação'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -117,9 +171,18 @@ export const authService = {
           }
         });
       return response.data;
-    } catch (error: any) {
-      console.error("Erro ao alterar senha:", error.response?.data || error.message);
-      throw new Error(`Erro ao alterar senha. ${error}`);
+   } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao alterar senha'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -134,9 +197,18 @@ export const authService = {
           }
         });
       return response.data;
-    } catch (error: any) {
-      console.error("Erro ao enviar codigo", error.response?.data || error.message);
-      throw new Error(`Erro ao enviar codigo ${error}`);
+   } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao enviar código'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -151,12 +223,36 @@ export const authService = {
           }
         });
       return response.data;
-    } catch (error: any) {
-      console.error("Erro ao verificar codigo:", error.response?.data || error.message);
-      throw new Error(`Erro ao verificar codigo. ${error}`);
+   } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao verificar código'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 };
 
 
 
+  try {
+
+  } catch (error: any) {
+    //Extraindo a resposta de error da mensagem da API
+    if(error.response && error.response.data){
+      //Se a API retornar um objetode erro com uma mensagem
+      const errorMessage = error.response.data.error 
+      || error.response.data.message 
+      || 'Error ao fazer Login'
+      throw new Error(errorMessage)
+    } else {
+      console.error("Erro ao registrar", error.message);
+      throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+    }
+  }

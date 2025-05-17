@@ -190,7 +190,8 @@ const Podium = ({ topThree, handleOpenDetail }: PodiumProps) => {
               animate={{ scale: [1, 1.08, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              {topThree[1].totalScore}
+              {/* {topThree[1].totalScore} */}
+              {Math.floor(Number(topThree[1].totalScore)).toLocaleString('pt-BR')}
             </motion.div>
 
 
@@ -301,7 +302,8 @@ const Podium = ({ topThree, handleOpenDetail }: PodiumProps) => {
               }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              {topThree[0].totalScore}
+              {/* {topThree[0].totalScore} */}
+              {Math.floor(Number(topThree[0].totalScore)).toLocaleString('pt-BR')}
             </motion.div>
 
 
@@ -412,7 +414,8 @@ const Podium = ({ topThree, handleOpenDetail }: PodiumProps) => {
               animate={{ scale: [1, 1.08, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              {topThree[2].totalScore}
+              {/* {topThree[2].totalScore} */}
+              {Math.floor(Number(topThree[2].totalScore)).toLocaleString('pt-BR')}
             </motion.div>
         
             {/* Pódio */}

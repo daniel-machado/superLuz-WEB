@@ -113,7 +113,8 @@ const IndividualRankingList = ({ rankings, startIndex = 4 }: IndividualRankingLi
                   className="font-bold text-lg text-white bg-indigo-700 bg-opacity-50 px-3 py-1 rounded-full"
                   whileHover={{ scale: 1.1 }}
                 >
-                  {person.totalScore}
+                  {/* {person.totalScore} */}
+                  {Math.floor(Number(person.totalScore)).toLocaleString('pt-BR')}
                   <span className="ml-1 text-xs opacity-70">pts</span>
                 </motion.div>
               </div>

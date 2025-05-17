@@ -88,7 +88,8 @@ const RankingList = ({ rankings, handleOpenDetail }: RankingProps) => {
               <motion.div className="flex items-center">
                 <motion.div className="mr-2 hidden sm:block">{getTrendIcon(index, null)}</motion.div>
                 <motion.div className="px-2 sm:px-3 py-1 text-xs sm:text-sm font-bold text-white bg-blue-600 rounded-full dark:bg-blue-700">
-                  {unit.totalScore}
+                  {/* {unit.totalScore} */}
+                  {Math.floor(Number(unit.totalScore)).toLocaleString('pt-BR')}
                 </motion.div>
               </motion.div>
             </motion.div>

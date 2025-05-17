@@ -16,9 +16,18 @@ export const individualEvaluationService = {
       });
       return response.data;
 
-    } catch (error) {
-      console.error("Erro na criação da Avaliação individual:", error);
-      throw new Error(`Erro na criação da Avaliação individual: ${error}`);
+   } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao criar'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -32,9 +41,18 @@ export const individualEvaluationService = {
         },
       });
       return response.data;
-    } catch (error) {
-      console.error("Erro atualização da Avaliação individual:", error);
-      throw new Error(`Erro na atualização da Avaliação individual: ${error}`);
+    } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao atualizar'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
@@ -48,60 +66,153 @@ export const individualEvaluationService = {
       });
       return response.data;
 
-    } catch (error) {
-      console.error("Erro ao excluir Avaliação individual:", error);
-      throw new Error(`Erro ao excluir Avaliação individual: ${error}`);
+    } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao deletar'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
     }
   },
 
   ListAllEvaluation: async (token?: string | null): Promise<any> => {
     const tokenAux = localStorage.getItem('token')
-    const res = await api.get(`individual-evaluation/list-all`, {
+    
+
+    
+         try {
+     const res = await api.get(`individual-evaluation/list-all`, {
       headers: {
         Authorization: `Bearer ${token ? token : tokenAux}`
       }
     });
     return res.data;
+  } catch (error: any) {
+    //Extraindo a resposta de error da mensagem da API
+    if(error.response && error.response.data){
+      //Se a API retornar um objetode erro com uma mensagem
+      const errorMessage = error.response.data.error 
+      || error.response.data.message 
+      || 'Error ao fazer Login'
+      throw new Error(errorMessage)
+    } else {
+      console.error("Erro ao registrar", error.message);
+      throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+    }
+  }
   },
 
   ListEvaluationID: async (evaluationId: string): Promise<any> => {
     const token = localStorage.getItem('token')
+   
+
+          try {
     const res = await api.get(`individual-evaluation/individual-evaluation/${evaluationId}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
     return res.data;
+  } catch (error: any) {
+    //Extraindo a resposta de error da mensagem da API
+    if(error.response && error.response.data){
+      //Se a API retornar um objetode erro com uma mensagem
+      const errorMessage = error.response.data.error 
+      || error.response.data.message 
+      || 'Error ao fazer Login'
+      throw new Error(errorMessage)
+    } else {
+      console.error("Erro ao registrar", error.message);
+      throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+    }
+  }
   },
 
   ListEvaluationFromUser: async (userId: string): Promise<any> => {
     const token = localStorage.getItem('token')
-    const res = await api.get(`individual-evaluation/list-all-evaluation/${userId}`, {
+    
+
+    
+          try {
+  const res = await api.get(`individual-evaluation/list-all-evaluation/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
     return res.data;
+  } catch (error: any) {
+    //Extraindo a resposta de error da mensagem da API
+    if(error.response && error.response.data){
+      //Se a API retornar um objetode erro com uma mensagem
+      const errorMessage = error.response.data.error 
+      || error.response.data.message 
+      || 'Error ao fazer Login'
+      throw new Error(errorMessage)
+    } else {
+      console.error("Erro ao registrar", error.message);
+      throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+    }
+  }
   },
 
   ListEvaluationActives: async (): Promise<any> => {
     const token = localStorage.getItem('token')
-    const res = await api.get(`individual-evaluation/evaluations-actives`, {
+   
+       try {
+  const res = await api.get(`individual-evaluation/evaluations-actives`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
     return res.data;
+  } catch (error: any) {
+    //Extraindo a resposta de error da mensagem da API
+    if(error.response && error.response.data){
+      //Se a API retornar um objetode erro com uma mensagem
+      const errorMessage = error.response.data.error 
+      || error.response.data.message 
+      || 'Error ao fazer Login'
+      throw new Error(errorMessage)
+    } else {
+      console.error("Erro ao registrar", error.message);
+      throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+    }
+  }
   },
 
   ListEvaluationActivesFromUser: async (userId: string): Promise<any> => {
     const token = localStorage.getItem('token')
-    const res = await api.get(`individual-evaluation/evaluation-active/${userId}`, {
+    
+
+
+
+    
+       try {
+ const res = await api.get(`individual-evaluation/evaluation-active/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
     return res.data;
+  } catch (error: any) {
+    //Extraindo a resposta de error da mensagem da API
+    if(error.response && error.response.data){
+      //Se a API retornar um objetode erro com uma mensagem
+      const errorMessage = error.response.data.error 
+      || error.response.data.message 
+      || 'Error ao fazer Login'
+      throw new Error(errorMessage)
+    } else {
+      console.error("Erro ao registrar", error.message);
+      throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+    }
+  }
   },
 
 };

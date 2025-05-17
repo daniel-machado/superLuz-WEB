@@ -44,8 +44,14 @@ export default function UsersPending() {
     try {
       const data = await userService.usersPending();
       setUsersPending(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao carregar usuários:", error);
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }

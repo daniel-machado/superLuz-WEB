@@ -54,8 +54,8 @@ const CreateClassModal: React.FC<Props> = ({ isOpen, loading, onClose, onSave })
         setPhotoUrl(previewUrl); // Atualiza o preview
 
         toast.success("Imagem processada com sucesso!", {position: 'bottom-right'});
-      } catch (error) {
-        toast.error(`Erro ao processar a imagem. ${error}`, {position: 'bottom-right'});
+      } catch (error: any) {
+        toast.error(`Error: ${error.message}`, {position: 'bottom-right', duration: 5000,});
       }
     }
   };

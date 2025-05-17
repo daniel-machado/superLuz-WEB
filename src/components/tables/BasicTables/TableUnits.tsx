@@ -99,8 +99,8 @@ console.log(openDropdownId)
       
       await findUnits();
       toast.success("Unidade atualizada com sucesso", { position: 'bottom-right' });
-    } catch (error) {
-      toast.error(`Erro ao atualizar unidade: ${error}`, { position: 'bottom-right' });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {position: 'bottom-right', duration: 5000,});
     } finally {
       setIsLoading(false);
       setIsEditModalOpen(false);
@@ -114,8 +114,8 @@ console.log(openDropdownId)
       await unitsService.deleteUnit(selectedUnit?.id as string);
       await findUnits();
       toast.success("Unidade excluída com sucesso", { position: 'bottom-right' });
-    } catch (error) {
-      toast.error(`Erro ao excluir unidade: ${error}`, { position: 'bottom-right' });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {position: 'bottom-right', duration: 5000,});
     } finally {
       setIsLoading(false);
       setIsDeleteModalOpen(false);
@@ -129,8 +129,8 @@ console.log(openDropdownId)
       await unitsService.removeDbvFromUnit(selectedUnit?.id as string, dbvId);
       await findUnits();
       toast.success("Membro excluído da unidade", { position: 'bottom-right' });
-    } catch (error) {
-      toast.error(`Erro ao remover desbravador: ${error}`, { position: 'bottom-right' });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {position: 'bottom-right', duration: 5000,});
     } finally {
       setIsLoading(false);
       setIsMembersModalOpen(false);
@@ -144,8 +144,8 @@ console.log(openDropdownId)
       await unitsService.removeCounselorFromUnit(selectedUnit?.id as string, counselorId);
       await findUnits();
       toast.success("Conselheiro removido da unidade", { position: 'bottom-right' });
-    } catch (error) {
-      toast.error(`Erro ao remover conselheiro: ${error}`, { position: 'bottom-right' });
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {position: 'bottom-right', duration: 5000,});
     } finally {
       setIsLoading(false);
       setIsMembersModalOpen(false);

@@ -14,8 +14,17 @@ export const uploadImage = async (file: File) => {
     });
 
     return response.data.secure_url; // Retorna a URL da imagem salva
-  } catch (error) {
-    console.error("Erro ao fazer upload da imagem", error);
-    throw error;
-  }
+  } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao fazer upload da imagem'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
+    }
 };

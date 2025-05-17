@@ -443,7 +443,7 @@ export default ClassGrid;
 //       toast.error('Não tem requisito cadastrado.', {
 //         position: 'bottom-right',
 //         className: 'dark:bg-gray-800 dark:text-white',
-//         duration: 5000,
+//         duration: duration: 5000,
 //       });
 //     }
 //   };

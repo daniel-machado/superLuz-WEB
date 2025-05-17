@@ -56,8 +56,13 @@ export default function Units() {
       toast.success("Unidade criada com sucesso!!", {position: 'bottom-right'});
       await findUnits()
       setIsOpenModal(false)
-    } catch (error) {
-      toast.error(`Erro: ${error}`, {position: 'bottom-right'});
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, {
+                position: 'bottom-right',
+                icon: '🚫',
+                className: 'dark:bg-gray-800 dark:text-white',
+                duration: 5000,
+              });
     } finally {
       setIsOpenModal(false)
       setIsLoading(false);
@@ -72,7 +77,12 @@ export default function Units() {
       await findUnits();
       toast.success("Conselheiro adicionado na unidade", { position: 'bottom-right' });
     } catch (error: any) {
-      toast.error(`Erro ao adicionar conselheiro: ${error.data.message}`, { position: 'bottom-right' });
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
       setIsOpenModalCounselor(false);
@@ -85,8 +95,13 @@ export default function Units() {
       await unitsService.addDbvFromUnit(unitId as string, dbvId);
       await findUnits();
       toast.success("Desbravador adicionado na unidade", { position: 'bottom-right' });
-    } catch (error) {
-      toast.error(`Erro ao adicionar desbravador: ${error}`, { position: 'bottom-right' });
+    } catch (error: any) {
+     toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
       setIsOpenModalDbv(false);

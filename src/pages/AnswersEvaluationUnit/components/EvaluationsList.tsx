@@ -53,7 +53,12 @@ export const EvaluationsList: React.FC<EvaluationsListProps> = ({ evaluations, o
     try {
       const date = new Date(dateString);
       return date.toLocaleDateString();
-    } catch (error) {
+    } catch (error: any) {toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          className: 'dark:bg-gray-800 dark:text-white',
+          duration: 5000,
+        });
       return "Data inválida";
     }
   };
@@ -104,7 +109,9 @@ export const EvaluationsList: React.FC<EvaluationsListProps> = ({ evaluations, o
           </div>
         
           <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-2">
-            {evaluation.totalScore ? `Pontuação: ${evaluation.totalScore}` : `Avaliação ${evaluation.id.substring(0, 8)}`}
+            {evaluation.totalScore 
+            ? `Pontuação: ${Math.floor(Number(evaluation.totalScore)).toLocaleString('pt-BR')}` 
+            : `Avaliação ${evaluation.id.substring(0, 8)}`}
           </h3>
         
           <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400 mt-3">

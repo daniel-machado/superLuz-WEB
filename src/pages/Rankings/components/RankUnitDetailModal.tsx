@@ -155,10 +155,10 @@ const RankUnitDetailModal: React.FC<RankUnitDetailModalProps> = ({ unit, isOpen,
   // Calculate achievement level based on score
   const getAchievementLevel = (score: string) => {
     const numScore = parseFloat(score);
-    if (numScore >= 1500) return { name: "Diamante", color: "from-blue-400 to-indigo-600", icon: Trophy };
-    if (numScore >= 1000) return { name: "Platina", color: "from-indigo-400 to-purple-600", icon: Award };
-    if (numScore >= 800) return { name: "Ouro", color: "from-yellow-400 to-amber-600", icon: Star };
-    if (numScore >= 500) return { name: "Prata", color: "from-gray-300 to-gray-500", icon: Shield };
+    if (numScore >= 150000) return { name: "Diamante", color: "from-blue-400 to-indigo-600", icon: Trophy };
+    if (numScore >= 90000) return { name: "Platina", color: "from-indigo-400 to-purple-600", icon: Award };
+    if (numScore >= 60000) return { name: "Ouro", color: "from-yellow-400 to-amber-600", icon: Star };
+    if (numScore >= 25000) return { name: "Prata", color: "from-gray-300 to-gray-500", icon: Shield };
     return { name: "Bronze", color: "from-amber-600 to-yellow-800", icon: Shield };
   };
   
@@ -169,24 +169,24 @@ const RankUnitDetailModal: React.FC<RankUnitDetailModalProps> = ({ unit, isOpen,
     : 0;
   
   // Get level info for current unit
-  const levelInfo = getAchievementLevel(unit.totalScore);
+  const levelInfo = getAchievementLevel(Math.floor(Number(unit.totalScore)).toLocaleString('pt-BR'));
   
   // Calculate mock progression to next level
-  const currentScore = parseFloat(unit.totalScore);
+  const currentScore = parseFloat(Math.floor(Number(unit.totalScore)).toLocaleString('pt-BR'));
   let nextLevelScore = 0;
   let nextLevelName = "";
   
-  if (currentScore < 500) {
-    nextLevelScore = 500;
+  if (currentScore < 25000) {
+    nextLevelScore = 25000;
     nextLevelName = "Prata";
-  } else if (currentScore < 800) {
-    nextLevelScore = 800;
+  } else if (currentScore < 60000) {
+    nextLevelScore = 60000;
     nextLevelName = "Ouro";
-  } else if (currentScore < 1000) {
-    nextLevelScore = 1000;
+  } else if (currentScore < 90000) {
+    nextLevelScore = 90000;
     nextLevelName = "Platina";
-  } else if (currentScore < 1500) {
-    nextLevelScore = 1500;
+  } else if (currentScore < 150000) {
+    nextLevelScore = 150000;
     nextLevelName = "Diamante";
   } else {
     // Already at highest level
@@ -302,10 +302,11 @@ const RankUnitDetailModal: React.FC<RankUnitDetailModalProps> = ({ unit, isOpen,
                     stiffness: 200 
                   }}
                 >
-                  {parseFloat(unit.totalScore).toLocaleString('pt-BR', {
+                  {/* {parseFloat(unit.totalScore).toLocaleString('pt-BR', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
-                  })}
+                  })} */}
+                  {Math.floor(Number(unit.totalScore)).toLocaleString('pt-BR')}
                 </motion.span>
                 
                 {/* Sparkles animation */}

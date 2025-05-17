@@ -84,7 +84,10 @@ export default function TableView({ ranking, handleOpenDetail }: TableProps) {
                   {unit.wrongAnswers}
                 </td>
                 <td className="py-3 px-4 text-right">
-                  <span className="font-bold text-blue-400">{unit.totalScore}</span>
+                  <span className="font-bold text-blue-400">
+                    {/* {unit.totalScore} */}
+                    {Math.floor(Number(unit.totalScore)).toLocaleString('pt-BR')}
+                  </span>
                 </td>
               </motion.tr>
             ))}
@@ -143,7 +146,10 @@ export default function TableView({ ranking, handleOpenDetail }: TableProps) {
 
               {/* Score */}
               <div className="text-right">
-                <span className="font-bold text-blue-400 text-lg">{unit.totalScore}</span>
+                <span className="font-bold text-blue-400 text-lg">
+                  {/* {unit.totalScore} */}
+                  {Math.floor(Number(unit.totalScore)).toLocaleString('pt-BR')}
+                </span>
               </div>
             </div>
 

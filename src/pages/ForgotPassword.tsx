@@ -24,9 +24,13 @@ const navigate = useNavigate()
       toast.success("Código Enviado com sucesso para o email", {position: 'bottom-right'});
       setIsLoading(false);
       setStep(2);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao enviar codigo", error);
-      toast.error("Error ao enviar código", {position: 'bottom-right'});
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }
@@ -45,9 +49,13 @@ const navigate = useNavigate()
       toast.success("Senha alterada com sucesso", {position: 'bottom-right'});
       setIsLoading(false);
       navigate('/sign-in')
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao enviar codigo", error);
-      toast.error("Error ao enviar código", {position: 'bottom-right'});
+      toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
     } finally {
       setIsLoading(false);
     }
