@@ -90,10 +90,10 @@ export default function UserDropdown() {
                   fill=""
                 />
               </svg>
-              Editar Perfil
+              Perfil
             </DropdownItem>
           </li>
-          <li>
+          {/* <li>
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
@@ -142,7 +142,7 @@ export default function UserDropdown() {
               </svg>
               Suporte
             </DropdownItem>
-          </li>
+          </li> */}
         </ul>
         <button
           onClick={handleSignout}

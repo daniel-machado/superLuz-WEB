@@ -100,6 +100,33 @@ export const userService = {
     }
   },
 
+  updateUser: async (userId: string, payload: any): Promise<any> => {
+    const token = localStorage.getItem('token')
+    try {
+      const response = await api.patch(`user/update-profile/${userId}`, 
+        {...payload}, {
+        headers: { 
+          "Content-Type": "application/json", 
+          Authorization: `Bearer ${token}`
+        },
+      });
+      return response.data;
+
+    } catch (error: any) {
+      //Extraindo a resposta de error da mensagem da API
+      if(error.response && error.response.data){
+        //Se a API retornar um objetode erro com uma mensagem
+        const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'erro ao atualizar dados'
+        throw new Error(errorMessage)
+      } else {
+        console.error("Erro ao registrar", error.message);
+        throw new Error(`Erro ao registrar ${error.messagem || "Erro ao conectar com o servidor"}`);
+      }
+    }
+  },
+
   getUser: async (userId: string): Promise<any>=> {
     const token = localStorage.getItem('token')
     try {

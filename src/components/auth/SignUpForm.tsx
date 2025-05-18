@@ -17,7 +17,7 @@ import avatarDefault from '../../assets/avatarDefault.png'
 import fabri from '../../assets/fabri.png'
 //import classNames from "react-day-picker/style.module.css";
 import { uploadImage } from "../../services/uploadService";
-
+import { ChevronDown, ChevronLeft, ChevronRight, Circle } from "lucide-react";
 
 // Esquema de validação com Yup
 const signUpSchema = yup.object({
@@ -157,7 +157,7 @@ const urlToFile = async (url: string, filename: string, mimeType: string): Promi
       await signup(payload); // 🔥 Chama a API e autentica automaticamente
   
       toast.success("Cadastro realizado com sucesso!", {position: 'bottom-right'});
-      navigate("/"); 
+      navigate("/home"); 
     } catch (error: any) {
       toast.error(`Error: ${error.message}`, {
                 position: 'bottom-right',
@@ -168,6 +168,12 @@ const urlToFile = async (url: string, filename: string, mimeType: string): Promi
       setIsLoading(false);
     }
   };
+
+const options: Intl.DateTimeFormatOptions = {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+};
 
   return (
     <div className="flex flex-col flex-1 w-full overflow-y-auto lg:w-1/2 no-scrollbar">
@@ -329,18 +335,81 @@ const urlToFile = async (url: string, filename: string, mimeType: string): Promi
                     mode="single"
                     selected={birthDate}
                     onSelect={(date) => {
-                      setBirthDate(date); // Atualiza o estado
-                      setValue("birthDate", date || undefined); // Atualiza o valor do formulário
+                      setBirthDate(date);
+                      setValue("birthDate", date || undefined);
                     }}
                     captionLayout="dropdown"
-                    required 
+                    required
                     classNames={{
-                      today: `text-lg font-semibold text-gray-800 dark:text-white/90`, // Add a border to today's date
-                      selected: `text-lg font-semibold text-gray-800 dark:text-white/90`, // Highlight the selected day
-                      root: `${defaultClassNames.root} shadow-lg p-5`, // Add a shadow to the root element
-                      chevron: `${defaultClassNames.chevron} text-gray-800 dark:text-white/90` // Change the color of the chevron
-                    }}
+                            selected: `text-gray-200`,
+                            root: `${defaultClassNames.root} shadow-lg p-5`,
+                            day: `group  w-10 h-10 rounded-full ${defaultClassNames.day}`,
+                            caption_label: `text-base`,
+                            weekdays: 'text-gray-300',
+                            month_caption: 'text-gray-500',
+                            footer: 'text-green-500',
+                          }}
+                          components={{
+                            /* Custom Button */
+                            DayButton: (props) => {
+                              const { day, ...buttonProps } = props;
+                              return (
+                                <button
+                                  {...buttonProps}
+                                  className="text-gray-100 w-10 h-10 m-1 group-aria-selected:bg-green-500 rounded-full"
+                                  onClick={() => {
+                                    setBirthDate(day.date);
+                                    setValue("birthDate", day.date || undefined);
+                                  }}
+                                />
+                              );
+                            },
+                            /* Custom Chevron Icon */
+                            Chevron: ({ className, orientation, ...chevronProps }) => {
+                              switch (orientation) {
+                                case "left":
+                                  return (
+                                    <ChevronLeft
+                                      className={`${className} w-4 h-4 fill-green-500`}
+                                      {...chevronProps}
+                                    />
+                                  );
+                                case "right":
+                                  return (
+                                    <ChevronRight
+                                      className={`${className} w-4 h-4 fill-green-500`}
+                                      {...chevronProps}
+                                    />
+                                  );
+                                case "down":
+                                  return (
+                                    <ChevronDown
+                                      className={`${className} w-4 h-4 fill-green-500`}
+                                      {...chevronProps}
+                                    />
+                                  );
+                                case "up":
+                                  return (
+                                    <ChevronDown
+                                      className={`${className} w-4 h-4 fill-green-500`}
+                                      {...chevronProps}
+                                    />
+                                  );
+                                default:
+                                  return (
+                                    <Circle className={`${className} w-4 h-4 fill-green-500`} />
+                                  );
+                              }
+                            },
+                          }}
+                          footer={
+                          birthDate
+                            ? `Sua data ${new Intl.DateTimeFormat('pt-PT', options).format(birthDate)}.`
+                            : "Selecione uma data"
+                        }
                   />
+
+
                 </div>
                 {errors.birthDate && <span className="text-red-500">{errors.birthDate.message}</span>}
 

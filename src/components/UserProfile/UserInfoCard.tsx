@@ -5,7 +5,7 @@ import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import { useAuth } from "../../context/AuthContext";
 import Badge from "../ui/badge/Badge";
-import toast from "react-hot-toast";
+//import toast from "react-hot-toast";
 
 export default function UserInfoCard() {
   const { 
@@ -21,12 +21,12 @@ export default function UserInfoCard() {
     closeModal();
   };
 
-  const handleEditModal = () => {
-    //openModal()
-    toast.success("Estamos trabalhando nessa página ainda, em breve ela estará disponível para você!",
-      {position: "bottom-right", duration: 3000}
-    )
-  }
+  // const handleEditModal = () => {
+  //   //openModal()
+  //   toast.success("Estamos trabalhando nessa página ainda, em breve ela estará disponível para você!",
+  //     {position: "bottom-right", duration: 3000}
+  //   )
+  // }
 
   const definedStatus = () => {
     const status = user?.user.user.status;
@@ -107,7 +107,7 @@ export default function UserInfoCard() {
           </div>
         </div>
 
-        <button
+        {/* <button
           onClick={handleEditModal}
           className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 lg:inline-flex lg:w-auto"
         >
@@ -127,7 +127,7 @@ export default function UserInfoCard() {
             />
           </svg>
           Editar
-        </button>
+        </button> */}
       </div>
 
       <Modal isOpen={isOpen} onClose={closeModal} className="max-w-[700px] m-4">

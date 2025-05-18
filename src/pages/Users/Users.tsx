@@ -21,26 +21,31 @@ interface IUser {
 }
 
 
-// Função para calcular idade a partir da data de nascimento
+
 const calculateAge = (birthDate: string) => {
-  const birth = new Date(birthDate);
+  // Divide a string no formato DD/MM/YYYY
+  const [day, month, year] = birthDate.split('/').map(Number);
+
+  // Cria um objeto Date com os valores extraídos
+  const birth = new Date(year, month - 1, day); // mês começa do zero (0 = janeiro)
   const today = new Date();
+
   let age = today.getFullYear() - birth.getFullYear();
   const monthDiff = today.getMonth() - birth.getMonth();
-
 
   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
     age--;
   }
   return age;
-};
+}
+
 
 
 // Função para formatar data brasileira (DD/MM/YYYY)
-const formatBrazilianDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('pt-BR');
-};
+// const formatBrazilianDate = (dateString: string) => {
+//   const date = new Date(dateString);
+//   return date.toLocaleDateString('pt-BR');
+// };
 
 
 // Traduzir status para português
@@ -297,7 +302,7 @@ export default function Users() {
                       }
                       
                       <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                        <span>{formatBrazilianDate(user.birthDate)}</span>
+                        <span>{user.birthDate}</span>
                         <span>{calculateAge(user.birthDate)} anos</span>
                       </div>
                     </div>

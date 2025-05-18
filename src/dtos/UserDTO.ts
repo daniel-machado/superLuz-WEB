@@ -16,4 +16,9 @@ export interface UserDTO {
   deleteAccountCode: string
   deleteAccountCodeValidation: string
   status: string;
+  facebook: string;
+  instagram: string;
+  linkedin: string;
+  youtube: string;
+  biografia: string;
 }

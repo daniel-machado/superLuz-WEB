@@ -7,6 +7,8 @@ import { UserSpecialtyCard } from "../components/UserProfile/UserSpecialtyCard";
 import { UserClassCard } from "../components/UserProfile/UserClassCard";
 
 export default function UserProfiles() {
+
+
   return (
     <>
       <PageMeta
