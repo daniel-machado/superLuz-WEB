@@ -642,46 +642,47 @@ export default function Specialty() {
 
 
 
-      {/* Create Specialty Modal */}
-      <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} className="max-w-[700px] m-4">
-        <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-5 dark:bg-gray-900 lg:p-11">
-          <div className="px-2 pr-14">
-            <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
+      {/* Modal de Criação de Especialidade */}
+      <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} className="max-w-[700px]">
+        <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white dark:bg-gray-900">
+          <div className="sticky top-0 z-10 bg-white p-5 pb-2 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+            <h4 className="mb-2 text-xl md:text-2xl font-semibold text-gray-800 dark:text-white/90">
               Criar Especialidade
             </h4>
-            <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Crie uma nova especialidade
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="m-3">
+
+          <div className="p-5 lg:p-8 pt-4 max-h-[70vh] overflow-y-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-2">
               <Label>Nome da Especialidade</Label>
               <Input
-                //label="Nome da Especialidade*"
                 value={nameSpecialty}
                 onChange={(e) => setNameSpecialty(e.target.value)}
                 placeholder="Ex: Apicultura"
               />
             </div>
 
-            <div className="m-3">
+
+            <div className="p-2">
               <Label>Categoria</Label>
-                  <Select
-                  placeholder="Selecione a categoria"
-                  onChange={(e) => setCategory(e as string)}
-                  options={categories.map((cat) => ({
-                    value: cat,
-                    label: cat.charAt(0).toUpperCase() + cat.slice(1),
-                  }))}
-                />
+              <Select
+                placeholder="Selecione a categoria"
+                onChange={setCategory}
+                options={categories.map((cat) => ({
+                  value: cat,
+                  label: cat.charAt(0).toUpperCase() + cat.slice(1),
+                }))}
+              />
             </div>
           </div>
 
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-            <div className="m-3">
+            <div className="p-2">
               <Label>Código</Label>
               <Input
                 value={codigo}
@@ -690,7 +691,8 @@ export default function Specialty() {
               />
             </div>
 
-            <div className="m-3">
+
+            <div className="p-2">
               <Label>Número</Label>
               <Input
                 value={numero}
@@ -702,7 +704,7 @@ export default function Specialty() {
 
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="m-3">
+            <div className="p-2">
               <Label>Nível</Label>
               <Input
                 type="number"
@@ -711,8 +713,8 @@ export default function Specialty() {
                 placeholder="Ex: 1"
               />
             </div>
-            
-            <div className="m-3">
+           
+            <div className="p-2">
               <Label>Ano</Label>
               <Input
                 value={year}
@@ -723,9 +725,9 @@ export default function Specialty() {
           </div>
 
 
-          <div>
+          <div className="p-2">
             <Label>Emblema</Label>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-wrap items-center gap-4">
               {previewImage ? (
                 <img
                   src={previewImage}
@@ -751,124 +753,123 @@ export default function Specialty() {
             </div>
           </div>
 
-          <div className="m-3">
+
+          <div className="p-2 mt-4">
             <Label>Requisitos</Label>
             <TextArea
               value={requirements}
-              onChange={(value: string) => setRequirements(value)}
+              onChange={setRequirements}
               rows={4}
               placeholder="Digite os requisitos, um por linha..."
             />
           </div>
-          
-
-          <div className="flex justify-end space-x-3 pt-4">
-            <Button
-              variant="outline"
-              onClick={() => setIsCreateModalOpen(false)}
-              disabled={isLoading}
-            >
-              Cancelar
-            </Button>
-            <Button
-              variant="primary"
-              onClick={handleCreateSpecialty}
-              disabled={isLoading}
-              //loading={isLoading}
-            >
-              Criar Especialidade
-            </Button>
+         
+          <div className="sticky bottom-0 z-10 bg-white p-5 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex flex-wrap justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setIsCreateModalOpen(false)}
+                disabled={isLoading}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleCreateSpecialty}
+                disabled={isLoading}
+              >
+                {isLoading ? "Criando..." : "Criar Especialidade"}
+              </Button>
+            </div>
           </div>
         </div>
-      </Modal>
+      </div>
+    </Modal>
 
 
-      {/* Edit Specialty Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} className="max-w-[700px] m-4">
+      {/* Modal de Edição de Especialidade */}
+      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} className="max-w-[700px]">
         {selectedSpecialty && (
-           <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-5 dark:bg-gray-900 lg:p-11">
-            <div className="px-2 pr-14">
-              <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
+          <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white dark:bg-gray-900">
+            <div className="sticky top-0 z-10 bg-white p-5 pb-2 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+              <h4 className="mb-2 text-xl md:text-2xl font-semibold text-gray-800 dark:text-white/90">
                 Editar Especialidade
               </h4>
-              <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Edite essa especialidade
               </p>
             </div>
-          
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="m-3">
-                  <Label>Nome da especialidade</Label>
-                    <Input
-                    value={nameSpecialty}
-                    onChange={(e) => setNameSpecialty(e.target.value)}
-                    placeholder="Ex: Apicultura"
-                  />
+         
+            <div className="p-5 lg:p-8 pt-4 max-h-[70vh] overflow-y-auto">
+              <div className="p-2">
+                <Label>Nome da especialidade</Label>
+                <Input
+                  value={nameSpecialty}
+                  onChange={(e) => setNameSpecialty(e.target.value)}
+                  placeholder="Ex: Apicultura"
+                />
               </div>
-              
-              <div className="m-3">
-                  <Label>Categoria</Label>
-                  <Select
-                    onChange={(e) => setCategory(e as string)}
-                    options={categories.map((cat) => ({
-                      value: cat,
-                      label: cat.charAt(0).toUpperCase() + cat.slice(1),
-                    }))}
-                  />
+             
+              <div className="p-2">
+                <Label>Categoria</Label>
+                <Select
+                  onChange={setCategory}
+                  options={categories.map((cat) => ({
+                    value: cat,
+                    label: cat.charAt(0).toUpperCase() + cat.slice(1),
+                  }))}
+                  placeholder="Selecione a categoria"
+                />
               </div>
-              
             </div>
 
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="m-3">
-                  <Label>Código</Label>
-                      <Input
-                    //label="Código"
-                    value={codigo}
-                    onChange={(e) => setCodigo(e.target.value)}
-                    placeholder="Ex: AP"
-                  />
+              <div className="p-2">
+                <Label>Código</Label>
+                <Input
+                  value={codigo}
+                  onChange={(e) => setCodigo(e.target.value)}
+                  placeholder="Ex: AP"
+                />
               </div>
-              <div className="m-3">
-                  <Label>Número</Label>
-                  <Input
-                //label="Número"
-                value={numero}
-                onChange={(e) => setNumero(e.target.value)}
-                placeholder="Ex: 004"
-              />
-              </div> 
+              <div className="p-2">
+                <Label>Número</Label>
+                <Input
+                  value={numero}
+                  onChange={(e) => setNumero(e.target.value)}
+                  placeholder="Ex: 004"
+                />
+              </div>
             </div>
 
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="m-3">
-                  <Label>Nível</Label>
-                  <Input
-                type="number"
-                //label="Nível"
-                value={level || ""}
-                onChange={(e) => setLevel(e.target.value ? parseInt(e.target.value) : null)}
-                placeholder="Ex: 1"
-              />
-              </div> 
+              <div className="p-2">
+                <Label>Nível</Label>
+                <Input
+                  type="number"
+                  value={level || ""}
+                  onChange={(e) => setLevel(e.target.value ? parseInt(e.target.value) : null)}
+                  placeholder="Ex: 1"
+                />
+              </div>
 
-              <div className="m-3">
-                  <Label>Ano</Label>
-                  <Input
-                //label="Ano"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                placeholder="Ex: 1929"
-              />
-              </div> 
+
+              <div className="p-2">
+                <Label>Ano</Label>
+                <Input
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  placeholder="Ex: 1929"
+                />
+              </div>
             </div>
 
 
-            <div>
+            <div className="p-2">
               <Label>Emblema</Label>
-              <div className="flex items-center space-x-4">
+              <div className="flex flex-wrap items-center gap-4">
                 {previewImage ? (
                   <img
                     src={previewImage}
@@ -894,35 +895,35 @@ export default function Specialty() {
               </div>
             </div>
 
-            <div className="m-3">
-                  <Label>Requisito</Label>
-                  <TextArea
-              //label="Requisitos (um por linha)"
-              value={requirements}
-              onChange={(value: string) => setRequirements(value)}
-              rows={4}
-              placeholder="Digite os requisitos, um por linha..."
-            />
+
+            <div className="p-2 mt-4">
+              <Label>Requisitos</Label>
+              <TextArea
+                value={requirements}
+                onChange={setRequirements}
+                rows={4}
+                placeholder="Digite os requisitos, um por linha..."
+              />
+            </div>
+
+
+            <div className="sticky bottom-0 z-10 bg-white p-5 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex flex-wrap justify-end gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsEditModalOpen(false)}
+                  disabled={isLoading}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={handleEditSpecialty}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Salvando..." : "Salvar Alterações"}
+                </Button>
               </div>
-            
-
-
-            <div className="flex justify-end space-x-3 pt-4">
-              <Button
-                variant="outline"
-                onClick={() => setIsEditModalOpen(false)}
-                disabled={isLoading}
-              >
-                Cancelar
-              </Button>
-              <Button
-                //variant="primary"
-                onClick={handleEditSpecialty}
-                disabled={isLoading}
-                //loading={isLoading}
-              >
-                Salvar Alterações
-              </Button>
             </div>
           </div>
         )}

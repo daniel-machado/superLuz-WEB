@@ -34,7 +34,7 @@ const StreakFire: React.FC<StreakFireProps> = ({
         try {
           setLoading(true);
           const response = await DailyReadingService.getStreakInfo(user.user.user.id);
-
+          
           if( response && response.streakInfo ){
             setStreak(response.streakInfo.currentStreak);
             setLives(response.streakInfo.lives);

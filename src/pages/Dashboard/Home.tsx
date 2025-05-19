@@ -83,7 +83,7 @@ export default function Home() {
         type: ''
       });
       
-      // Chama o serviço para registrar a leitura
+      // Chama o serviço para registrar a leitura e obter streakInfo
       await DailyReadingService.registerReading({
         userId: user.user.user.id,
         book: readingData.book,
@@ -91,10 +91,10 @@ export default function Home() {
         verse: String(readingData.verse),
         pointsEarned: 10 // Pontos por leitura
       });
-      
+
       // Atualiza o componente do fogo
       setRefreshTrigger(prev => prev + 1);
-      
+
       setReadingStatus({
         isLoading: false,
         message: 'Leitura registrada com sucesso!',
@@ -109,7 +109,7 @@ export default function Home() {
           type: ''
         });
       }, 3000);
-      
+
     } catch (error: any) {
       console.error('Error registering reading:', error);
       setReadingStatus({
@@ -241,7 +241,12 @@ export default function Home() {
       {/* Componente do versículo do dia */}
       {user.user.user.role !== "pending" && (
         <div className="mt-4">
-          <BibleVerseOfTheDay onRegisterReading={handleRegisterReading} />
+          <BibleVerseOfTheDay 
+            onRegisterReading={handleRegisterReading} 
+            refreshTrigger={refreshTrigger}
+            onStreakChange={handleStreakChange}
+
+          />
         </div>
       )}
     </>

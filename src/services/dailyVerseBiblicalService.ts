@@ -19,6 +19,12 @@ interface StreakInfoResponse {
     lastReadingDate: string | null;
     hasReadToday: boolean;
     streakActive: boolean
+    daysSinceLastReading: number,
+
+    //Infirmações adicionais para UI
+    formattedLastDate: string,
+    isOnfire: boolean,
+    nextMilestone: number
   }
   
 }

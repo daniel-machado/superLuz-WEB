@@ -463,7 +463,7 @@ export default function QuizScreen() {
             </div>
             
             <div className="flex justify-between items-center">
-              <span>Tentativas anteriores:</span>
+              <span>Erros:</span>
               <span>{quizResult.newAttempt.failedAttempts}</span>
             </div>
             
@@ -471,6 +471,20 @@ export default function QuizScreen() {
               <span>Data da tentativa:</span>
               <span>{new Date(quizResult.newAttempt.attemptDate).toLocaleDateString()}</span>
             </div>
+
+            { isPassing && (
+              <div className="flex justify-center items-center">
+                <button
+                  onClick={() => navigate('/specialty-users')}
+                  className='w-70 py-3 px-4 rounded-lg font-medium transition duration-200 flex items-center justify-center bg-gradient-to-r from-blue-600/70 to-green-600/70 hover:from-blue-800/80 hover:to-green-800/80'
+                >
+                  <p>
+                      É hora de enviar o relatório
+                  </p>
+                </button>
+              </div>
+            )}
+           
             
             {isPassing && (
               <motion.div 

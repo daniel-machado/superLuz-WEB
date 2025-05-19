@@ -16,6 +16,8 @@ import {
 import { Modal } from "../ui/modal";
 import Confetti from 'react-confetti';
 import toast from "react-hot-toast";
+import { useAuth } from "../../context/AuthContext";
+import { DailyReadingService } from "../../services/dailyVerseBiblicalService";
 
 
 
@@ -38,6 +40,8 @@ interface BibleChapter {
 // Props para o componente principal
 interface BibleVerseOfTheDayProps {
   onRegisterReading: (data: { book: string, chapter: number, verse: number }) => Promise<void>;
+  onStreakChange?: (streak: number) => void;
+  refreshTrigger?: number; // Prop para forçar atualização do componente
 }
 
 
@@ -139,14 +143,24 @@ const ModalNew = ({ isOpen, onClose, children }: ModalProps) => {
 
 
 // Componente de recompensa
-const ReadingReward = ({ streak, onClose }: { streak: number, onClose: () => void }) => {
+const ReadingReward = ({ 
+  streak, 
+  onClose, 
+  lives, 
+  milestone 
+}: { 
+  streak: number, 
+  onClose: () => void, 
+  lives: number, 
+  milestone: number 
+}) => {
   const [showConfetti, setShowConfetti] = useState(true);
  
   // Desativar confetti após alguns segundos
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowConfetti(false);
-    }, 5000);
+    }, 9000);
    
     return () => clearTimeout(timer);
   }, []);
@@ -212,21 +226,34 @@ const ReadingReward = ({ streak, onClose }: { streak: number, onClose: () => voi
          
           <div className="flex justify-center items-center gap-3 mb-4">
             <div className="text-center">
-              <div className="text-3xl font-bold text-brand-400">{streak}</div>
+              <div className="text-3xl font-bold text-brand-400">{streak} 🔥</div>
               <div className="text-xs uppercase text-gray-400">
                 { 
                 streak === 1 ? 'dia' : 'dias' 
               }
               </div>
             </div>
-           
+
             {streak > 0 && streak % 10 === 0 && (
               <div className="px-3 py-1.5 rounded-full bg-brand-900/50 border border-brand-700">
                 <span className="text-sm font-medium text-brand-400">+1 Nível</span>
               </div>
             )}
           </div>
-         
+
+          <div className="text-center">
+              <div className="text-3xl font-bold text-brand-400">{lives} ❤️</div>
+              <div className="text-xs uppercase text-gray-400">
+                { 
+                lives === 1 ? 'vida' : 'vidas' 
+              }
+              </div>
+            </div>
+
+          <p className="text-md mb-2 text-brand-300">
+            Faltam <strong>{milestone}</strong> dias para ganhar mais uma vida
+          </p>
+        
           <div className="flex justify-center mt-6">
             <button
               onClick={onClose}
@@ -243,7 +270,11 @@ const ReadingReward = ({ streak, onClose }: { streak: number, onClose: () => voi
 
 
 // Componente principal
-const BibleVerseOfTheDay: React.FC<BibleVerseOfTheDayProps> = ({ onRegisterReading }) => {
+const BibleVerseOfTheDay: React.FC<BibleVerseOfTheDayProps> = ({ 
+  onRegisterReading,  
+  refreshTrigger = 0,
+  onStreakChange, 
+}) => {
   const [verseData, setVerseData] = useState<BibleChapter | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -253,9 +284,13 @@ const BibleVerseOfTheDay: React.FC<BibleVerseOfTheDayProps> = ({ onRegisterReadi
   const [showReward, setShowReward] = useState(false);
   const [hasReadToday, setHasReadToday] = useState(false);
   const [highlightedVerse, setHighlightedVerse] = useState<number | null>(null);
- 
+  const [lives, setLives] = useState(0);
+  const [milestone, setMilestone] = useState(0);
+
   // Referência para scroll automático
   const selectedVerseRef = useRef<HTMLDivElement>(null);
+
+  const { user } = useAuth();
 
 
   useEffect(() => {
@@ -263,6 +298,7 @@ const BibleVerseOfTheDay: React.FC<BibleVerseOfTheDayProps> = ({ onRegisterReadi
       try {
         const response = await biblicalService.bibleChapterDay();
         setVerseData(response);
+
       } catch (erro: any) {
         setError(erro instanceof Error ? erro.message : "Erro desconhecido");
         toast.error(`Error: ${erro.message}`, {
@@ -278,6 +314,43 @@ const BibleVerseOfTheDay: React.FC<BibleVerseOfTheDayProps> = ({ onRegisterReadi
 
     fetchVerseOfTheDay();
   }, []);
+
+
+  // Efeito para carregar os dados do streak quando o componente montar ou atualizar
+  useEffect(() => {
+    const fetchStreakInfo = async () => {
+      if (user && user.user.user.id) {
+        try {
+          setLoading(true);
+          const response = await DailyReadingService.getStreakInfo(user.user.user.id);
+          
+          if( response && response.streakInfo ){
+            setStreak(response.streakInfo.currentStreak);
+            setLives(response.streakInfo.lives);
+            setHasReadToday(response.streakInfo.hasReadToday);
+            setMilestone(response.streakInfo.nextMilestone - response.streakInfo.currentStreak)
+          }
+
+          // Notificar componente pai sobre mudança no streak se necessário
+          if (onStreakChange) {
+            onStreakChange(response.streakInfo.currentStreak);
+          }
+        } catch (error: any) {
+          console.error('Erro ao buscar informações do streak:', error.message);
+          toast.error(`Error: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+
+    fetchStreakInfo();
+  }, [user, refreshTrigger]); // Adiciona refreshTrigger como dependência
 
 
   // Efeito para scroll quando um versículo é destacado
@@ -303,17 +376,14 @@ const BibleVerseOfTheDay: React.FC<BibleVerseOfTheDayProps> = ({ onRegisterReadi
 
   const handleRegisterReading = async () => {
     if (!verseData) return;
-   
+  
     try {
       await onRegisterReading({
         book: verseData.livro,
         chapter: verseData.capitulo,
         verse: verseData.verses[0].numero
       });
-     
-      // Atualizar state para mostrar recompensa
-      setStreak(prev => prev + 1);
-      setHasReadToday(true);
+
       setShowReward(true);
     } catch (error: any) {
       console.error("Erro ao registrar leitura:", error.message);
@@ -547,7 +617,12 @@ const BibleVerseOfTheDay: React.FC<BibleVerseOfTheDayProps> = ({ onRegisterReadi
       <AnimatePresence>
         {isModalOpen && showReward && (
           <ModalNew isOpen={isModalOpen} onClose={handleCloseReward}>
-            <ReadingReward streak={streak} onClose={handleCloseReward} />
+            <ReadingReward 
+              streak={streak} 
+              onClose={handleCloseReward} 
+              lives={lives}
+              milestone={milestone}
+              />
           </ModalNew>
         )}
       </AnimatePresence>
@@ -662,7 +737,7 @@ const BibleVerseOfTheDay: React.FC<BibleVerseOfTheDayProps> = ({ onRegisterReadi
                 </div> */}
                 
                 <div className="flex space-x-2">
-                  {!hasReadToday && (
+                  {hasReadToday === false && (
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -674,7 +749,7 @@ const BibleVerseOfTheDay: React.FC<BibleVerseOfTheDayProps> = ({ onRegisterReadi
                     </motion.button>
                   )}
                   
-                  {hasReadToday && (
+                  {hasReadToday === true && (
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}

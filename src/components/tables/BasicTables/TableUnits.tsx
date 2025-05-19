@@ -33,6 +33,7 @@ export default function EnhancedUnitsDisplay() {
   const [isLoading, setIsLoading] = useState(true);
 
   const { units, findUnits, userRole} = useAuth();
+
 console.log(openDropdownId)
   useEffect(() => {
     if (units) {
@@ -495,7 +496,7 @@ console.log(openDropdownId)
         <MembersModal
           isOpen={isMembersModalOpen}
           counselors={selectedUnit.counselors?.map((c) => (
-            { id: c.counselor.id, name: c.counselor.name })) || []}
+            { id: c.counselor.id, name: c.counselor.name, photoUrl: c.counselor.photoUrl })) || []}
           dbvs={selectedUnit.dbvs?.map((d) => (
             { id: d.dbv.id, name: d.dbv.name, photoUrl: d.dbv.photoUrl })) || []}
           onClose={() => setIsMembersModalOpen(false)}

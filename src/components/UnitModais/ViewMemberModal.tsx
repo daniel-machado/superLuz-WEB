@@ -45,7 +45,6 @@ const MembersModal: React.FC<Props> = ({
   const filteredCounselors = counselors.filter(c => 
     c.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
   const filteredDbvs = dbvs.filter(d => 
     d.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
