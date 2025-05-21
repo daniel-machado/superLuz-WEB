@@ -2,8 +2,9 @@ import { motion } from 'framer-motion';
 import { ChevronUp, ChevronDown, Crown } from 'lucide-react';
 import superUnidadeBiblica from '../../../assets/superUnidadeBiblica.png'
 import { useEffect, useState } from 'react';
-import Confetti from 'react-confetti';
-import { useWindowSize } from 'react-use';
+//import Confetti from 'react-confetti';
+//import { useWindowSize } from 'react-use';
+import confetti from "canvas-confetti";
 
 interface UnitRank {
   unitId: string;
@@ -22,8 +23,8 @@ interface PodiumProps {
 }
 
 const Podium = ({ topThree, handleOpenDetail }: PodiumProps) => {
-  const { width, height } = useWindowSize();
-  const [showConfetti, setShowConfetti] = useState(false);
+//  const { width, height } = useWindowSize();
+  const [_showConfetti, setShowConfetti] = useState(false);
 
   // // Define podium colors and animations
   // const podiumColors = [
@@ -31,6 +32,40 @@ const Podium = ({ topThree, handleOpenDetail }: PodiumProps) => {
   //   "bg-gradient-to-t from-gray-400 to-gray-300 h-16 sm:h-20",     // 2nd place
   //   "bg-gradient-to-t from-amber-700 to-amber-500 h-12 sm:h-16"    // 3rd place
   // ];
+
+  // Trigger confetti animation when modal opens
+        useEffect(() => {
+          setTimeout(() => {
+            setShowConfetti(true);
+            const end = Date.now() + 1000;
+            
+            const colors = ["#3b82f6", "#8b5cf6", "#ec4899", "#f59e0b"];
+            
+            (function frame() {
+              confetti({
+                particleCount: 2,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+                colors: colors
+              });
+              
+              confetti({
+                particleCount: 2,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+                colors: colors
+              });
+              
+              if (Date.now() < end) {
+                requestAnimationFrame(frame);
+              }
+            }());
+          }, 300);
+        }, []);
+  
+
     // Cores para os pódios
     const podiumColors = [
       'bg-gradient-to-t from-yellow-500 to-yellow-300 h-40', // Primeiro lugar
@@ -103,7 +138,7 @@ const Podium = ({ topThree, handleOpenDetail }: PodiumProps) => {
   
   return (
     <>
-      {showConfetti && (
+      {/* {showConfetti && (
         <Confetti
           width={width}
           height={height}
@@ -118,7 +153,7 @@ const Podium = ({ topThree, handleOpenDetail }: PodiumProps) => {
             h: 0
           }}
         />
-      )}
+      )} */}
       
       <motion.h2
         className="relative z-10 mb-6 text-xl sm:text-2xl font-bold text-center text-white mb-10"

@@ -36,7 +36,7 @@ const PhotosData = [
   {
     id: 3,
     src: "images/atividades/IMG3.jpg",
-    title: "Caminhada Ecológica",
+    title: "Caminhada",
     description: "A caminhada ecológica foi uma atividade de conscientização ambiental, onde os desbravadores aprenderam sobre a flora e fauna local.",
     category: "atividades",
     featured: false,
@@ -45,7 +45,7 @@ const PhotosData = [
   {
     id: 4,
     src: "images/atividades/IMG4.jpg",
-    title: "Dia de Aventuras",
+    title: "Fogo a lenha no acampamento",
     description: "Fogueira e cozinha ao ar livre",
     category: "aventura",
     featured: false,
@@ -54,7 +54,7 @@ const PhotosData = [
   {
     id: 5,
     src: "images/atividades/IMG5.jpg",
-    title: "Especialidade de Primeiros Socorros",
+    title: "Abertura do Luzeiros",
     description: "Primeira reunião do clube, muita alegria e diversão",
     category: "atividades",
     featured: true,
@@ -63,7 +63,7 @@ const PhotosData = [
   {
     id: 6,
     src: "images/atividades/IMG6.jpg",
-    title: "Investidura de Classes",
+    title: "Líder Máster Avançado",
     description: "Lenço, é oque nos move",
     category: "cerimonia",
     featured: false,
@@ -72,7 +72,7 @@ const PhotosData = [
   {
     id: 7,
     src: "images/atividades/IMG7.jpg",
-    title: "Projeto Comunitário",
+    title: "Abertura Luzeiros do norte",
     description: "Abertura do clube",
     category: "atividade",
     featured: true,
@@ -81,7 +81,7 @@ const PhotosData = [
   {
     id: 8,
     src: "images/atividades/IMG8.jpg",
-    title: "Olimpíadas dos Desbravadores",
+    title: "Momento de paz",
     description: "Campori, momento emocionante",
     category: "atividade",
     featured: false,
@@ -90,7 +90,7 @@ const PhotosData = [
   {
     id: 9,
     src: "images/atividades/IMG9.jpg",
-    title: "Especialidade de Culinária",
+    title: "Oração",
     description: "Campori, momento emocionante",
     category: "atividade",
     featured: false,
@@ -99,7 +99,7 @@ const PhotosData = [
   {
     id: 10,
     src: "images/atividades/IMG10.jpg",
-    title: "Acampamento de Inverno",
+    title: "Momento de comunhão",
     description: "Campori, momento emocionante",
     category: "cerimonia",
     featured: true,
@@ -108,7 +108,7 @@ const PhotosData = [
   {
     id: 11,
     src: "images/atividades/IMG11.jpg",
-    title: "Dia Mundial dos Desbravadores",
+    title: "Unidade Alfa na recreação",
     description: "Recreação na reunião do clube",
     category: "treinamento",
     featured: true,
@@ -117,7 +117,7 @@ const PhotosData = [
   {
     id: 12,
     src: "images/atividades/IMG12.jpg",
-    title: "Workshop de Nós e Amarras",
+    title: "Recreação com a unidade Órion",
     description: "Aprendendo técnicas essenciais de amarração para diversas situações.",
     category: "treinamento",
     featured: false,
@@ -126,7 +126,7 @@ const PhotosData = [
   {
     id: 13,
     src: "images/atividades/IMG13.jpg",
-    title: "Visita ao Museu de Ciências",
+    title: "Recreação com a unidade feminina",
     description: "Recreação na reunião do clube",
     category: "treinamento",
     featured: false,
@@ -135,7 +135,7 @@ const PhotosData = [
   {
     id: 14,
     src: "images/atividades/IMG14.jpg",
-    title: "Investidura de Líderes",
+    title: "Recreação da reunião",
     description: "Recreação na reunião do clube",
     category: "treinamento",
     featured: true,
@@ -144,7 +144,7 @@ const PhotosData = [
   {
     id: 15,
     src: "images/atividades/IMG15.jpg",
-    title: "Especialidade de Astronomia",
+    title: "Abertura campori ULB",
     description: "Campori, momento inesquecível",
     category: "acampamento",
     featured: false,
@@ -153,7 +153,7 @@ const PhotosData = [
   {
     id: 16,
     src: "images/atividades/IMG16.jpg",
-    title: "Acampamento de Verão",
+    title: "Vamos para o Egito",
     description: "Maior evento do ano com uma semana de aventuras e aprendizado.",
     category: "acampamento",
     featured: true,
@@ -162,7 +162,7 @@ const PhotosData = [
   {
     id: 17,
     src: "images/atividades/IMG17.jpg",
-    title: "Ação Social",
+    title: "Nosso Portal",
     description: "NOsso portal no campori ULB",
     category: "projeto",
     featured: false,
@@ -171,7 +171,7 @@ const PhotosData = [
   {
     id: 18,
     src: "images/atividades/IMG18.jpg",
-    title: "Especialidade de Sobrevivência",
+    title: "Momentos especiais ULB",
     description: "Momento de alegria, abertura do campori",
     category: "evento",
     featured: true,
@@ -180,7 +180,7 @@ const PhotosData = [
   {
     id: 19,
     src: "images/atividades/IMG19.jpg",
-    title: "Desfile Cívico",
+    title: "Concurso de ordem unida no campori ULB",
     description: "Evolução e ordem unida sendo apresentado para todo o campori",
     category: "evento",
     featured: false,
@@ -189,7 +189,7 @@ const PhotosData = [
   {
     id: 20,
     src: "images/atividades/IMG20.jpg",
-    title: "Confraternização de Fim de Ano",
+    title: "Campori ULB 2025",
     description: "O cantor veio tirar foto com o Luzeiros do Norte",
     category: "evento",
     featured: true,

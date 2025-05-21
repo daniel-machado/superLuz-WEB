@@ -15,7 +15,10 @@ import {
   BookOpen,
   Layers,
   User,
-  AlertTriangle
+  AlertTriangle,
+  Code,
+  LucideAxis3D,
+  ApertureIcon
 } from 'lucide-react';
 import Input from '../../components/form/input/InputField';
 import Button from '../../components/ui/button/Button';
@@ -792,7 +795,7 @@ const SpecialtyManager = () => {
           <div className="bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-700">
             <div className="p-5">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <h2 className="text-xl font-semibold text-white">Especialidades dos Desbravadores</h2>
+                <h2 className="text-xl font-semibold text-white">Especialidades</h2>
                 
                 {(userRole === 'admin' || userRole === 'director' || userRole === 'lead') && (
                     <motion.div
@@ -874,11 +877,25 @@ const SpecialtyManager = () => {
                         <span className="whitespace-nowrap">Aprovados</span>
                       </Button>
                       <Button
-                        onClick={() => setActiveTab('rejected')}
-                        className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm transition-all duration-300 rounded-none flex items-center ${activeTab === 'rejected' ? 'bg-red-600 text-white' : 'bg-transparent text-gray-300 hover:bg-gray-600'}`}
+                        onClick={() => setActiveTab('waiting_by_counselor')}
+                        className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm transition-all duration-300 rounded-none flex items-center ${activeTab === 'waiting_by_counselor' ? 'bg-purple-600 text-white' : 'bg-transparent text-gray-300 hover:bg-gray-600'}`}
                       >
-                        <XCircle size={12} className="mr-1 sm:mr-2" />
-                        <span className="whitespace-nowrap">Rejeitados</span>
+                        <Code size={12} className="mr-1 sm:mr-2" />
+                        <span className="whitespace-nowrap">Conselheiro</span>
+                      </Button>
+                      <Button
+                        onClick={() => setActiveTab('waiting_by_lead')}
+                        className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm transition-all duration-300 rounded-none flex items-center ${activeTab === 'waiting_by_lead' ? 'bg-purple-600 text-white' : 'bg-transparent text-gray-300 hover:bg-gray-600'}`}
+                      >
+                        <LucideAxis3D size={12} className="mr-1 sm:mr-2" />
+                        <span className="whitespace-nowrap">Líder</span>
+                      </Button>
+                      <Button
+                        onClick={() => setActiveTab('waiting_by_director')}
+                        className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm transition-all duration-300 rounded-none flex items-center ${activeTab === 'waiting_by_director' ? 'bg-purple-600 text-white' : 'bg-transparent text-gray-300 hover:bg-gray-600'}`}
+                      >
+                        <ApertureIcon size={12} className="mr-1 sm:mr-2" />
+                        <span className="whitespace-nowrap">Diretor</span>
                       </Button>
                     </div>
                     
@@ -1603,7 +1620,7 @@ const formatDate = (dateStr: string) => {
                             <span>Enviar Relatório</span>
                           </Button>
                         )}
-                       
+                      
                         {/* Approve Button */}
                         {canApprove(item) && (
                           <Button
@@ -1615,7 +1632,7 @@ const formatDate = (dateStr: string) => {
                             <span>Aprovar / Rejeitar</span>
                           </Button>
                         )}
-                       
+                      
                         {/* Remove Button */}
                         {(userLogged?.user.user.role === 'admin' || userLogged?.user.user.role === "director") && (
                           <Button
@@ -1828,29 +1845,29 @@ const EvaluateApproveRejectModal = ({
           Sua Decisão
         </label>
         
-<div className="flex gap-4">
-      <Button
-        variant={decision === 'reject' ? 'primary' : 'outline'}
-        onClick={() => setDecision('reject')}
-        className={`flex-1 flex items-center justify-center p-4 ${
-          decision === 'reject' ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-700 hover:bg-gray-600'
-        } rounded-lg transition-colors duration-200`}
-      >
-        <XCircle className="mr-2" size={18} />
-        Rejeitar
-      </Button>
+    <div className="flex gap-4">
+        <Button
+          variant={decision === 'reject' ? 'primary' : 'outline'}
+          onClick={() => setDecision('reject')}
+          className={`flex-1 flex items-center justify-center p-4 ${
+          decision === 'reject' ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-700 hover:bg-gray-600'
+          } rounded-lg transition-colors duration-200`}
+        >
+          <XCircle className="mr-2" size={18} />
+          Rejeitar
+        </Button>
 
-      <Button
-        variant={decision === 'approve' ? 'primary' : 'outline'}
-        onClick={() => setDecision('approve')}
-        className={`flex-1 flex items-center justify-center p-4 ${
-          decision === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-700 hover:bg-gray-600'
-        } rounded-lg transition-colors duration-200`}
-      >
-        <CheckCircle className="mr-2" size={18} />
-        Aprovar
-      </Button>
-    </div>
+        <Button
+          variant={decision === 'approve' ? 'primary' : 'outline'}
+          onClick={() => setDecision('approve')}
+          className={`flex-1 flex items-center justify-center p-4 ${
+          decision === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-700 hover:bg-gray-600'
+          } rounded-lg transition-colors duration-200`}
+        >
+          <CheckCircle className="mr-2" size={18} />
+          Aprovar
+        </Button>
+      </div>
 
       </div>
       

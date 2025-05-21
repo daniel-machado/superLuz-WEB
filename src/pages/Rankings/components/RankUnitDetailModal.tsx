@@ -169,10 +169,15 @@ const RankUnitDetailModal: React.FC<RankUnitDetailModalProps> = ({ unit, isOpen,
     : 0;
   
   // Get level info for current unit
-  const levelInfo = getAchievementLevel(Math.floor(Number(unit.totalScore)).toLocaleString('pt-BR'));
+  //const levelInfo = getAchievementLevel(Math.floor(Number(unit.totalScore)).toLocaleString('pt-BR'));
   
   // Calculate mock progression to next level
-  const currentScore = parseFloat(Math.floor(Number(unit.totalScore)).toLocaleString('pt-BR'));
+  //const currentScore = parseFloat(Math.floor(Number(unit.totalScore)).toLocaleString('pt-BR'));
+  
+  const levelInfo = getAchievementLevel(unit.totalScore); // sem toLocaleString
+
+  const currentScore = Number(unit.totalScore); // sem parseFloat e sem toLocaleString
+
   let nextLevelScore = 0;
   let nextLevelName = "";
   

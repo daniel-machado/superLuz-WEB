@@ -3,14 +3,25 @@ import { useAuth } from "../../context/AuthContext";
 import Card from "../../components/ui/Card/Card";
 import Button from "../../components/ui/button/Button";
 import { authService } from "../../services/authService";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import toast from "react-hot-toast";
 import BibleVerseOfTheDay from "../../components/BibleVerseOfTheDay/BibleVerdeDay";
 import { DailyReadingService } from "../../services/dailyVerseBiblicalService";
 import StreakFire from "../../components/StreakFire/StreakFire";
 import Avatar from "../../components/ui/avatar/Avatar";
+import BirthdayCard from "../../components/BirthDayCard/BirthDayCard";
+import { userService } from "../../services/userService";
 
+interface IUser {
+  id: string;
+  birthDate: string;
+  email: string;
+  name: string;
+  photoUrl: string;
+  role: string;
+  status: string;
+}
 
 export default function Home() {
   const [_loading, setLoading] = useState(false);
@@ -21,12 +32,37 @@ export default function Home() {
     message: '',
     type: '' // 'success' | 'error'
   });
-
+  const [_isLoading, setIsLoading] = useState(false);
+  const [users, setUsers] = useState<IUser[]>([]);
 
   const navigate = useNavigate();
 
+  const fetchUsers = async () => {
+    setIsLoading(true);
+    try {
+      
+  const data = await userService.getAllUsers();
+    const filteredUsers = data.map((user: any) => ({
+      id: user.id,
+      name: user.name,
+      birthDate: user.birthDate,
+      role: user.role,
+      photoUrl: user.photoUrl,
+      status: user.status,
+    }));
+    setUsers(filteredUsers);
+    } catch (error: any) {
+      console.log(error.message)
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  if (!user || !user.user) {
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  if ((!user || !user.user)) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="animate-pulse text-center">
@@ -133,7 +169,6 @@ export default function Home() {
     // Você pode disparar alguma lógica adicional quando o streak mudar
   };
 
-
   return (
     <>
       <PageMeta
@@ -172,7 +207,7 @@ export default function Home() {
         
         {/* StreakFire componente à direita */}
         <div className="w-full sm:w-auto mt-4 sm:mt-0">
-          {user.user.user.role !== "pending" && (
+          {(user.user.user.role === "admin" || user.user.user.role === "director") && (
               <StreakFire
                 className="w-full justify-center sm:justify-end" 
                 onStreakChange={handleStreakChange}
@@ -182,7 +217,7 @@ export default function Home() {
           
         </div>
       </div>
-      
+
       {/* Status de Leitura */}
       {readingStatus.message && (
         <div className={`p-3 rounded-lg mb-4 transition-all duration-300 ${
@@ -249,6 +284,12 @@ export default function Home() {
           />
         </div>
       )}
+      
+      {/* Card de Aniversário */}
+      <div className="mt-3 mb-3" >
+      <BirthdayCard users={users} />
+      </div>
+
     </>
   );
 }

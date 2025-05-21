@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Trophy, Star, Award, Medal, User, ShieldCheck } from "lucide-react";
 import { Modal } from "../../../../components/ui/modal";
+import confetti from "canvas-confetti";
 
 
 // Interface for the unit data
@@ -24,6 +25,7 @@ interface RankIndividualDetailModalProps {
 
 const RankIndividualDetailModal = ({ ranking, isOpen, onClose }: RankIndividualDetailModalProps) => {
   const [isClosing, setIsClosing] = useState(false);
+  const [_showConfetti, setShowConfetti] = useState(false);
 
 
   // Close with escape key
@@ -45,6 +47,39 @@ const RankIndividualDetailModal = ({ ranking, isOpen, onClose }: RankIndividualD
     setIsClosing(true);
     onClose();
   };
+
+  // Trigger confetti animation when modal opens
+    useEffect(() => {
+      setTimeout(() => {
+        setShowConfetti(true);
+        const end = Date.now() + 1000;
+        
+        const colors = ["#3b82f6", "#8b5cf6", "#ec4899", "#f59e0b"];
+        
+        (function frame() {
+          confetti({
+            particleCount: 2,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 },
+            colors: colors
+          });
+          
+          confetti({
+            particleCount: 2,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 },
+            colors: colors
+          });
+          
+          if (Date.now() < end) {
+            requestAnimationFrame(frame);
+          }
+        }());
+      }, 300);
+    }, []);
+  
 
 
   // Format score with comma as decimal separator (e.g., "800.00" to "800,00")
@@ -70,6 +105,33 @@ const RankIndividualDetailModal = ({ ranking, isOpen, onClose }: RankIndividualD
 
   const badge = getBadgeInfo(Math.floor(Number(ranking.totalScore)).toLocaleString('pt-BR'));
   const BadgeIcon = badge.icon;
+
+  const levelInfo = getBadgeInfo(ranking.totalScore); // sem toLocaleString
+
+  const currentScore = Number(ranking.totalScore); // sem parseFloat e sem toLocaleString
+
+  let nextLevelScore = 0;
+  let nextLevelName = "";
+  
+  if (currentScore < 1000) {
+    nextLevelScore = 1000;
+    nextLevelName = "Prata";
+  } else if (currentScore < 2500) {
+    nextLevelScore = 2500;
+    nextLevelName = "Ouro";
+  } else if (currentScore < 4000) {
+    nextLevelScore = 4000;
+    nextLevelName = "Platina";
+  } else if (currentScore < 7000) {
+    nextLevelScore = 7000;
+    nextLevelName = "Diamante";
+  } else {
+    // Already at highest level
+    nextLevelScore = currentScore;
+    nextLevelName = "Máximo";
+  }
+  
+  const progressToNextLevel = Math.min(Math.round((currentScore / nextLevelScore) * 100), 100);
 
 
   return (
@@ -143,6 +205,27 @@ const RankIndividualDetailModal = ({ ranking, isOpen, onClose }: RankIndividualD
                 Nível {badge.name}
               </motion.div>
             </div>
+
+            {/* Progress to next level */}
+            <motion.div 
+              className="mb-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+            >
+              <div className="flex justify-between mb-1 items-center">
+                <span className="text-gray-300 text-sm">Progresso para {nextLevelName}</span>
+                <span className="text-gray-300 text-sm font-medium">{progressToNextLevel}%</span>
+              </div>
+              <div className="w-full h-3 bg-gray-800 rounded-full overflow-hidden">
+                <motion.div
+                  className={`h-full bg-gradient-to-r ${levelInfo.color}`}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progressToNextLevel}%` }}
+                  transition={{ duration: 1, delay: 0.7 }}
+                />
+              </div>
+            </motion.div>
 
 
             {/* Score section */}

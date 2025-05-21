@@ -199,7 +199,7 @@ export default function RankingUnits() {
             }}
             className="bg-gray-900 rounded-xl overflow-hidden shadow-2xl"
           >
-            <AnimatePresence mode="wait" initial={isFirstRender}>
+            <AnimatePresence mode="wait">
               {activeTab === "podium" ? (
                 <motion.div
                   key="podium-view"

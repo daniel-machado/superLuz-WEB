@@ -449,9 +449,9 @@ export const AnswerModal: React.FC<AnswerModalProps> = ({
                                   className="form-radio h-4 w-4 text-blue-600 dark:text-blue-400"
                                 /> */}
                                 <Radio
-                                  id="radio1"
+                                  id={`sim_${question.id}`}
                                   name={`yes_no_${question.id}`}
-                                  value="option1"
+                                  value="sim"
                                   checked={answers[question.id]?.text === 'sim'}
                                   onChange={() => onInputChange(question.id, 'sim', 'text')}
                                   label="Sim"
@@ -467,9 +467,9 @@ export const AnswerModal: React.FC<AnswerModalProps> = ({
                                   className="form-radio h-4 w-4 text-blue-600 dark:text-blue-400"
                                 /> */}
                                 <Radio
-                                  id="radio2"
+                                  id={`nao_${question.id}`}
                                   name={`yes_no_${question.id}`}
-                                  value="option2"
+                                  value="não"
                                   checked={answers[question.id]?.text === 'não'}
                                   onChange={() => onInputChange(question.id, 'não', 'text')}
                                   label="Não"

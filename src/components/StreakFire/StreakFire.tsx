@@ -41,6 +41,7 @@ const StreakFire: React.FC<StreakFireProps> = ({
             setHasReadToday(response.streakInfo.hasReadToday);
           }
 
+          console.log(response.streakInfo)
           // Notificar componente pai sobre mudança no streak se necessário
           if (onStreakChange) {
             onStreakChange(response.streakInfo.currentStreak);

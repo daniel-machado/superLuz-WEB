@@ -180,7 +180,7 @@ const RankingIndividual = () => {
             }}
             className="bg-gray-900 rounded-xl overflow-hidden shadow-2xl"
           >
-            <AnimatePresence mode="wait" initial={false}>
+            <AnimatePresence mode="wait">
               {activeTab === "podium" ? (
                 <motion.div
                   key="podium-view"
@@ -193,7 +193,7 @@ const RankingIndividual = () => {
                 >
                   {/* Podium Section */}
                   <motion.div className="relative px-4 pt-5 pb-5 sm:pb-5 overflow-hidden bg-gradient-to-b">
-                    <AnimatedBackground />
+                      <AnimatedBackground />
                       <AnimatedBackgroundStars />
                       <AnimatedConfetti />
                       <AnimatedBackgroundOficial/>
