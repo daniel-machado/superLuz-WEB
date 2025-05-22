@@ -188,7 +188,7 @@ export default function Home() {
                 :  
                   <Avatar
                     src={user.user.user.photoUrl}
-                    size="large"
+                    size="xlarge"
                     status="online"
                   />
               }

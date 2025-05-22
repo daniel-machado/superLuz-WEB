@@ -271,7 +271,7 @@ const ReadingReward = ({
 
 // Componente principal
 const BibleVerseOfTheDay: React.FC<BibleVerseOfTheDayProps> = ({ 
-  //onRegisterReading,  
+  onRegisterReading,  
   refreshTrigger = 0,
   onStreakChange, 
 }) => {
@@ -375,31 +375,31 @@ const BibleVerseOfTheDay: React.FC<BibleVerseOfTheDayProps> = ({
 
 
   const handleRegisterReading = async () => {
-    // if (!verseData) return;
+    if (!verseData) return;
   
-    // try {
-    //   await onRegisterReading({
-    //     book: verseData.livro,
-    //     chapter: verseData.capitulo,
-    //     verse: verseData.verses[0].numero
-    //   });
+    try {
+      await onRegisterReading({
+        book: verseData.livro,
+        chapter: verseData.capitulo,
+        verse: verseData.verses[0].numero
+      });
 
-    //   setShowReward(true);
-    // } catch (error: any) {
-    //   console.error("Erro ao registrar leitura:", error.message);
-    //   toast.error(`Error ao registrar leitura: ${error.message}`, {
-    //       position: 'bottom-right',
-    //       icon: '🚫',
-    //       duration: 5000,
-    //     });
-    // }
-    setIsModalOpen(false);
-    toast.success(`Parabéns pela leitura (FOGO EM MANUTENÇÃO)`, {
-      position: 'bottom-right',
-      icon: '🚀',
-      duration: 8000,
+      setShowReward(true);
+    } catch (error: any) {
+      console.error("Erro ao registrar leitura:", error.message);
+      toast.error(`Error ao registrar leitura: ${error.message}`, {
+          position: 'bottom-right',
+          icon: '🚫',
+          duration: 5000,
+        });
+    }
+    // setIsModalOpen(false);
+    // toast.success(`Parabéns pela leitura (FOGO EM MANUTENÇÃO)`, {
+    //   position: 'bottom-right',
+    //   icon: '🚀',
+    //   duration: 8000,
       
-    });
+    // });
     
   };
 

@@ -32,21 +32,21 @@ const statusColorClasses = {
 const Avatar: React.FC<AvatarProps> = ({
   src,
   alt = "User Avatar",
-  size = "medium",
+  size = "large",
   status = "none",
 }) => {
   return (
-    <div className={`relative  rounded-full ${sizeClasses[size]}`}>
+    <div className={`relative  rounded-full overflow-visible ${sizeClasses[size]}`}>
       {/* Avatar Image */}
-      <img src={src} alt={alt} className="object-cover rounded-full" />
+      <img src={src} alt={alt} className={`object-cover rounded-full ${sizeClasses[size]}`} />
 
       {/* Status Indicator */}
       {status !== "none" && (
         <span
-          className={`absolute bottom-0 right-0 rounded-full border-[1.5px] border-white dark:border-gray-900 ${
+          className={`absolute bottom-0 right-0 translate-x-1/19 translate-y-1/9 rounded-full border-[1.5px] border-white dark:border-gray-900 shadow-md ${
             statusSizeClasses[size]
           } ${statusColorClasses[status] || ""}`}
-        ></span>
+        />
       )}
     </div>
   );
