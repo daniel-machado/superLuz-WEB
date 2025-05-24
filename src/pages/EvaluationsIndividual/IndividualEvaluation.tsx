@@ -833,7 +833,7 @@ export default function IndividualEvaluations() {
                                                       initial={{ opacity: 0 }}
                                                       animate={{ opacity: 1 }}
                                                       //onClick={() => handleOpenEdit(evaluation)}
-                                                      onClick={() => (userRole === "admin" || userRole === "director" || userRole === "counselor") 
+                                                      onClick={() => (userRole === "admin" || userRole === "director") 
                                                         ? handleOpenEdit(evaluation)
                                                         : {}
                                                       }
@@ -882,7 +882,7 @@ export default function IndividualEvaluations() {
                                                       </div>
 
 
-                                                      {(userRole === "admin" || userRole === "director" || userRole === "counselor") && (
+                                                      {(userRole === "admin" || userRole === "director") && (
                                                         <div className="mt-3 pt-3 border-t border-gray-700 flex justify-center">
                                                           <div className="flex gap-2">
                                                             <Button

@@ -403,6 +403,35 @@ const BibleVerseOfTheDay: React.FC<BibleVerseOfTheDayProps> = ({
     
   };
 
+  //  const handleRegisterReading2 = async () => {
+  //   if (!verseData) return;
+  
+  //   try {
+  //     await onRegisterReading({
+  //       book: verseData.livro,
+  //       chapter: verseData.capitulo,
+  //       verse: verseData.verses[0].numero
+  //     });
+
+  //     setShowReward(true);
+  //   } catch (error: any) {
+  //     console.error("Erro ao registrar leitura:", error.message);
+  //     toast.error(`Error ao registrar leitura: ${error.message}`, {
+  //         position: 'bottom-right',
+  //         icon: '🚫',
+  //         duration: 5000,
+  //       });
+  //   }
+  //   // setIsModalOpen(false);
+  //   // toast.success(`Parabéns pela leitura (FOGO EM MANUTENÇÃO)`, {
+  //   //   position: 'bottom-right',
+  //   //   icon: '🚀',
+  //   //   duration: 8000,
+      
+  //   // });
+    
+  // };
+
   // Fechar modal de recompensa
   const handleCloseReward = () => {
     setShowReward(false);
@@ -768,6 +797,37 @@ const BibleVerseOfTheDay: React.FC<BibleVerseOfTheDayProps> = ({
                     </motion.button>
                   )}
                 </div>
+
+
+                {/* <div className="flex space-x-2">
+                  {hasReadToday === false && (user?.user.user.role === "admin") &&(
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleRegisterReading2}
+                      className="px-4 py-2 bg-gradient-to-r from-brand-600 to-brand-700 hover:to-brand-600 text-white rounded-lg font-medium text-sm flex items-center shadow-lg shadow-brand-900/30 transition-all"
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Marcar como lidooooooo
+                    </motion.button>
+                  )}
+                  
+                  {hasReadToday === true && (user?.user.user.role === "admin") &&(
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      disabled
+                      className="px-4 py-2 bg-green-900/40 text-green-400 rounded-lg font-medium text-sm flex items-center cursor-not-allowed"
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Leitura registradaoooooo
+                    </motion.button>
+                  )}
+                </div> */}
+
+
+
+
               </div>
             </div>
           </ModalNew>

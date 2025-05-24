@@ -34,7 +34,7 @@ export const individualEvaluationService = {
   updateEvaluation: async (evaluationId: string, payload: any): Promise<any> => {
     const token = localStorage.getItem('token')
     try {
-      const response = await api.put(`individual-evaluation/update/${evaluationId}`, {...payload}, {
+      const response = await api.patch(`individual-evaluation/update/${evaluationId}`, {...payload}, {
         headers: { 
           "Content-Type": "application/json", 
           Authorization: `Bearer ${token}`

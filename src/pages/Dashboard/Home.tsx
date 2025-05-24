@@ -207,7 +207,7 @@ export default function Home() {
         
         {/* StreakFire componente à direita */}
         <div className="w-full sm:w-auto mt-4 sm:mt-0">
-          {(user.user.user.role === "admin" || user.user.user.role === "director") && (
+          {(user.user.user.role !== "pending") && (
               <StreakFire
                 className="w-full justify-center sm:justify-end" 
                 onStreakChange={handleStreakChange}
