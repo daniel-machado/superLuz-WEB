@@ -93,20 +93,35 @@ const RankIndividualDetailModal = ({ ranking, isOpen, onClose }: RankIndividualD
 
 
   // Badge calculation based on score
-  const getBadgeInfo = (score: string) => {
-    const numScore = parseFloat(score);
-    if (numScore >= 7000) return { name: "Diamante", color: "from-blue-400 to-indigo-600", icon: Trophy };
-    if (numScore >= 4000) return { name: "Platina", color: "from-indigo-400 to-purple-600", icon: Star };
-    if (numScore >= 2500) return { name: "Ouro", color: "from-yellow-400 to-amber-600", icon: Award };
-    if (numScore >= 1000) return { name: "Prata", color: "from-gray-400 to-slate-500", icon: Medal };
+  // const getBadgeInfo = (score: string) => {
+  //   const numScore = parseFloat(score);
+  //   if (numScore >= 7000) return { name: "Diamante", color: "from-blue-400 to-indigo-600", icon: Trophy };
+  //   if (numScore >= 4000) return { name: "Platina", color: "from-indigo-400 to-purple-600", icon: Star };
+  //   if (numScore >= 2500) return { name: "Ouro", color: "from-yellow-400 to-amber-600", icon: Award };
+  //   if (numScore >= 1000) return { name: "Prata", color: "from-gray-400 to-slate-500", icon: Medal };
+  //   return { name: "Bronze", color: "from-orange-400 to-amber-700", icon: ShieldCheck };
+  // };
+
+  
+  // Badge calculation based on score
+  const getBadgeInfo = (score: number) => {
+    if (score >= 7000) return { name: "Diamante", color: "from-blue-400 to-indigo-600", icon: Trophy };
+    if (score >= 4000) return { name: "Platina", color: "from-indigo-400 to-purple-600", icon: Star };
+    if (score >= 2500) return { name: "Ouro", color: "from-yellow-400 to-amber-600", icon: Award };
+    if (score >= 1000) return { name: "Prata", color: "from-gray-400 to-slate-500", icon: Medal };
     return { name: "Bronze", color: "from-orange-400 to-amber-700", icon: ShieldCheck };
   };
 
 
-  const badge = getBadgeInfo(Math.floor(Number(ranking.totalScore)).toLocaleString('pt-BR'));
-  const BadgeIcon = badge.icon;
 
-  const levelInfo = getBadgeInfo(ranking.totalScore); // sem toLocaleString
+  // const badge = getBadgeInfo(Math.floor(Number(ranking.totalScore)).toLocaleString('pt-BR'));
+  // const BadgeIcon = badge.icon;
+  
+const badge = getBadgeInfo(Math.floor(Number(ranking.totalScore)));
+const BadgeIcon = badge.icon;
+
+
+  const levelInfo = getBadgeInfo(Math.floor(Number(ranking.totalScore))); // sem toLocaleString
 
   const currentScore = Number(ranking.totalScore); // sem parseFloat e sem toLocaleString
 
