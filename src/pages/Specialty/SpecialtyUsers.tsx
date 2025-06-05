@@ -1441,6 +1441,28 @@ const formatDate = (dateStr: string) => {
                   >
                     <div className="pt-3 space-y-3 border-t border-gray-700 mt-3">
                       {/* Status Information - Adjusted for better mobile display */}
+                      
+                      {item.rejectionComments && item.rejectionComments.length > 0 && (item.report && item.report.length <= 0) && (
+                        <div className="p-2 sm:p-3 bg-gray-750 rounded-lg text-xs text-gray-300 mt-2">
+                          <div className="flex items-center mb-1.5">
+                            <FileText size={14} className="text-red-300 mr-2" />
+                            <span className="font-semibold text-red-300">Reprovado:</span>
+                          </div>
+                          {item.rejectionComments.map((comment, index) => (
+                            <div key={index} className="mb-2 border-b border-gray-600 pb-2 last:border-b-0">
+                              <p className="text-xs sm:text-sm">{comment[0]}</p>
+                              <div className="flex justify-between">
+                                <p className="text-right text-gray-500 text-xs mt-2">{comment[2]}</p>
+                                <div className="text-right text-gray-500 text-xs mt-2">
+                                  {new Date(comment[1]).toLocaleString()}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+
                       <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-y-2 gap-x-2 text-xs">
                         <div className="flex items-center gap-1.5">
                           <div className={`w-2 h-2 rounded-full ${item.isQuizApproved ? 'bg-green-500' : 'bg-gray-500'}`} />

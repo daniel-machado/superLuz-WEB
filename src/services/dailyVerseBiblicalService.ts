@@ -32,20 +32,22 @@ interface StreakInfoResponse {
 
 // Interface para o histórico de leituras
 interface ReadingHistory {
-  readings: Array<{
-    id: string;
-    userId: string;
-    date: string;
-    readAt: string;
-    verse: string;
-    book: string;
-    chapter: string;
-    pointsEarned: number;
-    life: number;
-    streak: number;
-  }>;
-  totalDays: number;
-  longestStreak: number;
+  result: {
+    readings: Array<{
+      id: string;
+      userId: string;
+      date: string;
+      readAt: string;
+      verse: string;
+      book: string;
+      chapter: string;
+      pointsEarned: number;
+      life: number;
+      streak: number;
+    }>;
+    totalDays: number;
+    longestStreak: number;
+  }
 }
 
 

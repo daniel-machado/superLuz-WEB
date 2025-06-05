@@ -241,7 +241,7 @@ import { getEvaluationStatusIcon } from "./getEvaluationStatusIcon"
 import { Modal } from '../../../components/ui/modal';
 import TextArea from '../../../components/form/input/TextArea';
 import Radio from '../../../components/form/input/Radio';
-import Input from '../../../components/form/input/InputField';
+//import Input from '../../../components/form/input/InputField';
 import { useAuth } from '../../../context/AuthContext';
 import Label from '../../../components/form/Label';
 import RangeSlider from './RangeSlider'
@@ -395,12 +395,11 @@ export const AnswerModal: React.FC<AnswerModalProps> = ({
                               />
 
                               <Label>Observação</Label>
-                              <Input
-                                type="text"
+                              <TextArea
                                 placeholder="Opcional"
                                 className="dark:bg-dark-900"
                                 value={answers[question.id]?.observation || ''}
-                                onChange={(e) => onInputChange(question.id, e.target.value, 'observation')}
+                                onChange={(e: string ) => onInputChange(question.id, e, 'observation')}
                                 disabled={!!(answers[question.id]?.id && isEditable)}
                               />
 
@@ -426,12 +425,11 @@ export const AnswerModal: React.FC<AnswerModalProps> = ({
                                   disabled={!!(answers[question.id] && answers[question.id].id && isEditable)}
                                 />
                                 <Label>Observação</Label>
-                                  <Input
-                                    type="text"
+                                  <TextArea
                                     placeholder="Opcional"
                                     className="dark:bg-dark-900"
                                     value={answers[question.id]?.observation || ''}
-                                    onChange={(e) => onInputChange(question.id, e.target.value, 'observation')}
+                                    onChange={(e: string) => onInputChange(question.id, e, 'observation')}
                                     disabled={!!(answers[question.id]?.id && isEditable)}
                                   />
                             </>
@@ -478,12 +476,11 @@ export const AnswerModal: React.FC<AnswerModalProps> = ({
                                 />                     
                             </div>
                               <Label>Observação</Label>
-                                <Input
-                                  type="text"
+                                <TextArea
                                   placeholder="Opcional"
                                   className="dark:bg-dark-900"
                                   value={answers[question.id]?.observation || ''}
-                                  onChange={(e) => onInputChange(question.id, e.target.value, 'observation')}
+                                  onChange={(e: string) => onInputChange(question.id, e, 'observation')}
                                   disabled={!!(answers[question.id]?.id && isEditable)}
                                 />
                             </>

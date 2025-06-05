@@ -9,9 +9,30 @@ import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
 import { uploadImage } from "../../services/uploadService";
 import { userService } from "../../services/userService";
-import { User2, Save, X } from "lucide-react";
+import { User2, Save, X, Flame, Calendar, Star, BookOpen, Zap, Trophy } from "lucide-react";
 import StreakFireProfile from "./StreakFireProfile";
+import { DailyReadingService } from "../../services/dailyVerseBiblicalService";
 
+type Reading = {
+    id: string;
+    userId: string;
+    date: string;
+    readAt: string;
+    verse: string;
+    book: string;
+    chapter: string;
+    pointsEarned: number;
+    life: number;
+    streak: number;
+};
+
+type ReadingHistory = {
+  result: {
+    readings: Reading[];
+    totalDays: number;
+    longestStreak: number;
+  }
+};
 
 export default function UserMetaCard() {
     const { user, setUser } = useAuth();
@@ -28,9 +49,26 @@ export default function UserMetaCard() {
     
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [previewImage, setPreviewImage] = useState(userData.photoUrl);
+    const [isOpenDetailsModal, setIsOpenDetailsModal] = useState(false);
+    const [animateContent, setAnimateContent] = useState(false);
+    const [streakData, setStreakData] = useState<ReadingHistory>({
+      result: {
+        readings: [],
+        totalDays: 0,
+        longestStreak: 0
+      }
+    });
     
     const { isOpen, openModal, closeModal } = useModal();
-    
+
+    useEffect(() => {
+      if (user?.user.user.id) {
+        DailyReadingService.getReadingHistory(user.user.user.id).then((response) => {
+          setStreakData({ result: response.result });
+        });
+      }
+    }, []);
+
     useEffect(() => {
         // Update local state when user data changes
         if (user?.user.user) {
@@ -149,6 +187,32 @@ export default function UserMetaCard() {
             [name]: value
         }));
     };
+
+  const totalPoints = streakData.result.readings.reduce((sum, reading) => sum + reading.pointsEarned, 0);
+
+  useEffect(() => {
+    if (isOpenDetailsModal) {
+      setTimeout(() => setAnimateContent(true), 500);
+    } else {
+      setAnimateContent(false);
+    }
+  }, [isOpenDetailsModal]);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR', { 
+      day: '2-digit', 
+      month: '2-digit',
+      timeZone: 'UTC'
+    });
+  };
+
+  // const FlameIcon = ({ className }: { className?: string }) => (
+  //   <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+  //     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+  //   </svg>
+  // );
+
     
     return (
         <>
@@ -171,6 +235,12 @@ export default function UserMetaCard() {
                               </div>
 
                               <StreakFireProfile />
+                              <button
+                                onClick={() => setIsOpenDetailsModal(true)}
+                                className="text-orange-400 hover:text-orange-300 transition-colors text-sm"
+                              >
+                                Informações do fogo
+                              </button>
                             </div>
 
                             <div className="flex flex-col items-center gap-2 xl:items-start">    
@@ -488,6 +558,166 @@ export default function UserMetaCard() {
                     </div>
                 </div>
             </Modal>
+
+      {/* Modal Details StreakFire*/}
+      {isOpenDetailsModal && (
+        <Modal isOpen={isOpenDetailsModal} onClose={() => setIsOpenDetailsModal(false)} className="max-w-[700px] m-4">
+        <div className="fixed custom-scrollbar inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div 
+            className={`relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl shadow-2xl border border-gray-700/50 transform transition-all duration-500 ${
+              animateContent ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+            }`}
+          >
+            {/* Header com animação de fogo */}
+            <div className="relative p-6 pb-4 border-b border-gray-700/50 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 via-red-500/20 to-yellow-500/20 animate-pulse"></div>
+              <div className="relative flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <div className="absolute -inset-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-full blur opacity-50 animate-pulse"></div>
+                    <div className="relative bg-gradient-to-r from-orange-500 to-red-500 p-3 rounded-full">
+                      <Flame className="w-8 h-8 text-white animate-bounce" />
+                    </div>
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
+                      Informações do Fogo
+                    </h2>
+                    <p className="text-gray-400 mt-1">Sua jornada de leitura diária</p>
+                  </div>
+                </div>
+                {/* <button
+                  onClick={() => setIsOpenDetailsModal(false)}
+                  className="p-2 hover:bg-gray-700/50 rounded-full transition-colors"
+                >
+                  <X className="w-6 h-6 text-gray-400" />
+                </button> */}
+              </div>
+            </div>
+
+            {/* Estatísticas principais */}
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                {/* Streak Atual */}
+                <div className={`bg-gradient-to-br from-orange-500/20 to-red-500/20 p-6 rounded-2xl border border-orange-500/30 transform transition-all duration-700 ${animateContent ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-orange-500/20 rounded-lg">
+                      <Flame className="w-6 h-6 text-orange-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white">Fogo Atual</h3>
+                  </div>
+                  <div className="text-4xl font-bold text-orange-400 mb-2">{streakData.result.longestStreak}</div>
+                  <p className="text-gray-400 text-sm">dias consecutivos</p>
+                </div>
+
+                {/* Total de Dias */}
+                <div className={`bg-gradient-to-br from-blue-500/20 to-purple-500/20 p-6 rounded-2xl border border-blue-500/30 transform transition-all duration-700 delay-100 ${animateContent ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-blue-500/20 rounded-lg">
+                      <Calendar className="w-6 h-6 text-blue-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white">Total de Dias</h3>
+                  </div>
+                  <div className="text-4xl font-bold text-blue-400 mb-2">{streakData.result.totalDays}</div>
+                  <p className="text-gray-400 text-sm">dias de leitura</p>
+                </div>
+
+                {/* Pontos Totais */}
+                <div className={`bg-gradient-to-br from-green-500/20 to-emerald-500/20 p-6 rounded-2xl border border-green-500/30 transform transition-all duration-700 delay-200 ${animateContent ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-green-500/20 rounded-lg">
+                      <Star className="w-6 h-6 text-green-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white">Pontos Totais</h3>
+                  </div>
+                  <div className="text-4xl font-bold text-green-400 mb-2">{totalPoints}</div>
+                  {
+                    user?.user.user.role!== 'dbv' 
+                    ?
+                      <p className="text-gray-400 text-sm">
+                        pontos conquistados se você fosse desbravador
+                      </p>
+                    :
+                      <p className="text-gray-400 text-sm">
+                        pontos conquistados
+                      </p>
+                  }
+                  
+                </div>
+              </div>
+
+              {/* Histórico de Leituras */}
+              <div className={`transform transition-all duration-700 delay-300 ${animateContent ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 bg-purple-500/20 rounded-lg">
+                    <BookOpen className="w-6 h-6 text-purple-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white">Histórico de Leituras</h3>
+                </div>
+
+                <div className="grid gap-4">
+                  {streakData.result.readings.map((reading, index) => (
+                    <div
+                      key={index}
+                      className={`bg-gray-800/50 backdrop-blur-sm p-4 rounded-xl border border-gray-700/50 hover:border-gray-600/50 transition-all duration-300 transform ${
+                        animateContent ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'
+                      }`}
+                      style={{ transitionDelay: `${400 + index * 100}ms` }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="relative">
+                            <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
+                              <span className="text-white font-bold text-lg">{reading.streak}</span>
+                            </div>
+                            {index === 0 && (
+                              <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
+                                <Zap className="w-3 h-3 text-white" />
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div>
+                            <div className="text-white font-semibold">
+                              {reading.book} - Capítulo {reading.chapter}
+                            </div>
+                            <div className="text-gray-400 text-sm">
+                              {formatDate(reading.date)}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="text-right">
+                          {user?.user.user.role === 'dbv' &&
+                            <div className="text-green-400 font-semibold">
+                              +{reading.pointsEarned} pts
+                            </div>
+                          }
+                          <div className="text-gray-500 text-sm">
+                            Dia {reading.streak}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Motivação */}
+              <div className={`mt-8 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-red-500/20 p-6 rounded-2xl border border-purple-500/30 text-center transform transition-all duration-700 delay-700 ${animateContent ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+                <Trophy className="w-12 h-12 text-yellow-400 mx-auto mb-3 animate-bounce" />
+                <h3 className="text-xl font-bold text-white mb-2">Parabéns! 🎉</h3>
+                <p className="text-gray-300">
+                  Você está mantendo uma consistência incrível na sua jornada de leitura bíblica. 
+                  Continue assim e alcance novos patamares!
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Modal>
+      )}
+
         </>
     );
 }

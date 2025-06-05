@@ -289,7 +289,7 @@ export const specialtyUserService = {
   ): Promise<any> => {
     const token = localStorage.getItem('token')
     try {
-      const response = await api.put(
+      const response = await api.patch(
       `specialty-user/reject/user/${userId}/specialty/${specialtyId}`, 
       {userIdRejected, comment},
       {headers: {
