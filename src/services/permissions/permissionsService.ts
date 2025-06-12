@@ -46,6 +46,7 @@ export const routePermissions: RoutePermission[] = [
   // Especialidades
   { path: '/specialty', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   { path: '/specialty-users', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
+  { path: '/ranking-specialty', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },
   
   // Classes
   { path: '/class', allowedRoles: ['admin', 'dbv', 'director', 'lead', 'counselor', 'secretary'] },

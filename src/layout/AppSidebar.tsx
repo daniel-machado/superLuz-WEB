@@ -589,7 +589,8 @@ const navItems: NavItem[] = [
     name: "Especialidades",
     subItems: [
       { name: "Especialidades", path: "/specialty", pro: false },
-      { name: "Especialidades de membros", path: "/specialty-users", pro: false }
+      { name: "Especialidades de membros", path: "/specialty-users", pro: false },
+      { name: "Ranking de Especialidades", path: "/ranking-specialty", pro: false }
     ],
   },
   {

@@ -264,5 +264,4 @@ const RankingIndividual = () => {
   );
 };
 
-
 export default RankingIndividual;

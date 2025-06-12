@@ -49,6 +49,7 @@ import GalleryPhotos from "./pages/galeryPhotos";
 import VerificationCode from "./pages/VerificationCode";
 import ForgotPassword from "./pages/ForgotPassword";
 import Profile from "./pages/ProfileFriends/Profile";
+import RankingSpecialty from "./pages/RankingSpecialty/RankingSpecialty";
 
 export default function App() {
   const { loading } = useAuth();
@@ -107,6 +108,7 @@ export default function App() {
 
               <Route path="/specialty" element={<Specialty />} />
               <Route path="/specialty-users" element={<SpecialtyUsers />} />
+              <Route path="/ranking-specialty" element={<RankingSpecialty />} />
 
               <Route path="/quiz" element={<Quiz />} />
               <Route path="/quiz/:id/questions" element={<QuizQuestions />} />
