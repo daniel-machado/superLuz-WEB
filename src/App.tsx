@@ -50,6 +50,7 @@ import VerificationCode from "./pages/VerificationCode";
 import ForgotPassword from "./pages/ForgotPassword";
 import Profile from "./pages/ProfileFriends/Profile";
 import RankingSpecialty from "./pages/RankingSpecialty/RankingSpecialty";
+import StatisticsQuiz from './pages/StatisticsQuiz/StatisticsQuiz'
 
 export default function App() {
   const { loading } = useAuth();
@@ -109,6 +110,7 @@ export default function App() {
               <Route path="/specialty" element={<Specialty />} />
               <Route path="/specialty-users" element={<SpecialtyUsers />} />
               <Route path="/ranking-specialty" element={<RankingSpecialty />} />
+              <Route path="/statistics-quiz" element={<StatisticsQuiz />} />
 
               <Route path="/quiz" element={<Quiz />} />
               <Route path="/quiz/:id/questions" element={<QuizQuestions />} />

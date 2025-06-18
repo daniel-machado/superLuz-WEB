@@ -526,7 +526,7 @@ import {
   BoxCubeIcon,
   CalenderIcon,
   ChevronDownIcon,
-  GridIcon,
+  //GridIcon,
   HorizontaLDots,
   ListIcon,
   PageIcon,
@@ -539,6 +539,7 @@ import { useSidebar } from '../context/SidebarContext'
 //import SidebarWidget from "./SidebarWidget";
 import { useAuth } from "../context/AuthContext";
 import { hasMenuPermission, hasRoutePermission } from "../services/permissions/permissionsService";
+import { GroupIcon, HomeIcon, LucideDatabase, NotebookPen, PaperclipIcon, PenSquare, PointerOffIcon, TestTube, User2, User2Icon } from "lucide-react";
 
 type NavItem = {
   name: string;
@@ -549,17 +550,17 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   {
-    icon: <GridIcon />,
+    icon: <HomeIcon />,
     name: "Início",
     path: "/home",
   },
   {
-    icon: <UserCircleIcon />,
+    icon: <GroupIcon />,
     name: "Unidades",
     path: "/units",
   },
   {
-    icon: <UserCircleIcon />,
+    icon: <PaperclipIcon />,
     name: "Avaliação De Unidades",
     subItems: [
       { name: "Avaliação de Unidades", path: "/evaluation-units", pro: false },
@@ -577,7 +578,7 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    icon: <UserCircleIcon />,
+    icon: <LucideDatabase />,
     name: "Rankings",
     subItems: [
       { name: "Ranking Individual", path: "/ranking-individual", pro: false },
@@ -585,16 +586,17 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    icon: <UserCircleIcon />,
+    icon: <TestTube />,
     name: "Especialidades",
     subItems: [
       { name: "Especialidades", path: "/specialty", pro: false },
       { name: "Especialidades de membros", path: "/specialty-users", pro: false },
-      { name: "Ranking de Especialidades", path: "/ranking-specialty", pro: false }
+      { name: "Ranking de Especialidades", path: "/ranking-specialty", pro: false },
+      { name: "Estatísticas de Quiz", path: "/statistics-quiz", pro: false }
     ],
   },
   {
-    icon: <UserCircleIcon />,
+    icon: <NotebookPen />,
     name: "Classes",
     subItems: [
       { name: "Classes", path: "/class", pro: false },
@@ -602,19 +604,19 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    icon: <UserCircleIcon />,
+    icon: <PenSquare />,
     name: "Quiz",
     path: "/quiz",
   },
   {
-    icon: <GridIcon />,
+    icon: <User2Icon />,
     name: "Usuários",
     subItems: [
       { name: "Todos os Usuários", path: "/users", pro: false },
     ],
   },
   {
-    icon: <CalenderIcon />,
+    icon: <User2 />,
     name: "Usuários Pendentes",
     path: "/users-pending",
   },
@@ -624,7 +626,7 @@ const navItems: NavItem[] = [
     path: "/calendar",
   },
   {
-    icon: <UserCircleIcon />,
+    icon: <PointerOffIcon />,
     name: "User Profile",
     path: "/profile",
   },

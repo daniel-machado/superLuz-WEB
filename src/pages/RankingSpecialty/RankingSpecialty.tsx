@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Award, Star, Trophy, Crown, User, X, Loader2, Clock, CheckCircle } from "lucide-react";
 import { specialtyUserService } from "../../services/specialtyUserService";
 import toast from "react-hot-toast";
+import { Modal } from "../../components/ui/modal";
 
 
 // Interfaces
@@ -85,6 +86,7 @@ const SpecialtyDetailModal = ({ user, isOpen, onClose }: { user: RankedUser | nu
 
 
   return (
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] m-4">
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-70 backdrop-blur-sm"
       initial={{ opacity: 0 }}
@@ -209,7 +211,7 @@ const SpecialtyDetailModal = ({ user, isOpen, onClose }: { user: RankedUser | nu
           </motion.h3>
           
           {currentSpecialties.length > 0 ? (
-            <div className="max-h-96 overflow-y-auto pr-2 custom-scrollbar scrollbar-thumb-gray-600 scrollbar-track-gray-800">
+            <div className="max-h-96 overflow-y-auto pt-3 pr-3 custom-scrollbar scrollbar-thumb-gray-600 scrollbar-track-gray-800">
               <motion.div
                 key={activeTab}
                 initial={{ opacity: 0 }}
@@ -297,6 +299,7 @@ const SpecialtyDetailModal = ({ user, isOpen, onClose }: { user: RankedUser | nu
         </div>
       </motion.div>
     </motion.div>
+    </Modal>
   );
 };
 
@@ -340,11 +343,13 @@ const SpecialtyRanking = () => {
       if (item.approvalStatus === 'approved') {
         user.approvedSpecialties.push(item);
         user.count = user.approvedSpecialties.length;
-      } else if (item.approvalStatus === 'pending') {
+      } else {
         user.pendingSpecialties.push(item);
       }
+      // } else if (item.approvalStatus === 'pending') {
+      //   user.pendingSpecialties.push(item);
+      // }
     });
-
 
     return Array.from(userMap.values())
       .filter(user => user.count > 0) // Only users with at least 1 approved specialty
