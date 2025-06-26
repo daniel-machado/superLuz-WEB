@@ -9,8 +9,7 @@ import { specialtyService } from '../services/specialtyService';
 import { classService } from '../services/classService';
 import { UserRole } from '../services/permissions/permissionsService';
 import toast from 'react-hot-toast';
-
-
+import { jwtDecode } from 'jwt-decode';
 
 
 export interface UserResponseDTO {
@@ -286,9 +285,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
  
     try {
-      const decoded = JSON.parse(atob(token.split(".")[1]));
-      const isExpired = decoded.exp * 1000 < Date.now();
- 
+      // Decodifica o token JWT para verificar a expiração
+      //const decoded = JSON.parse(atob(token.split(".")[1]));
+      const decoded: { exp?: number } = jwtDecode(token);
+
+      const isExpired = decoded.exp !== undefined ? decoded.exp * 1000 < Date.now() : true;
+      
       if (isExpired) {
         console.warn("Token expirado, tentando renovar...");
         refreshAuthToken();
