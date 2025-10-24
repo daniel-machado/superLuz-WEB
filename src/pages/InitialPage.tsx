@@ -246,6 +246,15 @@ const Hero = () => {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 leading-tight"
         >
+<div className="mt-12 text-center">
+  <Link
+    to="/cup"
+    className="px-4 py-1.5 border border-orange-500 text-orange-500 hover:bg-orange-500/10 font-medium rounded-md transition-all duration-300 transform hover:scale-105 inline-block text-xs"
+  >
+    Copa Ordem Unida
+  </Link>
+</div>
+
           <span className="text-green-600">Desbravadores Luzeiros do Norte</span>
           <br />
           <span className="text-3xl sm:text-4xl md:text-5xl">Aventura, Amizade e Crescimento</span>
@@ -499,6 +508,15 @@ const Atividades = () => {
             Ver Nossa Galeria
           </Link>
         </div>
+
+        <div className="mt-16 text-center">
+          <Link
+            to="/cup"
+            className="px-8 py-3 bg-green-500 hover:bg-green-400 text-gray-900 font-medium rounded-lg transition-colors duration-300 transform hover:scale-105 inline-block"
+          >
+            Copa Ordem Unida
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -659,15 +677,21 @@ const Galeria = () => {
           ))}
         </div>
 
-
-
-
         <div className="mt-12 text-center">
           <Link
             to="/gallery"
             className="px-8 py-3 border-2 border-green-500 text-green-500 hover:bg-green-500/10 font-medium rounded-lg transition-colors duration-300 transform hover:scale-105 inline-block"
           >
             Ver Mais Fotos
+          </Link>
+        </div>
+
+        <div className="mt-12 text-center">
+          <Link
+            to="/cup"
+            className="px-8 py-3 border-2 border-green-500 text-green-500 hover:bg-green-500/10 font-medium rounded-lg transition-colors duration-300 transform hover:scale-105 inline-block"
+          >
+            Copa Ordem Unida
           </Link>
         </div>
       </div>

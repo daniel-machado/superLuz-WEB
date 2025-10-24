@@ -51,6 +51,9 @@ import ForgotPassword from "./pages/ForgotPassword";
 import Profile from "./pages/ProfileFriends/Profile";
 import RankingSpecialty from "./pages/RankingSpecialty/RankingSpecialty";
 import StatisticsQuiz from './pages/StatisticsQuiz/StatisticsQuiz'
+import TournamentStandings from "./pages/TournamentStandings";
+import GroupsManager from "./pages/GroupManagerCup/GroupManager";
+import PlayersManager from "./pages/PlayerManagerCup/PlayerManager";
 
 export default function App() {
   const { loading } = useAuth();
@@ -158,6 +161,14 @@ export default function App() {
           {/* Auth Layout */}
           <Route index path="/" element={<InitialPage />} />
           <Route path="/gallery" element={<GalleryPhotos />} />
+          
+          <Route path="/cup" element={<TournamentStandings />} />
+
+          <Route path="/manage-group" element={<GroupsManager />} />
+          <Route path="/manage-player" element={<PlayersManager />} />
+
+
+          
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/sign-up" element={<SignUp />} />
 
