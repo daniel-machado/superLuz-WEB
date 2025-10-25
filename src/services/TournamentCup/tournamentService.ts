@@ -166,6 +166,36 @@ export const tournamentService = {
         throw new Error(`Erro ao buscar partidas por fase: ${error.message || "Erro ao conectar com o servidor"}`);
       }
     }
+  },
+   
+  // tournamentService.ts - Adicione este método na seção "MANAGE MATCHES"
+
+finishMatch: async (matchId: string, payload: {
+  winnerId: string;
+  winnerScore: number;
+  loserScore: number;
+  judges: string;
+  // Adicione outros campos que você está enviando no payload
+}): Promise<any> => {
+  const token = localStorage.getItem('token');
+  try {
+    const response = await api.post(`matches/${matchId}/finish`, payload, {
+      headers: { 
+        Authorization: `Bearer ${token}`
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if(error.response && error.response.data){
+      const errorMessage = error.response.data.error 
+        || error.response.data.message 
+        || 'Erro ao finalizar partida';
+      throw new Error(errorMessage);
+    } else {
+      console.error("Erro ao finalizar partida", error.message);
+      throw new Error(`Erro ao finalizar partida: ${error.message || "Erro ao conectar com o servidor"}`);
+    }
   }
+},
 
 };
