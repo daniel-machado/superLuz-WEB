@@ -398,7 +398,8 @@ const TournamentStandings = () => {
                             <th className="text-left py-1 px-1 text-gray-400 text-xs font-medium w-6">#</th>
                             <th className="text-left py-1 px-1 text-gray-400 text-xs font-medium">Jogador</th>
                             <th className="text-center py-1 px-1 text-gray-400 text-xs font-medium w-10">PTS</th>
-                            <th className="text-center py-1 px-1 text-gray-400 text-xs font-medium w-6">J</th>
+                            <th className="text-center py-1 px-1 text-gray-400 text-xs font-medium w-6">P</th>
+                            <th className="text-center py-1 px-1 text-gray-400 text-xs font-medium w-6">ERR</th>
                             <th className="text-center py-1 px-1 text-gray-400 text-xs font-medium w-16">V-E-D</th>
                             <th className="text-center py-1 px-1 text-gray-400 text-xs font-medium w-10">SG</th>
                           </tr>
@@ -509,6 +510,13 @@ const TournamentStandings = () => {
                               <td className="text-center py-2 px-1">
                                 <span className="text-gray-300 text-xs font-medium">
                                   {standing.matchesPlayed}
+                                </span>
+                              </td>
+
+                              {/* Jogos */}
+                              <td className="text-center py-2 px-1">
+                                <span className="text-gray-300 text-xs font-medium">
+                                  {standing.totalErrors}
                                 </span>
                               </td>
 
@@ -627,7 +635,8 @@ const TournamentStandings = () => {
                         <th className="text-left py-2 px-1 text-gray-400 text-xs font-medium">Jogador</th>
                         <th className="text-center py-2 px-1 text-gray-400 text-xs font-medium w-12">Grupo</th>
                         <th className="text-center py-2 px-1 text-gray-400 text-xs font-medium w-10">PTS</th>
-                        <th className="text-center py-2 px-1 text-gray-400 text-xs font-medium w-6">J</th>
+                        <th className="text-center py-2 px-1 text-gray-400 text-xs font-medium w-6">P</th>
+                        <th className="text-center py-2 px-1 text-gray-400 text-xs font-medium w-6">ERR</th>
                         <th className="text-center py-2 px-1 text-gray-400 text-xs font-medium w-14">V-E-D</th>
                         <th className="text-center py-2 px-1 text-gray-400 text-xs font-medium w-12">SG</th>
                         <th className="text-center py-2 px-1 text-gray-400 text-xs font-medium w-12">%</th>
@@ -781,6 +790,13 @@ const TournamentStandings = () => {
                           <td className="text-center py-3 px-1">
                             <span className="text-gray-300 text-sm font-medium bg-gray-700/50 rounded px-2 py-1 inline-block min-w-[2rem]">
                               {standing.matchesPlayed}
+                            </span>
+                          </td>
+
+                           {/* Erros */}
+                          <td className="text-center py-3 px-1">
+                            <span className="text-gray-300 text-sm font-medium rounded px-2 py-1 inline-block min-w-[2rem]">
+                              {standing.totalErrors}
                             </span>
                           </td>
 

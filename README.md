@@ -119,3 +119,6 @@ Este projeto está sob a licença **MIT** — sinta-se livre para usar e modific
 
 📦 **Autor:** Daniel Machado  
 💡 *Desenvolvido com foco em performance, clareza e escalabilidade.*
+
+
+
