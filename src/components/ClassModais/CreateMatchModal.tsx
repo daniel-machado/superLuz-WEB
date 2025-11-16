@@ -151,8 +151,8 @@ export const CreateMatchModal = ({
           b.goalsFor - a.goalsFor
         );
         
-        // Pegar os 2 primeiros de cada grupo
-        const topGroupPlayers = sortedStandings.slice(0, 2);
+        // Pegar os 3 primeiros de cada grupo
+        const topGroupPlayers = sortedStandings.slice(0, 3);
         topGroupPlayers.forEach(standing => {
           topPlayers.push({
             id: standing.playerId,
